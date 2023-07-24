@@ -28,23 +28,23 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 
-public class ExcelHelperReflection<T>   {
+public class ExcelHelper<T>   {
 
     private static final  String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private static final   String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private  final String sheetName;
     private final ReflectionUtil<T> reflectionUtil;
 
-    private ExcelHelperReflection(Class<T> type, AnnotationType annotationType) {
+    private ExcelHelper(Class<T> type, AnnotationType annotationType) {
             reflectionUtil = annotationType.equals(AnnotationType.FIELDS)?
                                new FieldsReflectionUtil<>(type)
                               :new ConstructorReflectionUtil<>(type);
         sheetName =type.getSimpleName()+"-"+ LocalDate.now();
     }
-    public static<T> ExcelHelperReflection<T> create(Class<T> type, AnnotationType annotationType) {
-        return new ExcelHelperReflection<>(type,annotationType);
+    public static<T> ExcelHelper<T> create(Class<T> type, AnnotationType annotationType) {
+        return new ExcelHelper<>(type,annotationType);
     }
-    public static<T> ExcelHelperReflection<T> create(Class<T> type) {
+    public static<T> ExcelHelper<T> create(Class<T> type) {
         return create(type,AnnotationType.FIELDS);
     }
     public List<T> excelToList(MultipartFile file) {

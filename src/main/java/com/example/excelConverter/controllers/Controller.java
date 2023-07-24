@@ -1,6 +1,6 @@
 package com.example.excelConverter.controllers;
 
-import com.example.excelConverter.excel.ExcelHelperReflection;
+import com.example.excelConverter.excel.ExcelHelper;
 import com.example.excelConverter.models.Category;
 import com.example.excelConverter.models.Product;
 import org.springframework.core.io.InputStreamResource;
@@ -19,17 +19,17 @@ import java.util.stream.IntStream;
 @RestController
 @RequestMapping("/excel/products")
 public class Controller {
-    private final ExcelHelperReflection<Product> excelHelperReflection = ExcelHelperReflection.create(Product.class);
+    private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class);
 
     @GetMapping
     public List<Product> excelToProducts(@RequestParam MultipartFile file){
-      return excelHelperReflection.excelToList(file);
+      return excelHelper.excelToList(file);
     }
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource>
     downloadExcelFromProducts() {
          String filename = "products-" + LocalDate.now() + ".xlsx";
-        InputStreamResource file = new InputStreamResource(excelHelperReflection.listToExcel(getProducts()));
+        InputStreamResource file = new InputStreamResource(excelHelper.listToExcel(getProducts()));
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                 .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
