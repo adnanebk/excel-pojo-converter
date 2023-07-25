@@ -18,6 +18,8 @@ public class ConstructorReflectionUtil<T> extends ReflectionUtil<T> {
         super(classType);
         this.constructor = getArgsConstructor();
         setFields(Arrays.asList(constructor.getAnnotation(ANNOTATION).titles()).iterator());
+        setGettersAndSetters();
+
     }
 
 

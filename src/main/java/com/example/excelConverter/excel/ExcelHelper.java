@@ -39,7 +39,7 @@ public class ExcelHelper<T>   {
             reflectionUtil = annotationType.equals(AnnotationType.FIELDS)?
                                new FieldsReflectionUtil<>(type)
                               :new ConstructorReflectionUtil<>(type);
-        sheetName =type.getSimpleName()+"-"+ LocalDate.now();
+        sheetName = type.getSimpleName()+"-"+ LocalDate.now();
     }
     public static<T> ExcelHelper<T> create(Class<T> type, AnnotationType annotationType) {
         return new ExcelHelper<>(type,annotationType);
@@ -141,7 +141,7 @@ public class ExcelHelper<T>   {
     private void fillRowWithObject(Row row, T obj) {
         int  cellIndex = 0;
         for(var field : reflectionUtil.getFields()){
-            Object fieldValue = reflectionUtil.getFieldValue(obj,field);
+            Object fieldValue = reflectionUtil.getFieldValue(obj,cellIndex);
             if(reflectionUtil.isNumberType(field))
                 row.createCell(cellIndex).setCellValue(Double.parseDouble(fieldValue.toString()));
             else if (reflectionUtil.isStringValue(field))

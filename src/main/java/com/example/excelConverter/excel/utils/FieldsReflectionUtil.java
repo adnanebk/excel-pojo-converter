@@ -14,6 +14,7 @@ public class FieldsReflectionUtil<T> extends ReflectionUtil<T> {
     public FieldsReflectionUtil(Class<T> classType) {
         super(classType);
         setFields();
+        setGettersAndSetters();
     }
 
 

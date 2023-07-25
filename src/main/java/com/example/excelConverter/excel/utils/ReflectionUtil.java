@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,6 +28,8 @@ public abstract class ReflectionUtil<T> {
 
     private final Set<String> numberTypes = new HashSet<>(Arrays.asList(int.class.getName(), long.class.getName(), double.class.getName(),short.class.getName()));
     private final Constructor<T> defaultConstructor;
+    private List<Method> setters= new ArrayList<>();
+    private List<Method> getters = new ArrayList<>();
 
     protected ReflectionUtil(Class<T> type) {
         classType=type;
@@ -42,6 +45,19 @@ public abstract class ReflectionUtil<T> {
         }
     }
 
+    protected void setGettersAndSetters() {
+        fields.forEach(field -> {
+            String fieldName = field.name();
+            try {
+                setters.add(classType.getDeclaredMethod("set"+Character.toUpperCase(fieldName.charAt(0))+fieldName.substring(1),field.type()));
+                getters.add(classType.getDeclaredMethod((field.type().equals(boolean.class)?"is":"get")+Character.toUpperCase(fieldName.charAt(0))+fieldName.substring(1)));
+            } catch (NoSuchMethodException e) {
+                throw new ReflectionException(e.getMessage());
+            }
+        });
+  
+    }
+
     public abstract List<Field> getFields();
 
 
@@ -51,25 +67,8 @@ public abstract class ReflectionUtil<T> {
             return numberTypes.contains(fieldType.getName());
         return Number.class.isAssignableFrom(fieldType);
     }
+    
 
-    public   Object getFieldValue(T obj, Field field) {
-        try {
-            String fieldName=field.name();
-            return obj.getClass().getDeclaredMethod((field.type().equals(boolean.class)?"is":"get")+Character.toUpperCase(fieldName.charAt(0))+fieldName.substring(1)).invoke(obj);
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new ReflectionException(e.getMessage());
-        }
-
-    }
-    public void setValue(T obj, Field field, Object value){
-        try {
-          if(value!=null)
-            obj.getClass().getDeclaredMethod("set"+Character.toUpperCase(field.name().charAt(0))+field.name().substring(1),field.type()).invoke(obj,value);
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new ReflectionException(e.getMessage());
-        }
-
-    }
 
     public  boolean isStringValue(Field field){
         return field.type().equals(String.class);
@@ -107,14 +106,13 @@ public abstract class ReflectionUtil<T> {
     public  T getInstance(Object... values){
         try {
             T obj =  defaultConstructor.newInstance();
-            int i =0;
-            for (Field field : fields) {
-                setValue(obj, field, values[i++]);
+            for (int i = 0; i < fields.size(); i++) {
+                setters.get(i).invoke(obj,values[i]);
             }
             return obj;
         }
         catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new ReflectionException("Something bad happened when reading the file");
+            throw new ReflectionException(e.getMessage());
         }
     }
     public Optional<String> dateFormat(){
@@ -128,6 +126,14 @@ public abstract class ReflectionUtil<T> {
             return str.toLowerCase().equals(str)?str:StringUtils
                     .uncapitalize(str.replaceAll("([a-z])([A-Z]+)", "$1 $2").toLowerCase());
         return str;
+    }
+
+    public Object getFieldValue(T obj,int index) {
+        try {
+            return getters.get(index).invoke(obj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new ReflectionException(e.getMessage());
+        }
     }
 }
 
