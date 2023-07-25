@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 @RestController
-@RequestMapping("/excel/products")
+@RequestMapping("products")
 public class Controller {
     private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class);
 
@@ -28,7 +28,7 @@ public class Controller {
     public List<Product> excelToProducts(@RequestParam MultipartFile file){
       return excelHelper.excelToList(file);
     }
-    @GetMapping("/download")
+    @GetMapping("/excel")
     public ResponseEntity<InputStreamResource>
     downloadExcelFromProducts() {
          String filename = "products-" + LocalDate.now() + ".xlsx";
