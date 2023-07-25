@@ -84,34 +84,28 @@ public class ExcelHelper<T>   {
             if (reflectionUtil.isNumberType(field))
                 return getValueAsNumber(cell,field);
             else if (reflectionUtil.isStringValue(field))
-                return getValueAsString(cell);
+                return cell.getStringCellValue();
             else if (reflectionUtil.isBooleanValue(field))
                 return cell.getBooleanCellValue();
             else if (reflectionUtil.isEnumValue(field))
-                return Enum.valueOf(field.type().asSubclass(Enum.class),getValueAsString(cell));
+                return Enum.valueOf(field.type().asSubclass(Enum.class),cell.getStringCellValue());
             else if (reflectionUtil.isDateValue(field))
-                return reflectionUtil.dateFormatter.parse(getValueAsString(cell));
+                return reflectionUtil.dateFormatter.parse(cell.getStringCellValue());
             else if (reflectionUtil.isLocalDateValue(field))
-                return LocalDate.parse(getValueAsString(cell),reflectionUtil.localedDateFormatter);
+                return LocalDate.parse(cell.getStringCellValue(),reflectionUtil.localedDateFormatter);
             else if (reflectionUtil.isLocalDateTimeValue(field))
-                return LocalDateTime.parse(getValueAsString(cell),reflectionUtil.localedDateTimeFormatter);
+                return LocalDateTime.parse(cell.getStringCellValue(),reflectionUtil.localedDateTimeFormatter);
             else if (reflectionUtil.isZonedDateValue(field))
-                return ZonedDateTime.parse(getValueAsString(cell),reflectionUtil.zonedDateTimeFormatter);
-        } catch (ParseException e) {
-            throw new ExcelValidationException("------"+field.name());
+                return ZonedDateTime.parse(cell.getStringCellValue(),reflectionUtil.zonedDateTimeFormatter);
+        } 
+        catch (ParseException | IllegalStateException e ) {
+            throw new ExcelValidationException(String.format("Invalid format in row %s, column %s",cell.getRowIndex()+1,ALPHABET.charAt(cell.getColumnIndex())));
         }
         throw new ExcelFileException("Can't find a corresponding type of the cell");
     }
 
 
-    private String getValueAsString(Cell cell) {
-        if(!cell.getCellType().equals(CellType.STRING))
-            throw new ExcelValidationException(String.format("type for the cell at row %s and column %s should be in string format",cell.getRowIndex()+1,ALPHABET.charAt(cell.getColumnIndex())));
-        return cell.getStringCellValue();
-    }
     private Number getValueAsNumber(Cell cell, Field field) {
-        if(!cell.getCellType().equals(CellType.NUMERIC))
-            throw new ExcelValidationException(String.format("type for the cell at row %s and column %s should be in numeric format",cell.getRowIndex(),ALPHABET.charAt(cell.getColumnIndex())));
         if (reflectionUtil.isIntegerValue(field))
             return (int) cell.getNumericCellValue();
         else if (reflectionUtil.isLongValue(field))
