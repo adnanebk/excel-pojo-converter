@@ -1,6 +1,9 @@
 package com.example.excelConverter.controllers;
 
 import com.example.excelConverter.excel.ExcelHelper;
+import com.example.excelConverter.excel.exceptions.ExcelFileException;
+import com.example.excelConverter.excel.exceptions.ExcelValidationException;
+import com.example.excelConverter.excel.exceptions.ReflectionException;
 import com.example.excelConverter.models.Category;
 import com.example.excelConverter.models.Product;
 import org.springframework.core.io.InputStreamResource;
@@ -53,5 +56,11 @@ public class Controller {
                 .zonedDateTime(ZonedDateTime.now())
                 .promoPrice(90.5)
                 .minPrice(50.4).build();
+    }
+
+    @ExceptionHandler(value = { ReflectionException.class, ExcelValidationException.class, ExcelFileException.class })
+    protected ResponseEntity<?> handleExceptions(
+            RuntimeException ex) {
+           return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }
