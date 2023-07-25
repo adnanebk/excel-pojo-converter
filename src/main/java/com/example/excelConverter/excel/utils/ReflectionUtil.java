@@ -107,7 +107,8 @@ public abstract class ReflectionUtil<T> {
         try {
             T obj =  defaultConstructor.newInstance();
             for (int i = 0; i < fields.size(); i++) {
-                setters.get(i).invoke(obj,values[i]);
+                if(values[i]!=null)
+                 setters.get(i).invoke(obj,values[i]);
             }
             return obj;
         }
