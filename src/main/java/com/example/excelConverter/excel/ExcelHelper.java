@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 
@@ -36,10 +38,11 @@ public class ExcelHelper<T>   {
     private final ReflectionUtil<T> reflectionUtil;
 
     private ExcelHelper(Class<T> type, AnnotationType annotationType) {
-            reflectionUtil = annotationType.equals(AnnotationType.FIELDS)?
-                               new FieldsReflectionUtil<>(type)
-                              :new ConstructorReflectionUtil<>(type);
+        reflectionUtil = annotationType.equals(AnnotationType.FIELDS)?
+                new FieldsReflectionUtil<>(type)
+                :new ConstructorReflectionUtil<>(type);
         sheetName = type.getSimpleName()+"-"+ LocalDate.now();
+
     }
     public static<T> ExcelHelper<T> create(Class<T> type, AnnotationType annotationType) {
         return new ExcelHelper<>(type,annotationType);
@@ -70,12 +73,12 @@ public class ExcelHelper<T>   {
 
     private T rowToObject(Row currentRow) {
         int i = 0;
-            Object[] values = new Object[reflectionUtil.getFields().size()];
-           for(Field field : reflectionUtil.getFields()){
-               values[i] = getCurrentCell(i++, currentRow).map(cell -> getCellValue(cell, field))
-                           .orElse(null);
-           }
-       return reflectionUtil.getInstance(values);
+        Object[] values = new Object[reflectionUtil.getFields().size()];
+        for(Field field : reflectionUtil.getFields()){
+            values[i] = getCurrentCell(i++, currentRow).map(cell -> getCellValue(cell, field))
+                    .orElse(null);
+        }
+        return reflectionUtil.getInstance(values);
 
     }
 
@@ -83,26 +86,33 @@ public class ExcelHelper<T>   {
         try {
             if (reflectionUtil.isNumberType(field))
                 return getValueAsNumber(cell,field);
-            else if (reflectionUtil.isStringValue(field))
+            if (reflectionUtil.isStringValue(field))
                 return cell.getStringCellValue();
-            else if (reflectionUtil.isBooleanValue(field))
+            if (reflectionUtil.isBooleanValue(field))
                 return cell.getBooleanCellValue();
-            else if (reflectionUtil.isEnumValue(field))
-                return Enum.valueOf(field.type().asSubclass(Enum.class),cell.getStringCellValue());
-            else if (reflectionUtil.isDateValue(field))
+            if (reflectionUtil.isEnumValue(field))
+                return Enum.valueOf(field.type().asSubclass(Enum.class),cell.getStringCellValue().toUpperCase().trim());
+            if(cell.getCellType().equals(CellType.NUMERIC)) {
+                if(reflectionUtil.isAnyDateTimeValue(field))
+                    cell.setCellValue(reflectionUtil.localedDateTimeFormatter.format(DateUtil.getLocalDateTime(cell.getNumericCellValue())));
+                else cell.setCellValue(reflectionUtil.localedDateFormatter.format(DateUtil.getLocalDateTime(cell.getNumericCellValue())));
+            }
+            if (reflectionUtil.isDateValue(field))
                 return reflectionUtil.dateFormatter.parse(cell.getStringCellValue());
-            else if (reflectionUtil.isLocalDateValue(field))
+            if (reflectionUtil.isLocalDateValue(field))
                 return LocalDate.parse(cell.getStringCellValue(),reflectionUtil.localedDateFormatter);
-            else if (reflectionUtil.isLocalDateTimeValue(field))
+            if (reflectionUtil.isLocalDateTimeValue(field))
                 return LocalDateTime.parse(cell.getStringCellValue(),reflectionUtil.localedDateTimeFormatter);
-            else if (reflectionUtil.isZonedDateValue(field))
+            if (reflectionUtil.isZonedDateValue(field))
                 return ZonedDateTime.parse(cell.getStringCellValue(),reflectionUtil.zonedDateTimeFormatter);
-        } 
+        }
         catch (ParseException | IllegalStateException e ) {
             throw new ExcelValidationException(String.format("Invalid format in row %s, column %s",cell.getRowIndex()+1,ALPHABET.charAt(cell.getColumnIndex())));
         }
         throw new ExcelFileException("Can't find a corresponding type of the cell");
     }
+
+
 
 
     private Number getValueAsNumber(Cell cell, Field field) {
@@ -160,7 +170,7 @@ public class ExcelHelper<T>   {
 
 
 
-     private boolean hasExcelFormat(MultipartFile file) {
+    private boolean hasExcelFormat(MultipartFile file) {
         return TYPE.equals(file.getContentType());
     }
 
@@ -188,12 +198,13 @@ public class ExcelHelper<T>   {
     }
 
 
-     private Optional<Cell> getCurrentCell(int colIndex, Row currentRow) {
+    private Optional<Cell> getCurrentCell(int colIndex, Row currentRow) {
         return Optional.ofNullable(currentRow.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
     }
-     private void skipRow(Iterator<Row> rows) {
+    private void skipRow(Iterator<Row> rows) {
         if (rows.hasNext())
             rows.next();
     }
+
 
 }

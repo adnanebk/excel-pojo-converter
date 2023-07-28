@@ -67,9 +67,11 @@ public abstract class ReflectionUtil<T> {
             return numberTypes.contains(fieldType.getName());
         return Number.class.isAssignableFrom(fieldType);
     }
-    
 
 
+    public boolean isAnyDateTimeValue(Field field) {
+        return isLocalDateTimeValue(field) || isDateValue(field);
+    }
     public  boolean isStringValue(Field field){
         return field.type().equals(String.class);
     }
