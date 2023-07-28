@@ -87,7 +87,7 @@ public class ExcelHelper<T>   {
             if (reflectionUtil.isNumberType(field))
                 return getValueAsNumber(cell,field);
             if (reflectionUtil.isStringValue(field))
-                return cell.getStringCellValue();
+                return cell.getStringCellValue().trim();
             if (reflectionUtil.isBooleanValue(field))
                 return cell.getBooleanCellValue();
             if (reflectionUtil.isEnumValue(field))
