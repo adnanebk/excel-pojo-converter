@@ -56,15 +56,15 @@ public class ExcelHelper<T>   {
         try(InputStream is = file.getInputStream();
             Workbook workbook = new XSSFWorkbook(is)
         ) {
-            List<T> products = new ArrayList<>();
+            List<T> objects = new ArrayList<>();
             Iterator<Row> rows = workbook.getSheetAt(0).iterator();
             // skip header
             skipRow(rows);
             rows.forEachRemaining(currentRow->{
                 if (hasAnyCell(currentRow))
-                    products.add(rowToObject(currentRow));
+                    objects.add(rowToObject(currentRow));
             });
-            return products;
+            return objects;
         }
         catch (IOException e) {
             throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
