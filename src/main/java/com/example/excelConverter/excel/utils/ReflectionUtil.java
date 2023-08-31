@@ -58,7 +58,9 @@ public abstract class ReflectionUtil<T> {
   
     }
 
-    public abstract List<Field> getFields();
+    public  List<Field> getFields(){
+        return fields;
+    }
 
 
     public boolean isNumberType(Field field){

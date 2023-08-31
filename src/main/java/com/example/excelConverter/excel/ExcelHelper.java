@@ -21,13 +21,10 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
 
 public class ExcelHelper<T>   {
@@ -39,8 +36,7 @@ public class ExcelHelper<T>   {
 
     private ExcelHelper(Class<T> type, AnnotationType annotationType) {
         reflectionUtil = annotationType.equals(AnnotationType.FIELDS)?
-                new FieldsReflectionUtil<>(type)
-                :new ConstructorReflectionUtil<>(type);
+                new FieldsReflectionUtil<>(type) :new ConstructorReflectionUtil<>(type);
         sheetName = type.getSimpleName()+"-"+ LocalDate.now();
 
     }
@@ -56,15 +52,13 @@ public class ExcelHelper<T>   {
         try(InputStream is = file.getInputStream();
             Workbook workbook = new XSSFWorkbook(is)
         ) {
-            List<T> objects = new ArrayList<>();
-            Iterator<Row> rows = workbook.getSheetAt(0).iterator();
-            // skip header
-            skipRow(rows);
-            rows.forEachRemaining(currentRow->{
-                if (hasAnyCell(currentRow))
-                    objects.add(rowToObject(currentRow));
-            });
-            return objects;
+            Sheet sheet = workbook.getSheetAt(0);
+           return StreamSupport.stream(sheet.spliterator(),false)
+                     .skip(1)
+                     .filter(this::hasAnyCell)
+                     .map(this::rowToObject)
+                     .toList();
+
         }
         catch (IOException e) {
             throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
@@ -72,9 +66,10 @@ public class ExcelHelper<T>   {
     }
 
     private T rowToObject(Row currentRow) {
-        int i = 0;
-        Object[] values = new Object[reflectionUtil.getFields().size()];
-        for(Field field : reflectionUtil.getFields()){
+        List<Field> fields = reflectionUtil.getFields();
+        Object[] values = new Object[fields.size()];
+        for (int i = 0; i < fields.size(); i++) {
+            Field field = fields.get(i);
             values[i] = getCurrentCell(i++, currentRow).map(cell -> getCellValue(cell, field))
                     .orElse(null);
         }
@@ -130,11 +125,10 @@ public class ExcelHelper<T>   {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = createSheet(sheetName,workbook, reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new));
-            int rowIdx = 1;
-            for(T obj:list){
-                fillRowWithObject(sheet.createRow(rowIdx++), obj);
+            for(int i=0;i<list.size();i++){
+                fillRowFromObject(sheet.createRow(i), list.get(i));
             }
-            IntStream.range(0,reflectionUtil.getFields().size()).forEach(sheet::autoSizeColumn);
+            autoSizeColumns(sheet);
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
@@ -142,27 +136,31 @@ public class ExcelHelper<T>   {
         }
     }
 
-    private void fillRowWithObject(Row row, T obj) {
-        int  cellIndex = 0;
-        for(var field : reflectionUtil.getFields()){
-            Object fieldValue = reflectionUtil.getFieldValue(obj,cellIndex);
-            if(reflectionUtil.isNumberType(field))
-                row.createCell(cellIndex).setCellValue(Double.parseDouble(fieldValue.toString()));
+    private void autoSizeColumns(Sheet sheet) {
+        IntStream.range(0,reflectionUtil.getFields().size()).forEach(sheet::autoSizeColumn);
+    }
+
+    private void fillRowFromObject(Row row, T obj) {
+        List<Field> fields = reflectionUtil.getFields();
+        for (int i = 0; i < fields.size(); i++) {
+            Field field = fields.get(i);
+            Object fieldValue = reflectionUtil.getFieldValue(obj, i);
+            if (reflectionUtil.isNumberType(field))
+                row.createCell(i).setCellValue(Double.parseDouble(fieldValue.toString()));
             else if (reflectionUtil.isStringValue(field))
-                row.createCell(cellIndex).setCellValue(fieldValue.toString());
+                row.createCell(i).setCellValue(fieldValue.toString());
             else if (reflectionUtil.isBooleanValue(field))
-                row.createCell(cellIndex).setCellValue((boolean)fieldValue);
+                row.createCell(i).setCellValue((boolean) fieldValue);
             else if (reflectionUtil.isEnumValue(field))
-                row.createCell(cellIndex).setCellValue(fieldValue.toString());
+                row.createCell(i).setCellValue(fieldValue.toString());
             else if (reflectionUtil.isDateValue(field))
-                row.createCell(cellIndex).setCellValue(reflectionUtil.dateFormatter.format(fieldValue));
+                row.createCell(i).setCellValue(reflectionUtil.dateFormatter.format(fieldValue));
             else if (reflectionUtil.isLocalDateValue(field))
-                row.createCell(cellIndex).setCellValue(reflectionUtil.localedDateFormatter.format((LocalDate) fieldValue));
+                row.createCell(i).setCellValue(reflectionUtil.localedDateFormatter.format((LocalDate) fieldValue));
             else if (reflectionUtil.isLocalDateTimeValue(field))
-                row.createCell(cellIndex).setCellValue(reflectionUtil.localedDateTimeFormatter.format((LocalDateTime) fieldValue));
+                row.createCell(i).setCellValue(reflectionUtil.localedDateTimeFormatter.format((LocalDateTime) fieldValue));
             else if (reflectionUtil.isZonedDateValue(field))
-                row.createCell(cellIndex).setCellValue(reflectionUtil.zonedDateTimeFormatter.format((ZonedDateTime) fieldValue));
-            cellIndex++;
+                row.createCell(i).setCellValue(reflectionUtil.zonedDateTimeFormatter.format((ZonedDateTime) fieldValue));
         }
 
     }
@@ -200,10 +198,6 @@ public class ExcelHelper<T>   {
 
     private Optional<Cell> getCurrentCell(int colIndex, Row currentRow) {
         return Optional.ofNullable(currentRow.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
-    }
-    private void skipRow(Iterator<Row> rows) {
-        if (rows.hasNext())
-            rows.next();
     }
 
 

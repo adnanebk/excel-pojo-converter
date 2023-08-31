@@ -1,6 +1,7 @@
 package com.example.excelConverter.excel.utils;
 
 import com.example.excelConverter.excel.annotations.ExcelConstructorParameters;
+import com.example.excelConverter.excel.exceptions.ReflectionException;
 import com.example.excelConverter.excel.models.Field;
 
 import java.lang.reflect.Constructor;
@@ -36,11 +37,8 @@ public class ConstructorReflectionUtil<T> extends ReflectionUtil<T> {
 
     private Constructor<T> getArgsConstructor() {
         return (Constructor<T>) Arrays.stream(this.classType.getDeclaredConstructors()).filter(ct -> ct.isAnnotationPresent(ExcelConstructorParameters.class))
-                .findFirst().orElseThrow(() -> new RuntimeException("Annotation ExcelColsDefinition is required in constructor"));
+                .findFirst().orElseThrow(() -> new ReflectionException("Annotation ExcelColsDefinition is required in constructor"));
     }
-    @Override
-    public List<Field> getFields() {
-        return  fields;
-    }
+
 
 }

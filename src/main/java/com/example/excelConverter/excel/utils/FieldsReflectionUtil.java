@@ -29,8 +29,5 @@ private void setFields(){
              )).toList();
 }
 
-    @Override
-    public List<Field> getFields() {
-        return  fields;
-    }
+
 }
