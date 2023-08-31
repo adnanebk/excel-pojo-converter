@@ -48,10 +48,10 @@ public class ExcelFieldsController {
         return  Product.builder()
                 .expired(true)
                 .active(false)
-                .category(Category.A)
+                .category(Category.B)
                 .unitsInStock(10)
                 .updatedDate(LocalDate.now())
-                .price(100)
+                .price(200)
                 .name("P1")
                 .createdDate(new Date())
                 .zonedDateTime(ZonedDateTime.now())
@@ -60,7 +60,7 @@ public class ExcelFieldsController {
     }
 
     @ExceptionHandler(value = { ReflectionException.class, ExcelValidationException.class, ExcelFileException.class })
-    protected ResponseEntity<?> handleExceptions(
+    protected ResponseEntity<String> handleExceptions(
             RuntimeException ex) {
            return ResponseEntity.badRequest().body(ex.getMessage());
     }

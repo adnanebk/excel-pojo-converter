@@ -60,7 +60,7 @@ public class ExcelConstructorController {
     }
 
     @ExceptionHandler(value = { ReflectionException.class, ExcelValidationException.class, ExcelFileException.class })
-    protected ResponseEntity<?> handleExceptions(
+    protected ResponseEntity<String> handleExceptions(
             RuntimeException ex) {
            return ResponseEntity.badRequest().body(ex.getMessage());
     }
