@@ -132,7 +132,8 @@ public class ExcelHelper<T>   {
     }
 
     private void autoSizeColumns(Sheet sheet) {
-       IntStream.range(0,reflectionUtil.getFields().size()).forEach(sheet::autoSizeColumn);
+        for (int i = 0; i < reflectionUtil.getFields().size(); i++)
+            sheet.autoSizeColumn(i);
     }
 
     private void fillRowFromObject(Row row, T obj) {
