@@ -2,6 +2,7 @@ package com.example.excelConverter.models;
 
 import com.example.excelConverter.excel.annotations.ExcelCol;
 import com.example.excelConverter.excel.annotations.ExcelColsDefinition;
+import com.example.excelConverter.excel.annotations.ExcelConstructorParameters;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -51,6 +52,7 @@ public class Product {
     private Category category;
 
 
+    @ExcelConstructorParameters(titles = {"Namme"})
     public Product(String name, long price, double promoPrice, Double minPrice, boolean active, Boolean expired, Integer unitsInStock, Date createdDate, LocalDate updatedDate, ZonedDateTime zonedDateTime,Category category) {
         this.name = name;
         this.price = price;

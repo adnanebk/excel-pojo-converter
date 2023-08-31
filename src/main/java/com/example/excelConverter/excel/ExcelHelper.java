@@ -5,8 +5,7 @@ import com.example.excelConverter.excel.exceptions.ExcelFileException;
 import com.example.excelConverter.excel.exceptions.ExcelValidationException;
 import com.example.excelConverter.excel.models.AnnotationType;
 import com.example.excelConverter.excel.models.Field;
-import com.example.excelConverter.excel.utils.ConstructorReflectionUtil;
-import com.example.excelConverter.excel.utils.FieldsReflectionUtil;
+
 import com.example.excelConverter.excel.utils.ReflectionUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -35,8 +34,7 @@ public class ExcelHelper<T>   {
     private final ReflectionUtil<T> reflectionUtil;
 
     private ExcelHelper(Class<T> type, AnnotationType annotationType) {
-        reflectionUtil = annotationType.equals(AnnotationType.FIELDS)?
-                new FieldsReflectionUtil<>(type) :new ConstructorReflectionUtil<>(type);
+        reflectionUtil = new ReflectionUtil<>(type,annotationType);
         sheetName = type.getSimpleName()+"-"+ LocalDate.now();
 
     }
@@ -44,7 +42,7 @@ public class ExcelHelper<T>   {
         return new ExcelHelper<>(type,annotationType);
     }
     public static<T> ExcelHelper<T> create(Class<T> type) {
-        return create(type,AnnotationType.FIELDS);
+        return create(type,AnnotationType.FIELD);
     }
     public List<T> excelToList(MultipartFile file) {
         if (!hasExcelFormat(file))
@@ -53,7 +51,7 @@ public class ExcelHelper<T>   {
             Workbook workbook = new XSSFWorkbook(is)
         ) {
             Sheet sheet = workbook.getSheetAt(0);
-           return StreamSupport.stream(sheet.spliterator(),false)
+            return StreamSupport.stream(sheet.spliterator(),false)
                      .skip(1)
                      .filter(this::hasAnyCell)
                      .map(this::rowToObject)
@@ -118,14 +116,13 @@ public class ExcelHelper<T>   {
         else if (reflectionUtil.isDoubleValue(field))
             return  cell.getNumericCellValue();
         return cell.getNumericCellValue();
-
     }
 
     public ByteArrayInputStream listToExcel(List<T> list) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = createSheet(sheetName,workbook, reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new));
-            for(int i=0;i<list.size();i++){
+            for(int i=1;i<list.size();i++){
                 fillRowFromObject(sheet.createRow(i), list.get(i));
             }
             autoSizeColumns(sheet);
@@ -137,7 +134,7 @@ public class ExcelHelper<T>   {
     }
 
     private void autoSizeColumns(Sheet sheet) {
-        IntStream.range(0,reflectionUtil.getFields().size()).forEach(sheet::autoSizeColumn);
+       IntStream.range(0,reflectionUtil.getFields().size()).forEach(sheet::autoSizeColumn);
     }
 
     private void fillRowFromObject(Row row, T obj) {

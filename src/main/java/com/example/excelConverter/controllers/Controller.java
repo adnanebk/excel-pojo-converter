@@ -4,6 +4,7 @@ import com.example.excelConverter.excel.ExcelHelper;
 import com.example.excelConverter.excel.exceptions.ExcelFileException;
 import com.example.excelConverter.excel.exceptions.ExcelValidationException;
 import com.example.excelConverter.excel.exceptions.ReflectionException;
+import com.example.excelConverter.excel.models.AnnotationType;
 import com.example.excelConverter.models.Category;
 import com.example.excelConverter.models.Product;
 import org.springframework.core.io.InputStreamResource;
@@ -22,11 +23,15 @@ import java.util.stream.IntStream;
 @RestController
 @RequestMapping("products")
 public class Controller {
-    private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class);
+    private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class, AnnotationType.CONSTRUCTOR);
 
     @GetMapping
     public List<Product> excelToProducts(@RequestParam MultipartFile file){
-      return excelHelper.excelToList(file);
+        long start = System.currentTimeMillis();
+         var r =excelHelper.excelToList(file);
+        long end = System.currentTimeMillis();
+        System.out.println("------ "+(end-start));
+        return r;
     }
     @GetMapping("/excel")
     public ResponseEntity<InputStreamResource>
