@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 
@@ -119,7 +118,8 @@ public class ExcelHelper<T>   {
     public ByteArrayInputStream listToExcel(List<T> list) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = createSheetAndHeaders(sheetName,workbook, reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new));
+            Sheet sheet = workbook.createSheet(sheetName);
+            createHeaders(sheet,workbook, reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new));
             for(int i=1;i<list.size();i++){
                 fillRowFromObject(sheet.createRow(i), list.get(i));
             }
@@ -168,8 +168,8 @@ public class ExcelHelper<T>   {
         return TYPE.equals(file.getContentType());
     }
 
-    private  Sheet createSheetAndHeaders(String sheetName, Workbook workbook, String[] headers) {
-        Sheet sheet = workbook.createSheet(sheetName);
+    private  void createHeaders(Sheet sheet, Workbook workbook, String[] headers) {
+
         Row headerRow = sheet.createRow(0);
         CellStyle headerStyle = workbook.createCellStyle();
         headerStyle.setFillForegroundColor(IndexedColors.BLUE_GREY.getIndex());
@@ -179,13 +179,11 @@ public class ExcelHelper<T>   {
         font.setFontHeightInPoints((short) 10);
         font.setBold(true);
         headerStyle.setFont(font);
-
         for (int colIdx = 0; colIdx < headers.length; colIdx++) {
             Cell cell = headerRow.createCell(colIdx);
             cell.setCellValue(headers[colIdx]);
             cell.setCellStyle(headerStyle);
         }
-        return sheet;
     }
     private boolean hasAnyCell(Row currentRow) {
         return currentRow.getPhysicalNumberOfCells() > 0;
