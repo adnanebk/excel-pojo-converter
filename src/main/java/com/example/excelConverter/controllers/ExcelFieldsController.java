@@ -22,16 +22,12 @@ import java.util.stream.IntStream;
 
 @RestController
 @RequestMapping("products")
-public class Controller {
-    private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class, AnnotationType.CONSTRUCTOR);
+public class ExcelFieldsController {
+    private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class);
 
     @GetMapping
     public List<Product> excelToProducts(@RequestParam MultipartFile file){
-        long start = System.currentTimeMillis();
-         var r =excelHelper.excelToList(file);
-        long end = System.currentTimeMillis();
-        System.out.println("------ "+(end-start));
-        return r;
+      return excelHelper.excelToList(file);
     }
     @GetMapping("/excel")
     public ResponseEntity<InputStreamResource>

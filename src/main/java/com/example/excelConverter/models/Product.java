@@ -36,7 +36,7 @@ public class Product {
     private Boolean expired;
 
 
-    @ExcelCol(index = 2)
+    @ExcelCol(index = 1)
     private Integer unitsInStock;
 
     @ExcelCol
@@ -48,11 +48,11 @@ public class Product {
     @ExcelCol
     private ZonedDateTime zonedDateTime;
 
-    @ExcelCol(index = 2)
+    @ExcelCol(index = 3)
     private Category category;
 
 
-    @ExcelConstructorParameters(titles = {"Namme"})
+    @ExcelConstructorParameters
     public Product(String name, long price, double promoPrice, Double minPrice, boolean active, Boolean expired, Integer unitsInStock, Date createdDate, LocalDate updatedDate, ZonedDateTime zonedDateTime,Category category) {
         this.name = name;
         this.price = price;

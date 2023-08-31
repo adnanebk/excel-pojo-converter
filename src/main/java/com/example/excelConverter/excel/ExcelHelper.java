@@ -52,10 +52,10 @@ public class ExcelHelper<T>   {
         ) {
             Sheet sheet = workbook.getSheetAt(0);
             return StreamSupport.stream(sheet.spliterator(),false)
-                     .skip(1)
-                     .filter(this::hasAnyCell)
-                     .map(this::rowToObject)
-                     .toList();
+                    .filter(this::hasAnyCell)
+                    .skip(1)
+                    .map(this::rowToObject)
+                    .toList();
 
         }
         catch (IOException e) {
@@ -68,8 +68,9 @@ public class ExcelHelper<T>   {
         Object[] values = new Object[fields.size()];
         for (int i = 0; i < fields.size(); i++) {
             Field field = fields.get(i);
-            values[i] = getCurrentCell(i++, currentRow).map(cell -> getCellValue(cell, field))
-                    .orElse(null);
+            values[i] = getCurrentCell(i, currentRow)
+                        .map(cell -> getCellValue(cell, field))
+                        .orElse(null);
         }
         return reflectionUtil.getInstance(values);
 
@@ -105,9 +106,6 @@ public class ExcelHelper<T>   {
         throw new ExcelFileException("Can't find a corresponding type of the cell");
     }
 
-
-
-
     private Number getValueAsNumber(Cell cell, Field field) {
         if (reflectionUtil.isIntegerValue(field))
             return (int) cell.getNumericCellValue();
@@ -115,13 +113,13 @@ public class ExcelHelper<T>   {
             return (long) cell.getNumericCellValue();
         else if (reflectionUtil.isDoubleValue(field))
             return  cell.getNumericCellValue();
-        return cell.getNumericCellValue();
+        throw new ExcelFileException("Unsupported number field type");
     }
 
     public ByteArrayInputStream listToExcel(List<T> list) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = createSheet(sheetName,workbook, reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new));
+            Sheet sheet = createSheetAndHeaders(sheetName,workbook, reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new));
             for(int i=1;i<list.size();i++){
                 fillRowFromObject(sheet.createRow(i), list.get(i));
             }
@@ -169,7 +167,7 @@ public class ExcelHelper<T>   {
         return TYPE.equals(file.getContentType());
     }
 
-    private  Sheet createSheet(String sheetName,Workbook workbook,String[] headers) {
+    private  Sheet createSheetAndHeaders(String sheetName, Workbook workbook, String[] headers) {
         Sheet sheet = workbook.createSheet(sheetName);
         Row headerRow = sheet.createRow(0);
         CellStyle headerStyle = workbook.createCellStyle();
