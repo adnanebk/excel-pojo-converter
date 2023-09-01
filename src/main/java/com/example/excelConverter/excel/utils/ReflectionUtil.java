@@ -30,8 +30,6 @@ public  class ReflectionUtil<T> {
 
     protected  List<Field> fields;
     protected  final Class<T> classType;
-
-    private final Set<String> numberTypes = new HashSet<>(Arrays.asList(int.class.getName(), long.class.getName(), double.class.getName(),short.class.getName()));
     private  Constructor<T> defaultConstructor;
     private  Constructor<T> argsConstructor;
     private final List<Method> setters= new ArrayList<>();
@@ -58,50 +56,6 @@ public  class ReflectionUtil<T> {
 
     public  List<Field> getFields(){
         return fields;
-    }
-
-    public boolean isNumberType(Field field){
-        Class<?> fieldType=field.type();
-        if(fieldType.isPrimitive())
-            return numberTypes.contains(fieldType.getName());
-        return Number.class.isAssignableFrom(fieldType);
-    }
-
-
-    public boolean isAnyDateTimeValue(Field field) {
-        return isLocalDateTimeValue(field) || isDateValue(field);
-    }
-    public  boolean isStringValue(Field field){
-        return field.type().equals(String.class);
-    }
-    public  boolean isLocalDateValue(Field field){
-        return  LocalDate.class.equals(field.type());
-    }
-    public  boolean isLocalDateTimeValue(Field field){
-        return  LocalDateTime.class.equals(field.type());
-    }
-    public  boolean isZonedDateValue(Field field){
-        return  ZonedDateTime.class.equals(field.type());
-    }
-    public  boolean isDateValue(Field field){
-        return field.type().equals(Date.class);
-    }
-    public  boolean isEnumValue(Field field){
-        return field.type().isEnum();
-    }
-    public  boolean isBooleanValue(Field field){
-        return field.type().equals(Boolean.class) || field.type().equals(boolean.class);
-    }
-    public  boolean isIntegerValue(Field field){
-        return field.type().equals(Integer.class) || field.type().equals(int.class);
-    }
-
-    public  boolean isLongValue(Field field){
-        return field.type().equals(Long.class) || field.type().equals(long.class);
-    }
-
-    public  boolean isDoubleValue(Field field){
-        return field.type().equals(Double.class) || field.type().equals(double.class);
     }
 
     public  T getInstance(Object... values){

@@ -27,7 +27,12 @@ public class ExcelFieldsController {
 
     @GetMapping
     public List<Product> excelToProducts(@RequestParam MultipartFile file){
-      return excelHelper.excelToList(file);
+        var s = System.currentTimeMillis();
+      var r =  excelHelper.excelToList(file);
+        var e = System.currentTimeMillis();
+        System.out.println(e-s);
+        return r;
+
     }
     @GetMapping("/excel")
     public ResponseEntity<InputStreamResource>
