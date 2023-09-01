@@ -30,15 +30,17 @@ public class ExcelHelper<T>   {
     private  final String sheetName;
 
     private final ReflectionUtil<T> reflectionUtil;
-    private final CellHandlerUtil cellHandlerUtil;
+    private final CellHandlerUtil<T> cellHandlerUtil;
 
-    private ExcelHelper(Class<T> type, AnnotationType annotationType) {
-        reflectionUtil = new ReflectionUtil<>(type,annotationType);
-        cellHandlerUtil = new CellHandlerUtil(reflectionUtil);
+    public ExcelHelper(Class<T> type,ReflectionUtil<T> reflectionUtil,CellHandlerUtil<T> cellHandlerUtil) {
+        this.reflectionUtil=reflectionUtil;
+        this.cellHandlerUtil=cellHandlerUtil;
         sheetName = type.getSimpleName()+"-"+ LocalDate.now();
     }
     public static<T> ExcelHelper<T> create(Class<T> type, AnnotationType annotationType) {
-        return new ExcelHelper<>(type,annotationType);
+        var reflectionUtil = new ReflectionUtil<>(type,annotationType);
+        var cellHandlerUtil = new CellHandlerUtil<>(reflectionUtil);
+        return new ExcelHelper<>(type,new ReflectionUtil<>(type,annotationType),cellHandlerUtil);
     }
     public static<T> ExcelHelper<T> create(Class<T> type) {
         return create(type,AnnotationType.FIELD);
