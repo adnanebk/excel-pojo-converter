@@ -37,44 +37,37 @@ public class CellHandlerUtil {
     }
 
     private String getTypeName(Field field) {
-        return field.type().isEnum() ? Enum.class.getName() : field.type().getName();
+        return field.type().isEnum() ? Enum.class.getSimpleName().toLowerCase() : field.type().getSimpleName().toLowerCase();
     }
 
     private void initCellValueMap() {
-        cellValueMap.put(String.class.getName(), (cell, fieldType) -> cell.getStringCellValue());
-        cellValueMap.put(Boolean.class.getName(), (cell, fieldType) -> cell.getBooleanCellValue());
-        cellValueMap.put(boolean.class.getName(), (cell, fieldType) -> cell.getBooleanCellValue());
-        cellValueMap.put(Enum.class.getName(), (cell, fieldType) -> Enum.valueOf(fieldType.asSubclass(Enum.class), cell.getStringCellValue()));
-        cellValueMap.put(Integer.class.getName(), (cell, fieldType) -> (int) cell.getNumericCellValue());
-        cellValueMap.put(int.class.getName(), (cell, fieldType) -> (int) cell.getNumericCellValue());
-        cellValueMap.put(Short.class.getName(), (cell, fieldType) -> (short) cell.getNumericCellValue());
-        cellValueMap.put(short.class.getName(), (cell, fieldType) -> (short) cell.getNumericCellValue());
-        cellValueMap.put(Long.class.getName(), (cell, fieldType) -> (long) cell.getNumericCellValue());
-        cellValueMap.put(long.class.getName(), (cell, fieldType) -> (long) cell.getNumericCellValue());
-        cellValueMap.put(Double.class.getName(), (cell, fieldType) -> cell.getNumericCellValue());
-        cellValueMap.put(double.class.getName(), (cell, fieldType) -> cell.getNumericCellValue());
-        cellValueMap.put(LocalDate.class.getName(), (cell, fieldType) -> getAsLocalDate(cell));
-        cellValueMap.put(LocalDateTime.class.getName(), (cell, fieldType) -> getAsLocalDateTime(cell));
-        cellValueMap.put(ZonedDateTime.class.getName(), (cell, fieldType) -> ZonedDateTime.parse(cell.getStringCellValue(), reflectionUtil.zonedDateTimeFormatter));
-        cellValueMap.put(Date.class.getName(), (cell, fieldType) -> getAsDate(cell));
+        cellValueMap.put(String.class.getSimpleName().toLowerCase(), (cell, fieldType) -> cell.getStringCellValue());
+        cellValueMap.put(boolean.class.getSimpleName().toLowerCase(), (cell, fieldType) -> cell.getBooleanCellValue());
+        cellValueMap.put(Enum.class.getSimpleName().toLowerCase(), (cell, fieldType) -> Enum.valueOf(fieldType.asSubclass(Enum.class), cell.getStringCellValue()));
+        cellValueMap.put(Integer.class.getSimpleName().toLowerCase(), (cell, fieldType) -> (int) cell.getNumericCellValue());
+        cellValueMap.put(int.class.getSimpleName().toLowerCase(), (cell, fieldType) -> (int) cell.getNumericCellValue());
+        cellValueMap.put(short.class.getSimpleName().toLowerCase(), (cell, fieldType) -> (short) cell.getNumericCellValue());
+        cellValueMap.put(long.class.getSimpleName().toLowerCase(), (cell, fieldType) -> (long) cell.getNumericCellValue());
+        cellValueMap.put(double.class.getSimpleName().toLowerCase(), (cell, fieldType) -> cell.getNumericCellValue());
+        cellValueMap.put(LocalDate.class.getSimpleName().toLowerCase(), (cell, fieldType) -> getAsLocalDate(cell));
+        cellValueMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), (cell, fieldType) -> getAsLocalDateTime(cell));
+        cellValueMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), (cell, fieldType) -> ZonedDateTime.parse(cell.getStringCellValue(), reflectionUtil.zonedDateTimeFormatter));
+        cellValueMap.put(Date.class.getSimpleName().toLowerCase(), (cell, fieldType) -> getAsDate(cell));
     }
     private void initValueSetterMap() {
-        cellValueSetterMap.put(String.class.getName(), (cell, value) -> cell.setCellValue(value.toString()));
-        cellValueSetterMap.put(Double.class.getName(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(double.class.getName(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(Integer.class.getName(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(int.class.getName(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(Long.class.getName(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(long.class.getName(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(short.class.getName(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(Short.class.getName(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(Boolean.class.getName(), (cell, value) -> cell.setCellValue((boolean) value));
-        cellValueSetterMap.put(boolean.class.getName(), (cell, value) -> cell.setCellValue((boolean) value));
-        cellValueSetterMap.put(Enum.class.getName(), (cell, value) -> cell.setCellValue(value.toString()));
-        cellValueSetterMap.put(LocalDate.class.getName(), (cell, value) -> cell.setCellValue(reflectionUtil.localedDateFormatter.format((LocalDate) value)));
-        cellValueSetterMap.put(LocalDateTime.class.getName(), (cell, value) -> cell.setCellValue(reflectionUtil.localedDateTimeFormatter.format((LocalDateTime) value)));
-        cellValueSetterMap.put(ZonedDateTime.class.getName(), (cell, value) -> cell.setCellValue(reflectionUtil.zonedDateTimeFormatter.format((ZonedDateTime) value)));
-        cellValueSetterMap.put(Date.class.getName(), (cell, value) -> cell.setCellValue(reflectionUtil.dateFormatter.format((Date)value)));
+        cellValueSetterMap.put(String.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(value.toString()));
+        cellValueSetterMap.put(Double.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
+        cellValueSetterMap.put(double.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
+        cellValueSetterMap.put(Integer.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
+        cellValueSetterMap.put(int.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
+        cellValueSetterMap.put(long.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
+        cellValueSetterMap.put(short.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
+        cellValueSetterMap.put(boolean.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue((boolean) value));
+        cellValueSetterMap.put(Enum.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(value.toString()));
+        cellValueSetterMap.put(LocalDate.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(reflectionUtil.localedDateFormatter.format((LocalDate) value)));
+        cellValueSetterMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(reflectionUtil.localedDateTimeFormatter.format((LocalDateTime) value)));
+        cellValueSetterMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(reflectionUtil.zonedDateTimeFormatter.format((ZonedDateTime) value)));
+        cellValueSetterMap.put(Date.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(reflectionUtil.dateFormatter.format((Date)value)));
     }
     private Date getAsDate(Cell cell) {
         try {
