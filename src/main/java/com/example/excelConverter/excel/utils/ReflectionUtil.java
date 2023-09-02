@@ -18,7 +18,8 @@ import java.util.stream.Stream;
 public  class ReflectionUtil<T> {
 
 
-    private final ExcelColsDefinition excelDefinitionAnnotation;
+    private String dateTimeFormat;
+    private  String dateFormat;
 
     protected  List<Field> fields;
     protected  final Class<T> classType;
@@ -29,7 +30,6 @@ public  class ReflectionUtil<T> {
 
     public ReflectionUtil(Class<T> type, AnnotationType annotationType) {
             classType=type;
-            excelDefinitionAnnotation = classType.getAnnotation(ExcelColsDefinition.class);
         this.setDefaultConstructor();
         if(annotationType.equals(AnnotationType.FIELD)) {
                 this.setFields();
@@ -39,6 +39,7 @@ public  class ReflectionUtil<T> {
                 this.setFieldsFromArgsConstructor();
             }
             setGettersAndSetters();
+            setDateFormats();
 
     }
 
@@ -60,10 +61,10 @@ public  class ReflectionUtil<T> {
         }
     }
     public Optional<String> dateFormat(){
-        return Optional.ofNullable(excelDefinitionAnnotation).map(ExcelColsDefinition::dateFormat).filter(s->!s.isEmpty());
+        return Optional.ofNullable(dateFormat).filter(s->!s.isEmpty());
     }
     public Optional<String> dateTimeFormat(){
-        return Optional.ofNullable(excelDefinitionAnnotation).map(ExcelColsDefinition::dateTimeFormat).filter(s->!s.isEmpty());
+        return Optional.ofNullable(dateTimeFormat).filter(s->!s.isEmpty());
     }
 
     public Object getFieldValue(T obj,int index) {
@@ -72,6 +73,13 @@ public  class ReflectionUtil<T> {
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ReflectionException(e.getMessage());
         }
+    }
+    private void setDateFormats() {
+        Optional.ofNullable(classType.getAnnotation(ExcelColsDefinition.class))
+                .ifPresent(excelDefinitionAnnotation-> {
+                    this.dateFormat = excelDefinitionAnnotation.dateFormat();
+                    this.dateTimeFormat = excelDefinitionAnnotation.dateTimeFormat();
+                });
     }
     private String camelCaseWordsToWordsWithSpaces(String str) {
         if(StringUtils.hasLength(str))
