@@ -7,6 +7,7 @@ import com.example.excelConverter.excel.models.AnnotationType;
 import com.example.excelConverter.excel.models.Field;
 
 import com.example.excelConverter.excel.utils.CellHandlerUtil;
+import com.example.excelConverter.excel.utils.DateParserUtil;
 import com.example.excelConverter.excel.utils.ReflectionUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -39,8 +40,9 @@ public class ExcelHelper<T>   {
     }
     public static<T> ExcelHelper<T> create(Class<T> type, AnnotationType annotationType) {
         var reflectionUtil = new ReflectionUtil<>(type,annotationType);
-        var cellHandlerUtil = new CellHandlerUtil<>(reflectionUtil);
-        return new ExcelHelper<>(type,new ReflectionUtil<>(type,annotationType),cellHandlerUtil);
+        var tDateParserUtil = new DateParserUtil<>(reflectionUtil);
+        var cellHandlerUtil = new CellHandlerUtil<>(tDateParserUtil);
+        return new ExcelHelper<>(type,reflectionUtil,cellHandlerUtil);
     }
     public static<T> ExcelHelper<T> create(Class<T> type) {
         return create(type,AnnotationType.FIELD);

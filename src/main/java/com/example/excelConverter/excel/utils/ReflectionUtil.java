@@ -31,16 +31,14 @@ public  class ReflectionUtil<T> {
     public ReflectionUtil(Class<T> type, AnnotationType annotationType) {
             classType=type;
         this.setDefaultConstructor();
-        if(annotationType.equals(AnnotationType.FIELD)) {
+        if(annotationType.equals(AnnotationType.FIELD))
                 this.setFields();
-            }
-            else{
+        else{
                 this.setArgsConstructor();
                 this.setFieldsFromArgsConstructor();
             }
-            setGettersAndSetters();
-            setDateFormats();
-
+        setGettersAndSetters();
+        setDateFormats();
     }
 
     public  List<Field> getFields(){
