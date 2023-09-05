@@ -1,7 +1,6 @@
 package com.example.excelConverter.excel.utils;
 
 import com.example.excelConverter.excel.exceptions.ExcelValidationException;
-import com.example.excelConverter.excel.models.Field;
 import org.apache.poi.ss.usermodel.*;
 
 import java.text.ParseException;
@@ -31,21 +30,21 @@ public class CellHandlerUtil<T> {
         initValueSetterMap();
     }
 
-    public Object getCellValue(Field field, Cell cell) {
+    public Object getCellValue(Class<?> type, Cell cell) {
         try {
-            return cellValueMap.get(getTypeName(field)).apply(cell, field.type());
+            return cellValueMap.get(getTypeName(type)).apply(cell, type);
         } catch (IllegalStateException | NumberFormatException e) {
             throw new ExcelValidationException(String.format("Invalid format in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
         }
     }
 
-    public void setCellValue(Field field, Cell cell, Object value) {
-        cellValueSetterMap.get(getTypeName(field)).accept(cell, value);
+    public void setCellValue(Class<?> type, Cell cell, Object value) {
+        cellValueSetterMap.get(getTypeName(type)).accept(cell, value);
 
     }
 
-    private String getTypeName(Field field) {
-        return field.type().isEnum() ? Enum.class.getSimpleName().toLowerCase() : field.type().getSimpleName().toLowerCase();
+    private String getTypeName(Class<?> type) {
+        return type.isEnum() ? Enum.class.getSimpleName().toLowerCase() : type.getSimpleName().toLowerCase();
     }
 
     private void initCellValueMap() {
@@ -137,4 +136,5 @@ public class CellHandlerUtil<T> {
     private static String getInvalidCellDateMsg(Cell cell) {
         return String.format("Invalid or unsupported date format in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex()));
     }
+
 }

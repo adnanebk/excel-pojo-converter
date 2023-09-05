@@ -1,6 +1,5 @@
 package com.example.excelConverter.excel;
 
-
 import com.example.excelConverter.excel.exceptions.ExcelFileException;
 import com.example.excelConverter.excel.exceptions.ExcelValidationException;
 import com.example.excelConverter.excel.models.AnnotationType;
@@ -70,15 +69,15 @@ public class ExcelHelper<T>   {
         List<Field> fields = reflectionUtil.getFields();
         Object[] values = IntStream.range(0,fields.size())
                  .mapToObj(index->getCurrentCell(index, currentRow)
-                                 .map(cell->getCellValue(cell,fields.get(index)))
+                                 .map(cell->getCellValue(cell,fields.get(index).type()))
                                  .orElse(null)
                            ).toArray();
         return reflectionUtil.getInstance(values);
 
     }
 
-    private Object  getCellValue(Cell cell, Field field) {
-       return cellHandlerUtil.getCellValue(field,cell);
+    private Object  getCellValue(Cell cell, Class<?> type) {
+       return cellHandlerUtil.getCellValue(type,cell);
     }
 
     public ByteArrayInputStream listToExcel(List<T> list) {
@@ -107,7 +106,7 @@ public class ExcelHelper<T>   {
         for (int i = 0; i < fields.size(); i++) {
             Field field = fields.get(i);
             Object fieldValue = reflectionUtil.getFieldValue(obj, i);
-            cellHandlerUtil.setCellValue(field,row.createCell(i),fieldValue);
+            cellHandlerUtil.setCellValue(field.type(),row.createCell(i),fieldValue);
                     }
 
     }

@@ -24,7 +24,7 @@ public  class ReflectionUtil<T> {
     protected  List<Field> fields;
     protected  final Class<T> classType;
     private  Constructor<T> defaultConstructor;
-    private  Constructor<T> argsConstructor;
+    private  Constructor<?> argsConstructor;
     private final List<Method> setters= new ArrayList<>();
     private final List<Method> getters = new ArrayList<>();
 
@@ -94,7 +94,7 @@ public  class ReflectionUtil<T> {
         }
     }
     private void setArgsConstructor(){
-        argsConstructor = (Constructor<T>) Arrays.stream(this.classType.getDeclaredConstructors()).filter(ct -> ct.isAnnotationPresent(ExcelConstructorParameters.class))
+        argsConstructor =  Arrays.stream(this.classType.getDeclaredConstructors()).filter(ct -> ct.isAnnotationPresent(ExcelConstructorParameters.class))
                 .findFirst().orElseThrow(() -> new ReflectionException("Annotation ExcelColsDefinition is required in constructor"));
     }
     private void setGettersAndSetters() {
