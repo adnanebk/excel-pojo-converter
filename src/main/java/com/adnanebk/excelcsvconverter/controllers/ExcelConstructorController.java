@@ -27,14 +27,14 @@ public class ExcelConstructorController {
     private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class, AnnotationType.CONSTRUCTOR);
 
     @GetMapping
-    public List<Product> excelToProducts(@RequestParam MultipartFile file){
-      return excelHelper.excelToList(file);
+    public List<Product> excelToProducts(@RequestBody MultipartFile file){
+      return excelHelper.toList(file);
     }
     @GetMapping("/excel")
     public ResponseEntity<InputStreamResource>
     downloadExcelFromProducts() {
          String filename = "products-" + LocalDate.now() + ".xlsx";
-        InputStreamResource file = new InputStreamResource(excelHelper.listToExcel(getProducts()));
+        InputStreamResource file = new InputStreamResource(excelHelper.toExcel(getProducts()));
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                 .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))

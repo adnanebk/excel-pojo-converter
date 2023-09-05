@@ -31,7 +31,7 @@ public class ExcelHelper<T> {
     private final ReflectionUtil<T> reflectionUtil;
     private final ExcelCellHandlerUtil<T> cellHandlerUtil;
 
-    public ExcelHelper(String fineName, ReflectionUtil<T> reflectionUtil, ExcelCellHandlerUtil<T> cellHandlerUtil) {
+    private ExcelHelper(String fineName, ReflectionUtil<T> reflectionUtil, ExcelCellHandlerUtil<T> cellHandlerUtil) {
         this.reflectionUtil = reflectionUtil;
         this.cellHandlerUtil = cellHandlerUtil;
         sheetName = fineName + "-" + LocalDate.now();
@@ -48,7 +48,7 @@ public class ExcelHelper<T> {
         return create(type, AnnotationType.FIELD);
     }
 
-    public List<T> excelToList(MultipartFile file) {
+    public List<T> toList(MultipartFile file) {
         if (!hasExcelFormat(file))
             throw new ExcelFileException("Only excel formats are valid");
         try (InputStream is = file.getInputStream();
@@ -66,7 +66,7 @@ public class ExcelHelper<T> {
         }
     }
 
-    public ByteArrayInputStream listToExcel(List<T> list) {
+    public ByteArrayInputStream toExcel(List<T> list) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet(sheetName);

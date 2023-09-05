@@ -18,31 +18,34 @@ import java.util.List;
 public class CsvHelper<T> {
 
     private static final String TYPE = "text/csv";
+    public  final String delimiter;
     private final ReflectionUtil<T> reflectionUtil;
     private final CsvCellHandlerUtil<T> cellHandlerUtil;
 
-    public CsvHelper(ReflectionUtil<T> reflectionUtil, CsvCellHandlerUtil<T> cellHandlerUtil) {
+    private CsvHelper(ReflectionUtil<T> reflectionUtil, CsvCellHandlerUtil<T> cellHandlerUtil, String delimiter) {
         this.reflectionUtil = reflectionUtil;
         this.cellHandlerUtil = cellHandlerUtil;
+        this.delimiter =delimiter;
     }
 
-    public static <T> CsvHelper<T> create(Class<T> type, AnnotationType annotationType) {
+    public static <T> CsvHelper<T> create(Class<T> type, AnnotationType annotationType,String delimiter) {
         var reflectionUtil = new ReflectionUtil<>(type, annotationType);
         var tDateParserUtil = new DateParserUtil<>(reflectionUtil);
         var cellHandlerUtil = new CsvCellHandlerUtil<>(tDateParserUtil);
-        return new CsvHelper<>(reflectionUtil, cellHandlerUtil);
+
+        return new CsvHelper<>(reflectionUtil, cellHandlerUtil,delimiter);
     }
 
-    public static <T> CsvHelper<T> create(Class<T> type) {
-        return create(type, AnnotationType.FIELD);
+    public static <T> CsvHelper<T> create(Class<T> type,String delimiter) {
+        return create(type, AnnotationType.FIELD,delimiter);
     }
 
-    public List<T> csvToList(MultipartFile file) {
+    public List<T> toList(MultipartFile file) {
         if (!hasCsvFormat(file))
             throw new ExcelFileException("Only csv formats are valid");
         try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            return br.lines().parallel().skip(1).map(row -> {
-                String[] columns = row.split(";");
+            return br.lines().skip(1).map(row -> {
+                String[] columns = row.split(delimiter);
                 Object[] values = new Object[columns.length];
                 for (int i = 0; i < columns.length; i++) {
                     String cellValue = columns[i];
