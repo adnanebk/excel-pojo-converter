@@ -1,4 +1,4 @@
-package com.example.excelConverter.excel.annotations;
+package com.adnanebk.excelcsvconverter.excelcsv.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,9 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface ExcelColsDefinition {
-    String dateFormat() default "";
-    String dateTimeFormat() default "";
+@Target(ElementType.CONSTRUCTOR)
+public @interface ConstructorCells {
+    String[] titles() default {};
 
 }

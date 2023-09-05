@@ -1,4 +1,4 @@
-package com.example.excelConverter.excel.annotations;
+package com.adnanebk.excelcsvconverter.excelcsv.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,7 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface ExcelCol {
+public @interface CellDefinition {
     String title() default "";
+
     int index() default Integer.MAX_VALUE;
 }

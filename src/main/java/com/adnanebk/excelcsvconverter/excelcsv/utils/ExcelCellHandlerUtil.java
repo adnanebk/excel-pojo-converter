@@ -1,7 +1,8 @@
-package com.example.excelConverter.excel.utils;
+package com.adnanebk.excelcsvconverter.excelcsv.utils;
 
-import com.example.excelConverter.excel.exceptions.ExcelValidationException;
-import org.apache.poi.ss.usermodel.*;
+import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -15,16 +16,15 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-public class CellHandlerUtil<T> {
+public class ExcelCellHandlerUtil<T> {
 
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
     private final Map<String, BiFunction<Cell, Class<?>, Object>> cellValueMap = new HashMap<>();
     private final Map<String, BiConsumer<Cell, Object>> cellValueSetterMap = new HashMap<>();
     private final DateParserUtil<T> dateParserUtil;
 
 
-    public CellHandlerUtil(DateParserUtil<T> dateParserUtil) {
+    public ExcelCellHandlerUtil(DateParserUtil<T> dateParserUtil) {
         this.dateParserUtil = dateParserUtil;
         initCellValueMap();
         initValueSetterMap();
@@ -40,7 +40,6 @@ public class CellHandlerUtil<T> {
 
     public void setCellValue(Class<?> type, Cell cell, Object value) {
         cellValueSetterMap.get(getTypeName(type)).accept(cell, value);
-
     }
 
     private String getTypeName(Class<?> type) {

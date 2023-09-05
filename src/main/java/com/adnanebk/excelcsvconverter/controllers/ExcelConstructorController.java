@@ -1,12 +1,13 @@
-package com.example.excelConverter.controllers;
+package com.adnanebk.excelcsvconverter.controllers;
 
-import com.example.excelConverter.excel.ExcelHelper;
-import com.example.excelConverter.excel.exceptions.ExcelFileException;
-import com.example.excelConverter.excel.exceptions.ExcelValidationException;
-import com.example.excelConverter.excel.exceptions.ReflectionException;
-import com.example.excelConverter.excel.models.AnnotationType;
-import com.example.excelConverter.models.Category;
-import com.example.excelConverter.models.Product;
+
+import com.adnanebk.excelcsvconverter.excelcsv.ExcelHelper;
+import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
+import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
+import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
+import com.adnanebk.excelcsvconverter.excelcsv.models.AnnotationType;
+import com.adnanebk.excelcsvconverter.models.Category;
+import com.adnanebk.excelcsvconverter.models.Product;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,7 +24,7 @@ import java.util.stream.IntStream;
 @RestController
 @RequestMapping("/v2/products")
 public class ExcelConstructorController {
-    private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class,AnnotationType.CONSTRUCTOR);
+    private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class, AnnotationType.CONSTRUCTOR);
 
     @GetMapping
     public List<Product> excelToProducts(@RequestParam MultipartFile file){

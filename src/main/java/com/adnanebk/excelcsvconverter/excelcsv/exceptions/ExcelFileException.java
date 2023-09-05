@@ -1,4 +1,4 @@
-package com.example.excelConverter.excel.exceptions;
+package com.adnanebk.excelcsvconverter.excelcsv.exceptions;
 
 public class ExcelFileException extends RuntimeException {
     public ExcelFileException(String message) {
