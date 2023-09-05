@@ -17,6 +17,7 @@ import java.util.List;
 
 public class CsvHelper<T> {
 
+    private static final String TYPE = "text/csv";
     private final ReflectionUtil<T> reflectionUtil;
     private final CsvCellHandlerUtil<T> cellHandlerUtil;
 
@@ -37,7 +38,8 @@ public class CsvHelper<T> {
     }
 
     public List<T> csvToList(MultipartFile file) {
-
+        if (!hasCsvFormat(file))
+            throw new ExcelFileException("Only csv formats are valid");
         try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             return br.lines().parallel().skip(1).map(row -> {
                 String[] columns = row.split(";");
@@ -52,6 +54,10 @@ public class CsvHelper<T> {
         } catch (IOException e) {
             throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
         }
+    }
+
+    private boolean hasCsvFormat(MultipartFile file) {
+        return TYPE.equals(file.getContentType());
     }
 
 }
