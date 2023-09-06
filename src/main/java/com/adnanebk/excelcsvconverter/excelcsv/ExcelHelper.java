@@ -83,7 +83,7 @@ public class ExcelHelper<T> {
     }
 
     private T rowToObject(Row currentRow) {
-        List<Field> fields = reflectionUtil.getFields();
+        var fields = reflectionUtil.getFields();
         Object[] values = IntStream.range(0, fields.size())
                 .mapToObj(index -> getCurrentCell(index, currentRow)
                         .map(cell -> getCellValue(cell, fields.get(index).type()))
@@ -103,13 +103,11 @@ public class ExcelHelper<T> {
     }
 
     private void fillRowFromObject(Row row, T obj) {
-        List<Field> fields = reflectionUtil.getFields();
+        var fields = reflectionUtil.getFields();
         for (int i = 0; i < fields.size(); i++) {
-            Field field = fields.get(i);
-            Object fieldValue = reflectionUtil.getFieldValue(obj, i);
-            cellHandlerUtil.setCellValue(field.type(), row.createCell(i), fieldValue);
+            var field = fields.get(i);
+            cellHandlerUtil.setCellValue(field.type(), row.createCell(i),field.getValue(obj));
         }
-
     }
 
 

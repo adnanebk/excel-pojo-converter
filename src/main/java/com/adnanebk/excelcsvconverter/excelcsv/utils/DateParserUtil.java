@@ -42,9 +42,9 @@ public class DateParserUtil<T> {
     private final DateTimeFormatter zonedDateTimeFormatter;
 
     public DateParserUtil(ReflectionUtil<T> reflectionUtil) {
-        dateFormatter = reflectionUtil.dateTimeFormat().map(SimpleDateFormat::new).orElse(new SimpleDateFormat());
-        localedDateFormatter = reflectionUtil.dateFormat().map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE);
-        localedDateTimeFormatter = reflectionUtil.dateTimeFormat().map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        dateFormatter = reflectionUtil.getDateTimeFormat().map(SimpleDateFormat::new).orElse(new SimpleDateFormat());
+        localedDateFormatter = reflectionUtil.getDateFormat().map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE);
+        localedDateTimeFormatter = reflectionUtil.getDateTimeFormat().map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         zonedDateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
     }
 
