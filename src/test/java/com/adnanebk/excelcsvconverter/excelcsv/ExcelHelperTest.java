@@ -1,6 +1,5 @@
-package com.adnanebk.excelcsvconverter;
+package com.adnanebk.excelcsvconverter.excelcsv;
 
-import com.adnanebk.excelcsvconverter.excelcsv.ExcelHelper;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
 import com.adnanebk.excelcsvconverter.models.Category;
 import com.adnanebk.excelcsvconverter.models.Product;
@@ -18,9 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -33,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ExcelConverterApplicationTests {
+class ExcelHelperTest {
 
     private ExcelHelper<Product> excelHelper;
 
