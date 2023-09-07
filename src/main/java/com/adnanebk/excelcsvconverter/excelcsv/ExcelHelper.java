@@ -71,8 +71,8 @@ public class ExcelHelper<T> {
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet(sheetName);
             createHeaders(sheet, workbook);
-            for (int i = 1; i < list.size(); i++) {
-                fillRowFromObject(sheet.createRow(i), list.get(i));
+            for (int i = 0; i < list.size(); i++) {
+                fillRowFromObject(sheet.createRow(i+1), list.get(i));
             }
             autoSizeColumns(sheet);
             workbook.write(out);
