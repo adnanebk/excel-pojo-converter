@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 
-public class DateParserUtil<T> {
+public class DateParserFormatterUtil<T> {
 
     private static final String[] DATE_TIME_PATTERNS = {
             "yyyy-MM-dd HH:mm:ss",
@@ -41,7 +41,7 @@ public class DateParserUtil<T> {
     private final DateTimeFormatter localedDateTimeFormatter;
     private final DateTimeFormatter zonedDateTimeFormatter;
 
-    public DateParserUtil(ReflectionUtil<T> reflectionUtil) {
+    public DateParserFormatterUtil(ReflectionUtil<T> reflectionUtil) {
         dateFormatter = reflectionUtil.getDateTimeFormat().map(SimpleDateFormat::new).orElse(new SimpleDateFormat());
         localedDateFormatter = reflectionUtil.getDateFormat().map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE);
         localedDateTimeFormatter = reflectionUtil.getDateTimeFormat().map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE_TIME);

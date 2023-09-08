@@ -14,10 +14,10 @@ import java.util.function.BiFunction;
 public class CsvCellHandlerUtil<T> {
 
     private final Map<String, BiFunction<String, Class<?>, ?>> cellValueMap = new HashMap<>();
-    private final DateParserUtil<T> dateParserUtil;
+    private final DateParserFormatterUtil<T> dateParserFormatterUtil;
 
-    public CsvCellHandlerUtil(DateParserUtil<T> dateParserUtil) {
-        this.dateParserUtil = dateParserUtil;
+    public CsvCellHandlerUtil(DateParserFormatterUtil<T> dateParserFormatterUtil) {
+        this.dateParserFormatterUtil = dateParserFormatterUtil;
         initCellValueMap();
     }
 
@@ -38,12 +38,12 @@ public class CsvCellHandlerUtil<T> {
         cellValueMap.put(short.class.getSimpleName().toLowerCase(), (value, fieldType) -> Short.parseShort(value));
         cellValueMap.put(long.class.getSimpleName().toLowerCase(), (value, fieldType) -> Long.parseLong(value));
         cellValueMap.put(double.class.getSimpleName().toLowerCase(), (value, fieldType) -> Double.parseDouble(value.replace(",", ".")));
-        cellValueMap.put(LocalDate.class.getSimpleName().toLowerCase(), (value, fieldType) -> dateParserUtil.parseToLocalDate(value));
-        cellValueMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), (value, fieldType) -> dateParserUtil.parseToLocalDateTime(value));
-        cellValueMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), (value, fieldType) -> dateParserUtil.parseToZonedDateTime(value));
+        cellValueMap.put(LocalDate.class.getSimpleName().toLowerCase(), (value, fieldType) -> dateParserFormatterUtil.parseToLocalDate(value));
+        cellValueMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), (value, fieldType) -> dateParserFormatterUtil.parseToLocalDateTime(value));
+        cellValueMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), (value, fieldType) -> dateParserFormatterUtil.parseToZonedDateTime(value));
         cellValueMap.put(Date.class.getSimpleName().toLowerCase(), (value, fieldType) -> {
             try {
-                return dateParserUtil.parseToDate(value);
+                return dateParserFormatterUtil.parseToDate(value);
             } catch (ParseException e) {
                 throw new ExcelValidationException("Invalid date format");
             }

@@ -2,7 +2,7 @@ package com.adnanebk.excelcsvconverter.excelcsv;
 
 import com.adnanebk.excelcsvconverter.excelcsv.models.AnnotationType;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
-import com.adnanebk.excelcsvconverter.excelcsv.utils.DateParserUtil;
+import com.adnanebk.excelcsvconverter.excelcsv.utils.DateParserFormatterUtil;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.ExcelCellHandlerUtil;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
@@ -39,7 +39,7 @@ public class ExcelHelper<T> {
 
     public static <T> ExcelHelper<T> create(Class<T> type, AnnotationType annotationType) {
         var reflectionUtil = new ReflectionUtil<>(type, annotationType);
-        var tDateParserUtil = new DateParserUtil<>(reflectionUtil);
+        var tDateParserUtil = new DateParserFormatterUtil<>(reflectionUtil);
         var cellHandlerUtil = new ExcelCellHandlerUtil<>(tDateParserUtil);
         return new ExcelHelper<>(type.getSimpleName(), reflectionUtil, cellHandlerUtil);
     }

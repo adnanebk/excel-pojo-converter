@@ -5,7 +5,7 @@ import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
 import com.adnanebk.excelcsvconverter.excelcsv.models.AnnotationType;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.CsvCellHandlerUtil;
-import com.adnanebk.excelcsvconverter.excelcsv.utils.DateParserUtil;
+import com.adnanebk.excelcsvconverter.excelcsv.utils.DateParserFormatterUtil;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.ReflectionUtil;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,7 +30,7 @@ public class CsvHelper<T> {
 
     public static <T> CsvHelper<T> create(Class<T> type, AnnotationType annotationType,String delimiter) {
         var reflectionUtil = new ReflectionUtil<>(type, annotationType);
-        var tDateParserUtil = new DateParserUtil<>(reflectionUtil);
+        var tDateParserUtil = new DateParserFormatterUtil<>(reflectionUtil);
         var cellHandlerUtil = new CsvCellHandlerUtil<>(tDateParserUtil);
 
         return new CsvHelper<>(reflectionUtil, cellHandlerUtil,delimiter);

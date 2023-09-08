@@ -21,11 +21,11 @@ public class ExcelCellHandlerUtil<T> {
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private final Map<String, BiFunction<Cell, Class<?>, Object>> cellValueMap = new HashMap<>();
     private final Map<String, BiConsumer<Cell, Object>> cellValueSetterMap = new HashMap<>();
-    private final DateParserUtil<T> dateParserUtil;
+    private final DateParserFormatterUtil<T> dateParserFormatterUtil;
 
 
-    public ExcelCellHandlerUtil(DateParserUtil<T> dateParserUtil) {
-        this.dateParserUtil = dateParserUtil;
+    public ExcelCellHandlerUtil(DateParserFormatterUtil<T> dateParserFormatterUtil) {
+        this.dateParserFormatterUtil = dateParserFormatterUtil;
         initCellValueMap();
         initValueSetterMap();
     }
@@ -71,17 +71,17 @@ public class ExcelCellHandlerUtil<T> {
         cellValueSetterMap.put(short.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
         cellValueSetterMap.put(boolean.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue((boolean) value));
         cellValueSetterMap.put(Enum.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(value.toString()));
-        cellValueSetterMap.put(LocalDate.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserUtil.formatLocalDate((LocalDate)value)));
-        cellValueSetterMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserUtil.formatLocalDateTime((LocalDateTime) value)));
-        cellValueSetterMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserUtil.formatZonedDateTime((ZonedDateTime) value)));
-        cellValueSetterMap.put(Date.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserUtil.formatDate((Date) value)));
+        cellValueSetterMap.put(LocalDate.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.formatLocalDate((LocalDate)value)));
+        cellValueSetterMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.formatLocalDateTime((LocalDateTime) value)));
+        cellValueSetterMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.formatZonedDateTime((ZonedDateTime) value)));
+        cellValueSetterMap.put(Date.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.formatDate((Date) value)));
     }
 
     private Date getAsDate(Cell cell) {
         try {
             if (cell.getCellType().equals(CellType.NUMERIC))
                 return cell.getDateCellValue();
-            return dateParserUtil.parseToDate(cell.getStringCellValue());
+            return dateParserFormatterUtil.parseToDate(cell.getStringCellValue());
         } catch (ParseException e) {
             throw new ExcelValidationException(getInvalidCellDateMsg(cell));
         }
@@ -91,7 +91,7 @@ public class ExcelCellHandlerUtil<T> {
         try {
             if (cell.getCellType().equals(CellType.NUMERIC))
                 return cell.getLocalDateTimeCellValue().toLocalDate();
-            return dateParserUtil.parseToLocalDate(cell.getStringCellValue());
+            return dateParserFormatterUtil.parseToLocalDate(cell.getStringCellValue());
         } catch (DateTimeParseException ex) {
             throw new ExcelValidationException(getInvalidCellDateMsg(cell));
         }
@@ -101,7 +101,7 @@ public class ExcelCellHandlerUtil<T> {
         try {
             if (cell.getCellType().equals(CellType.NUMERIC))
                 return cell.getLocalDateTimeCellValue();
-            return dateParserUtil.parseToLocalDateTime(cell.getStringCellValue());
+            return dateParserFormatterUtil.parseToLocalDateTime(cell.getStringCellValue());
         } catch (DateTimeParseException ex) {
             throw new ExcelValidationException(getInvalidCellDateMsg(cell));
         }
@@ -111,7 +111,7 @@ public class ExcelCellHandlerUtil<T> {
         try {
             if (cell.getCellType().equals(CellType.NUMERIC))
                 return cell.getLocalDateTimeCellValue().atZone(ZoneId.systemDefault());
-            return dateParserUtil.parseToZonedDateTime(cell.getStringCellValue());
+            return dateParserFormatterUtil.parseToZonedDateTime(cell.getStringCellValue());
         } catch (DateTimeParseException ex) {
             throw new ExcelValidationException(getInvalidCellDateMsg(cell));
         }

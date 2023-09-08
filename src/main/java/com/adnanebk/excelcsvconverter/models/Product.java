@@ -2,6 +2,7 @@ package com.adnanebk.excelcsvconverter.models;
 
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.ConstructorCells;
+import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import java.util.Date;
 @Data
 @Builder
 @NoArgsConstructor
+@SheetDefinition(dateFormat = "dd MMM yyyy")
 public class Product {
     @CellDefinition
     private String name;
