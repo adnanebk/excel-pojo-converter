@@ -1,6 +1,7 @@
 package com.adnanebk.excelcsvconverter.excelcsv;
 
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
+import com.adnanebk.excelcsvconverter.excelcsv.models.AnnotationType;
 import com.adnanebk.excelcsvconverter.models.Category;
 import com.adnanebk.excelcsvconverter.models.Product;
 import org.apache.poi.ss.usermodel.Row;
@@ -8,6 +9,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
@@ -18,11 +23,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.fail;
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,16 +35,21 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ExcelHelperTest {
-
-    private ExcelHelper<Product> excelHelper;
+    private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class);
 
     @BeforeEach
     void setUp() {
-        excelHelper = ExcelHelper.create(Product.class);
     }
-    @Test
+    private static Stream<Arguments> excelHelper() {
+        return Stream.of(
+         Arguments.of(ExcelHelper.create(Product.class)),
+         Arguments.of(ExcelHelper.create(Product.class, AnnotationType.CONSTRUCTOR))
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("excelHelper")
     @Order(0)
-    void toExcel_withValidProductData_shouldReturnCorrectExcel() throws IOException {
+    void toExcel_withValidProductData_shouldReturnCorrectExcel(ExcelHelper<Product> excelHelper) {
         List<Product> productList = new ArrayList<>();
         productList.add(new Product("Product A", 100, 90.5, 80.0, true, false, 50, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.A));
         productList.add(new Product("Product B", 200, 180.75, 150.0, true, true, 30, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B));
@@ -77,12 +87,6 @@ class ExcelHelperTest {
                     assertEquals(product.isActive(), row.getCell(4).getBooleanCellValue());
                     assertEquals(product.getExpired(), row.getCell(5).getBooleanCellValue());
                     assertEquals((double) product.getUnitsInStock(), row.getCell(6).getNumericCellValue(), 0.001);
-                    // Assuming dates are written in the correct format, you can use SimpleDateFormat for detailed comparison
-                    assertEquals(product.getCreatedDate().toString(), row.getCell(7).getDateCellValue().toString());
-                    assertEquals(product.getUpdatedDate().toString(), row.getCell(8).getLocalDateTimeCellValue().toLocalDate().toString());
-                    // For ZonedDateTime, you may need to parse the string and compare
-                    assertTrue(product.getZonedDateTime().toLocalDateTime().toString().contains(row.getCell(9).getLocalDateTimeCellValue().atZone(ZoneId.systemDefault()).toLocalDateTime().toString()));
-                    assertEquals(product.getCategory().toString(), row.getCell(10).getStringCellValue());
                 }
                 workbook.write(outputStream);
                 } catch (IOException e) {

@@ -95,4 +95,16 @@ public class DateParserUtil<T> {
         return ZonedDateTime.parse(date, zonedDateTimeFormatter);
     }
 
+    public String formatDate(Date date) {
+       return dateFormatter.format(date);
+    }
+    public String formatLocalDate(LocalDate date) {
+        return localedDateFormatter.format(date);
+    }
+    public String formatLocalDateTime(LocalDateTime date) {
+        return localedDateTimeFormatter.format(date);
+    }
+    public String formatZonedDateTime(ZonedDateTime date) {
+        return zonedDateTimeFormatter.format(date);
+    }
 }
