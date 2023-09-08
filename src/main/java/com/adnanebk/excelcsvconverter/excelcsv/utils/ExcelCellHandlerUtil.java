@@ -71,10 +71,10 @@ public class ExcelCellHandlerUtil<T> {
         cellValueSetterMap.put(short.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
         cellValueSetterMap.put(boolean.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue((boolean) value));
         cellValueSetterMap.put(Enum.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(value.toString()));
-        cellValueSetterMap.put(LocalDate.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.formatLocalDate((LocalDate)value)));
-        cellValueSetterMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.formatLocalDateTime((LocalDateTime) value)));
-        cellValueSetterMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.formatZonedDateTime((ZonedDateTime) value)));
-        cellValueSetterMap.put(Date.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.formatDate((Date) value)));
+        cellValueSetterMap.put(LocalDate.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.format((LocalDate)value)));
+        cellValueSetterMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.format((LocalDateTime) value)));
+        cellValueSetterMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.format((ZonedDateTime) value)));
+        cellValueSetterMap.put(Date.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.format((Date) value)));
     }
 
     private Date getAsDate(Cell cell) {
