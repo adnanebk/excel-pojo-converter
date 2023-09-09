@@ -32,14 +32,20 @@ public class ExcelCellHandlerUtil<T> {
 
     public Object getCellValue(Class<?> type, Cell cell) {
         try {
-            return cellValueMap.get(getTypeName(type)).apply(cell, type);
+            var function = cellValueMap.get(getTypeName(type));
+            if(function==null)
+                throw new ExcelValidationException("Unsupported field type");
+            return function.apply(cell, type);
         } catch (IllegalStateException | NumberFormatException e) {
             throw new ExcelValidationException(String.format("Invalid format in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
         }
     }
 
     public void setCellValue(Class<?> type, Cell cell, Object value) {
-        cellValueSetterMap.get(getTypeName(type)).accept(cell, value);
+        var function = cellValueSetterMap.get(getTypeName(type));
+        if(function==null)
+            throw new ExcelValidationException("Unsupported field type");
+        function.accept(cell, value);
     }
 
     private String getTypeName(Class<?> type) {

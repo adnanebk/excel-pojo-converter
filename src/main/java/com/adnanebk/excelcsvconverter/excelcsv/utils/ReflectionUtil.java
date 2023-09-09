@@ -2,6 +2,7 @@ package com.adnanebk.excelcsvconverter.excelcsv.utils;
 
 
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.ConstructorCells;
+import com.adnanebk.excelcsvconverter.excelcsv.annotations.IgnoreCell;
 import com.adnanebk.excelcsvconverter.excelcsv.models.AnnotationType;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
@@ -22,18 +23,21 @@ public class ReflectionUtil<T> {
     protected final Class<T> classType;
     private Constructor<T> defaultConstructor;
     private Constructor<?> argsConstructor;
+    private boolean includeAllFields;
 
 
     public ReflectionUtil(Class<T> type, AnnotationType annotationType) {
         classType = type;
         this.setDefaultConstructor();
-        if (annotationType.equals(AnnotationType.FIELD))
+        setSheetInfos();
+        if(includeAllFields)
+          this.setAllFields();
+        else if (annotationType.equals(AnnotationType.FIELD))
             this.setFields();
         else {
             this.setArgsConstructor();
             this.setFieldsFromArgsConstructor();
         }
-        setDateFormats();
     }
 
     public List<Field<T>> getFields() {
@@ -60,12 +64,12 @@ public class ReflectionUtil<T> {
     public Optional<String> getDateTimeFormat() {
         return Optional.ofNullable(dateTimeFormat).filter(s -> !s.isEmpty());
     }
-
-    private void setDateFormats() {
+    private void setSheetInfos() {
         Optional.ofNullable(classType.getAnnotation(SheetDefinition.class))
                 .ifPresent(excelDefinitionAnnotation -> {
                     this.dateFormat = excelDefinitionAnnotation.dateFormat();
                     this.dateTimeFormat = excelDefinitionAnnotation.dateTimeFormat();
+                    this.includeAllFields = excelDefinitionAnnotation.includeAllFields();
                 });
     }
     private void setDefaultConstructor() {
@@ -85,26 +89,24 @@ public class ReflectionUtil<T> {
         Class<CellDefinition> annotation = CellDefinition.class;
         fields = Arrays.stream(classType.getDeclaredFields()).filter(field -> field.isAnnotationPresent(annotation))
                 .sorted(Comparator.comparing(field -> field.getDeclaredAnnotation(annotation).index()))
-                .map(field -> {
-                    String fieldName=field.getName();
-                    Class<?> fieldType=field.getType();
-                    return new Field<T>(fieldName, fieldType, getFieldTitle(annotation, field)
-                                   ,getFieldGetter(fieldName,fieldType),getFieldSetter(fieldName, fieldType));
-                }).toList();
+                .map(field -> buildField(List.of(getFieldTitle(field)).iterator(), field.getName(), field.getType())).toList();
+    }
+    private void setAllFields() {
+        Class<SheetDefinition> annotation = SheetDefinition.class;
+        var titles = Arrays.asList(classType.getAnnotation(annotation).titles()).iterator();
+        this.fields= Arrays.stream(classType.getDeclaredFields())
+                .filter(field -> !field.isAnnotationPresent(IgnoreCell.class))
+                .map(field -> buildField(titles, field.getName(), field.getType())).toList();
     }
 
     private void setFieldsFromArgsConstructor() {
         Class<ConstructorCells> annotation = ConstructorCells.class;
         var titles = Arrays.asList(argsConstructor.getAnnotation(annotation).titles()).iterator();
-        fields = Stream.of(argsConstructor.getParameters()).map(field -> {
-                    String fieldName=field.getName();
-                    Class<?> fieldType=field.getType();
-            return new Field<T>(field.getName(), field.getType(), this.getTitle(titles, field.getName()),
-                                getFieldGetter(fieldName,fieldType),getFieldSetter(fieldName,fieldType));
-                }).toList();
+        fields = Stream.of(argsConstructor.getParameters())
+                 .map(parameter -> buildField(titles,parameter.getName(), parameter.getType())).toList();
     }
-    private String getFieldTitle(Class<CellDefinition> annotation, java.lang.reflect.Field field) {
-        return Optional.of(field.getDeclaredAnnotation(annotation).title()).filter(s -> !s.isEmpty())
+    private String getFieldTitle(java.lang.reflect.Field field) {
+        return Optional.of(field.getDeclaredAnnotation(CellDefinition.class).title()).filter(s -> !s.isEmpty())
                 .orElseGet(() -> camelCaseWordsToWordsWithSpaces(field.getName()));
     }
     private String getTitle(Iterator<String> titles, String fieldName) {
@@ -123,6 +125,10 @@ public class ReflectionUtil<T> {
         } catch (NoSuchMethodException ex) {
             throw new ReflectionException("No setter found");
         }
+    }
+    private Field<T> buildField(Iterator<String> titles, String fieldName, Class<?> fieldType) {
+        return new Field<>(fieldName, fieldType, getTitle(titles, fieldName)
+                , getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType));
     }
     private String camelCaseWordsToWordsWithSpaces(String str) {
         if (StringUtils.hasLength(str))

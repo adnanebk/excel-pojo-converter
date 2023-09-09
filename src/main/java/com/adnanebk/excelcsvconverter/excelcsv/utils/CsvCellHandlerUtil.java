@@ -22,7 +22,10 @@ public class CsvCellHandlerUtil<T> {
     }
 
     public Object getCellValue(String value, Class<?> type) {
-        return cellValueMap.get(getTypeName(type)).apply(value, type);
+        var function = cellValueMap.get(getTypeName(type));
+        if(function==null)
+            throw new ExcelValidationException("Unsupported field type");
+        return function.apply(value, type);
     }
 
     private String getTypeName(Class<?> type) {

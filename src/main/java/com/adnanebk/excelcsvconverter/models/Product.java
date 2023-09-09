@@ -14,7 +14,6 @@ import java.util.Date;
 @Data
 @Builder
 @NoArgsConstructor
-@SheetDefinition(dateFormat = "dd MMM yyyy")
 public class Product {
     @CellDefinition
     private String name;

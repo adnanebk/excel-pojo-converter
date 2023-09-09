@@ -1,31 +1,17 @@
 package com.adnanebk.excelcsvconverter.excelcsv;
 
-import com.adnanebk.excelcsvconverter.excelcsv.ExcelHelper;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
-import com.adnanebk.excelcsvconverter.models.Category;
 import com.adnanebk.excelcsvconverter.models.Product;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.fail;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
