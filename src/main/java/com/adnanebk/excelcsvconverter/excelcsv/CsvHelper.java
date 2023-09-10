@@ -41,7 +41,8 @@ public class CsvHelper<T> {
             return br.lines().skip(1).map(row -> {
                 String[] columns = row.split(delimiter);
                 Object[] values = new Object[columns.length];
-                for (int i = 0; i < columns.length; i++) {
+                var fields = reflectionUtil.getFields();
+                for (int i = 0; i < fields.size(); i++) {
                     String cellValue = columns[i];
                     var field = reflectionUtil.getFields().get(i);
                     values[i] = cellHandlerUtil.getCellValue(cellValue, field.type());
