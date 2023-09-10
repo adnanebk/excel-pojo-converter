@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.CONSTRUCTOR)
-public @interface ConstructorCells {
-    String[] titles() default {};
+@Target(ElementType.FIELD)
+public @interface CellEnumValues {
 
+    String[] values() default {};
 }

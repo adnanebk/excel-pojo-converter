@@ -9,11 +9,11 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class CsvCellHandlerUtil<T> {
 
-    private final Map<String, BiFunction<String, Class<?>, ?>> cellValueMap = new HashMap<>();
+    private final Map<String, Function<String,Object>> cellValueMap = new HashMap<>();
     private final DateParserFormatterUtil<T> dateParserFormatterUtil;
 
     public CsvCellHandlerUtil(DateParserFormatterUtil<T> dateParserFormatterUtil) {
@@ -25,7 +25,7 @@ public class CsvCellHandlerUtil<T> {
         var function = cellValueMap.get(getTypeName(type));
         if(function==null)
             throw new ExcelValidationException("Unsupported field type");
-        return function.apply(value, type);
+        return function.apply(value);
     }
 
     private String getTypeName(Class<?> type) {
@@ -33,18 +33,18 @@ public class CsvCellHandlerUtil<T> {
     }
 
     private void initCellValueMap() {
-        cellValueMap.put(String.class.getSimpleName().toLowerCase(), (value, fieldType) -> value);
-        cellValueMap.put(boolean.class.getSimpleName().toLowerCase(), (value, fieldType) -> Boolean.valueOf(value));
-        cellValueMap.put(Enum.class.getSimpleName().toLowerCase(), (value, fieldType) -> Enum.valueOf(fieldType.asSubclass(Enum.class), value));
-        cellValueMap.put(Integer.class.getSimpleName().toLowerCase(), (value, fieldType) -> Integer.parseInt(value));
-        cellValueMap.put(int.class.getSimpleName().toLowerCase(), (value, fieldType) -> Integer.parseInt(value));
-        cellValueMap.put(short.class.getSimpleName().toLowerCase(), (value, fieldType) -> Short.parseShort(value));
-        cellValueMap.put(long.class.getSimpleName().toLowerCase(), (value, fieldType) -> Long.parseLong(value));
-        cellValueMap.put(double.class.getSimpleName().toLowerCase(), (value, fieldType) -> Double.parseDouble(value.replace(",", ".")));
-        cellValueMap.put(LocalDate.class.getSimpleName().toLowerCase(), (value, fieldType) -> dateParserFormatterUtil.parseToLocalDate(value));
-        cellValueMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), (value, fieldType) -> dateParserFormatterUtil.parseToLocalDateTime(value));
-        cellValueMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), (value, fieldType) -> dateParserFormatterUtil.parseToZonedDateTime(value));
-        cellValueMap.put(Date.class.getSimpleName().toLowerCase(), (value, fieldType) -> {
+        cellValueMap.put(String.class.getSimpleName().toLowerCase(), value -> value);
+        cellValueMap.put(boolean.class.getSimpleName().toLowerCase(), Boolean::valueOf);
+        cellValueMap.put(Enum.class.getSimpleName().toLowerCase(), value -> value);
+        cellValueMap.put(Integer.class.getSimpleName().toLowerCase(), Integer::parseInt);
+        cellValueMap.put(int.class.getSimpleName().toLowerCase(), Integer::parseInt);
+        cellValueMap.put(short.class.getSimpleName().toLowerCase(), Short::parseShort);
+        cellValueMap.put(long.class.getSimpleName().toLowerCase(), Long::parseLong);
+        cellValueMap.put(double.class.getSimpleName().toLowerCase(),value -> Double.parseDouble(value.replace(",", ".")));
+        cellValueMap.put(LocalDate.class.getSimpleName().toLowerCase(), dateParserFormatterUtil::parseToLocalDate);
+        cellValueMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), dateParserFormatterUtil::parseToLocalDateTime);
+        cellValueMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), dateParserFormatterUtil::parseToZonedDateTime);
+        cellValueMap.put(Date.class.getSimpleName().toLowerCase(), (value) -> {
             try {
                 return dateParserFormatterUtil.parseToDate(value);
             } catch (ParseException e) {

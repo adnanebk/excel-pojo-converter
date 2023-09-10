@@ -1,17 +1,14 @@
 package com.adnanebk.excelcsvconverter.excelcsv;
 
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
-import com.adnanebk.excelcsvconverter.excelcsv.models.AnnotationType;
-import com.adnanebk.excelcsvconverter.models.Category;
-import com.adnanebk.excelcsvconverter.models.Product;
+import com.adnanebk.excelcsvconverter.excelcsv.models.Category;
+import com.adnanebk.excelcsvconverter.excelcsv.models.Product;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
@@ -24,13 +21,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.fail;
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,25 +38,19 @@ class ExcelHelperTest {
     @BeforeEach
     void setUp() {
     }
-    private static Stream<Arguments> excelHelper() {
-        return Stream.of(
-         Arguments.of(ExcelHelper.create(Product.class)),
-         Arguments.of(ExcelHelper.create(Product.class, AnnotationType.CONSTRUCTOR))
-        );
-    }
-    @ParameterizedTest
-    @MethodSource("excelHelper")
+
+    @Test
     @Order(0)
-    void toExcel_withValidProductData_shouldReturnCorrectExcel(ExcelHelper<Product> excelHelper) {
+    void toExcel_withValidProductData_shouldReturnCorrectExcel() {
         List<Product> productList = new ArrayList<>();
-        productList.add(new Product("Product A", 100, 90.5, 80.0, true, false, 50, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.A, LocalDateTime.now()));
-        productList.add(new Product("Product B", 200, 180.75, 150.0, true, true, 30, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B, LocalDateTime.now()));
+        productList.add(new Product("Product A", 100, 90.5, 80.0, true, false, 50, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B));
+        productList.add(new Product("Product B", 200, 180.75, 150.0, true, true, 30, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B));
 
         // Generate Excel file
         String destinationPath = "src/test/resources/products.xlsx";
         try (ByteArrayInputStream excelBytes = excelHelper.toExcel(productList);
                 Workbook workbook = new XSSFWorkbook(excelBytes);
-             FileOutputStream outputStream = new FileOutputStream(destinationPath);
+             FileOutputStream outputStream = new FileOutputStream(destinationPath)
         ) {
             workbook.write(outputStream);
             Sheet sheet = workbook.getSheetAt(0);
@@ -92,9 +81,9 @@ class ExcelHelperTest {
                     assertEquals(product.getExpired(), row.getCell(5).getBooleanCellValue());
                     assertEquals((double) product.getUnitsInStock(), row.getCell(6).getNumericCellValue());
                     assertEquals(new SimpleDateFormat().format(product.getCreatedDate()), row.getCell(7).getStringCellValue());
-                    assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(product.getUpdatedDate()), row.getCell(8).getStringCellValue());
+                    assertEquals(product.getUpdatedDate().toString(), row.getCell(8).getStringCellValue());
                     assertEquals(DateTimeFormatter.ISO_ZONED_DATE_TIME.format(product.getZonedDateTime()), row.getCell(9).getStringCellValue());
-                    assertEquals(product.getCategory().toString(), row.getCell(10).getStringCellValue());
+                    assertEquals("bb", row.getCell(10).getStringCellValue());
                 }
                 } catch (IOException e) {
                 fail("Error reading Excel file: " + e.getMessage());

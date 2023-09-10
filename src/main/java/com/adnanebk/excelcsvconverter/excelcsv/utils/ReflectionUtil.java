@@ -1,20 +1,18 @@
 package com.adnanebk.excelcsvconverter.excelcsv.utils;
 
 
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.ConstructorCells;
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.IgnoreCell;
-import com.adnanebk.excelcsvconverter.excelcsv.models.AnnotationType;
-import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
+import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnumValues;
+import com.adnanebk.excelcsvconverter.excelcsv.annotations.IgnoreCell;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
+import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class ReflectionUtil<T> {
     private String dateTimeFormat;
@@ -22,22 +20,17 @@ public class ReflectionUtil<T> {
     protected List<Field<T>> fields;
     protected final Class<T> classType;
     private Constructor<T> defaultConstructor;
-    private Constructor<?> argsConstructor;
     private boolean includeAllFields;
 
 
-    public ReflectionUtil(Class<T> type, AnnotationType annotationType) {
+    public ReflectionUtil(Class<T> type) {
         classType = type;
         this.setDefaultConstructor();
         setSheetInfos();
         if(includeAllFields)
           this.setAllFields();
-        else if (annotationType.equals(AnnotationType.FIELD))
+        else
             this.setFields();
-        else {
-            this.setArgsConstructor();
-            this.setFieldsFromArgsConstructor();
-        }
     }
 
     public List<Field<T>> getFields() {
@@ -80,31 +73,20 @@ public class ReflectionUtil<T> {
         }
     }
 
-    private void setArgsConstructor() {
-        argsConstructor = Arrays.stream(this.classType.getDeclaredConstructors()).filter(ct -> ct.isAnnotationPresent(ConstructorCells.class))
-                .findFirst().orElseThrow(() -> new ReflectionException("Annotation ExcelColsDefinition is required in constructor"));
-    }
-
     private void setFields() {
         Class<CellDefinition> annotation = CellDefinition.class;
         fields = Arrays.stream(classType.getDeclaredFields()).filter(field -> field.isAnnotationPresent(annotation))
-                .sorted(Comparator.comparing(field -> field.getDeclaredAnnotation(annotation).index()))
-                .map(field -> buildField(List.of(getFieldTitle(field)).iterator(), field.getName(), field.getType())).toList();
+                .sorted(Comparator.comparing(field -> field.getDeclaredAnnotation(annotation).value()))
+                .map(field -> buildField(List.of(getFieldTitle(field)).iterator(),field)).toList();
     }
     private void setAllFields() {
         Class<SheetDefinition> annotation = SheetDefinition.class;
         var titles = Arrays.asList(classType.getAnnotation(annotation).titles()).iterator();
         this.fields= Arrays.stream(classType.getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(IgnoreCell.class))
-                .map(field -> buildField(titles, field.getName(), field.getType())).toList();
+                .map(field -> buildField(titles,field)).toList();
     }
 
-    private void setFieldsFromArgsConstructor() {
-        Class<ConstructorCells> annotation = ConstructorCells.class;
-        var titles = Arrays.asList(argsConstructor.getAnnotation(annotation).titles()).iterator();
-        fields = Stream.of(argsConstructor.getParameters())
-                 .map(parameter -> buildField(titles,parameter.getName(), parameter.getType())).toList();
-    }
     private String getFieldTitle(java.lang.reflect.Field field) {
         return Optional.of(field.getDeclaredAnnotation(CellDefinition.class).title()).filter(s -> !s.isEmpty())
                 .orElseGet(() -> camelCaseWordsToWordsWithSpaces(field.getName()));
@@ -126,9 +108,13 @@ public class ReflectionUtil<T> {
             throw new ReflectionException("No setter found");
         }
     }
-    private Field<T> buildField(Iterator<String> titles, String fieldName, Class<?> fieldType) {
+    private Field<T> buildField(Iterator<String> titles, java.lang.reflect.Field field) {
+        var fieldType = field.getType();
+        var fieldName = field.getName();
         return new Field<>(fieldName, fieldType, getTitle(titles, fieldName)
-                , getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType));
+                , getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType),
+                Optional.ofNullable(field.getDeclaredAnnotation(CellEnumValues.class))
+                        .map(CellEnumValues::values).orElse(new String[]{}));
     }
     private String camelCaseWordsToWordsWithSpaces(String str) {
         if (StringUtils.hasLength(str))

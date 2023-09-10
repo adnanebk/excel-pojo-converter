@@ -1,11 +1,10 @@
 package com.adnanebk.excelcsvconverter.excelcsv;
 
-import com.adnanebk.excelcsvconverter.excelcsv.models.AnnotationType;
+import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
+import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.DateParserFormatterUtil;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.ExcelCellHandlerUtil;
-import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
-import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.ReflectionUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -37,16 +36,13 @@ public class ExcelHelper<T> {
         sheetName = fineName + "-" + LocalDate.now();
     }
 
-    public static <T> ExcelHelper<T> create(Class<T> type, AnnotationType annotationType) {
-        var reflectionUtil = new ReflectionUtil<>(type, annotationType);
+    public static <T> ExcelHelper<T> create(Class<T> type) {
+        var reflectionUtil = new ReflectionUtil<>(type);
         var tDateParserUtil = new DateParserFormatterUtil<>(reflectionUtil);
         var cellHandlerUtil = new ExcelCellHandlerUtil<>(tDateParserUtil);
         return new ExcelHelper<>(type.getSimpleName(), reflectionUtil, cellHandlerUtil);
     }
 
-    public static <T> ExcelHelper<T> create(Class<T> type) {
-        return create(type, AnnotationType.FIELD);
-    }
 
     public List<T> toList(MultipartFile file) {
         if (!hasExcelFormat(file))

@@ -2,8 +2,6 @@ package com.adnanebk.excelcsvconverter.excelcsv;
 
 
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
-import com.adnanebk.excelcsvconverter.excelcsv.models.AnnotationType;
-import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.CsvCellHandlerUtil;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.DateParserFormatterUtil;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.ReflectionUtil;
@@ -28,16 +26,12 @@ public class CsvHelper<T> {
         this.delimiter =delimiter;
     }
 
-    public static <T> CsvHelper<T> create(Class<T> type, AnnotationType annotationType,String delimiter) {
-        var reflectionUtil = new ReflectionUtil<>(type, annotationType);
+    public static <T> CsvHelper<T> create(Class<T> type,String delimiter) {
+        var reflectionUtil = new ReflectionUtil<>(type);
         var tDateParserUtil = new DateParserFormatterUtil<>(reflectionUtil);
         var cellHandlerUtil = new CsvCellHandlerUtil<>(tDateParserUtil);
 
         return new CsvHelper<>(reflectionUtil, cellHandlerUtil,delimiter);
-    }
-
-    public static <T> CsvHelper<T> create(Class<T> type,String delimiter) {
-        return create(type, AnnotationType.FIELD,delimiter);
     }
 
     public List<T> toList(MultipartFile file) {

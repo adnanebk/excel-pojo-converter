@@ -14,12 +14,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class ExcelCellHandlerUtil<T> {
 
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private final Map<String, BiFunction<Cell, Class<?>, Object>> cellValueMap = new HashMap<>();
+    private final Map<String, Function<Cell, Object>> cellValueMap = new HashMap<>();
     private final Map<String, BiConsumer<Cell, Object>> cellValueSetterMap = new HashMap<>();
     private final DateParserFormatterUtil<T> dateParserFormatterUtil;
 
@@ -35,7 +35,7 @@ public class ExcelCellHandlerUtil<T> {
             var function = cellValueMap.get(getTypeName(type));
             if(function==null)
                 throw new ExcelValidationException("Unsupported field type");
-            return function.apply(cell, type);
+            return function.apply(cell);
         } catch (IllegalStateException | NumberFormatException e) {
             throw new ExcelValidationException(String.format("Invalid format in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
         }
@@ -53,18 +53,18 @@ public class ExcelCellHandlerUtil<T> {
     }
 
     private void initCellValueMap() {
-        cellValueMap.put(String.class.getSimpleName().toLowerCase(), (cell, fieldType) -> cell.getStringCellValue());
-        cellValueMap.put(boolean.class.getSimpleName().toLowerCase(), (cell, fieldType) -> cell.getBooleanCellValue());
-        cellValueMap.put(Enum.class.getSimpleName().toLowerCase(), (cell, fieldType) -> Enum.valueOf(fieldType.asSubclass(Enum.class), cell.getStringCellValue()));
-        cellValueMap.put(Integer.class.getSimpleName().toLowerCase(), (cell, fieldType) -> (int) cell.getNumericCellValue());
-        cellValueMap.put(int.class.getSimpleName().toLowerCase(), (cell, fieldType) -> (int) cell.getNumericCellValue());
-        cellValueMap.put(short.class.getSimpleName().toLowerCase(), (cell, fieldType) -> (short) cell.getNumericCellValue());
-        cellValueMap.put(long.class.getSimpleName().toLowerCase(), (cell, fieldType) -> (long) cell.getNumericCellValue());
-        cellValueMap.put(double.class.getSimpleName().toLowerCase(), (cell, fieldType) -> cell.getNumericCellValue());
-        cellValueMap.put(LocalDate.class.getSimpleName().toLowerCase(), (cell, fieldType) -> getAsLocalDate(cell));
-        cellValueMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), (cell, fieldType) -> getAsLocalDateTime(cell));
-        cellValueMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), (cell, fieldType) -> getAsZonedDateTime(cell));
-        cellValueMap.put(Date.class.getSimpleName().toLowerCase(), (cell, fieldType) -> getAsDate(cell));
+        cellValueMap.put(String.class.getSimpleName().toLowerCase(), Cell::getStringCellValue);
+        cellValueMap.put(boolean.class.getSimpleName().toLowerCase(), Cell::getBooleanCellValue);
+        cellValueMap.put(Enum.class.getSimpleName().toLowerCase(), Cell::getStringCellValue);
+        cellValueMap.put(Integer.class.getSimpleName().toLowerCase(), (cell) -> (int) cell.getNumericCellValue());
+        cellValueMap.put(int.class.getSimpleName().toLowerCase(), (cell) -> (int) cell.getNumericCellValue());
+        cellValueMap.put(short.class.getSimpleName().toLowerCase(), (cell) -> (short) cell.getNumericCellValue());
+        cellValueMap.put(long.class.getSimpleName().toLowerCase(), (cell) -> (long) cell.getNumericCellValue());
+        cellValueMap.put(double.class.getSimpleName().toLowerCase(), Cell::getNumericCellValue);
+        cellValueMap.put(LocalDate.class.getSimpleName().toLowerCase(), this::getAsLocalDate);
+        cellValueMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), this::getAsLocalDateTime);
+        cellValueMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), this::getAsZonedDateTime);
+        cellValueMap.put(Date.class.getSimpleName().toLowerCase(), this::getAsDate);
     }
 
     private void initValueSetterMap() {

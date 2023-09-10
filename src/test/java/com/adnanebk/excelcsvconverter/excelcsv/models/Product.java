@@ -1,4 +1,4 @@
-package com.adnanebk.excelcsvconverter.models;
+package com.adnanebk.excelcsvconverter.excelcsv.models;
 
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnumValues;
@@ -46,6 +46,7 @@ public class Product {
     @CellDefinition
     private ZonedDateTime zonedDateTime;
 
+    @CellDefinition
     @CellEnumValues(values = {"aa","bb","cc"})
     private Category category;
 
