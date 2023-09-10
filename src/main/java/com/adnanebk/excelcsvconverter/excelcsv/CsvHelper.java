@@ -44,7 +44,7 @@ public class CsvHelper<T> {
                 var fields = reflectionUtil.getFields();
                 for (int i = 0; i < fields.size(); i++) {
                     String cellValue = columns[i];
-                    var field = reflectionUtil.getFields().get(i);
+                    var field = fields.get(i);
                     values[i] = cellHandlerUtil.getCellValue(cellValue, field.type());
                 }
                 return reflectionUtil.getInstance(values);
