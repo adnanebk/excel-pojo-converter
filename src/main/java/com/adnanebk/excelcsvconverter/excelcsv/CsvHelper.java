@@ -49,7 +49,7 @@ public class CsvHelper<T> {
                 Object[] values = new Object[columns.length];
                 for (int i = 0; i < columns.length; i++) {
                     String cellValue = columns[i];
-                    Field field = reflectionUtil.getFields().get(i);
+                    var field = reflectionUtil.getFields().get(i);
                     values[i] = cellHandlerUtil.getCellValue(cellValue, field.type());
                 }
                 return reflectionUtil.getInstance(values);

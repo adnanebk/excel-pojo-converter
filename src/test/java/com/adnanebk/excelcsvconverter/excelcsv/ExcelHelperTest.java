@@ -12,6 +12,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -52,8 +54,8 @@ class ExcelHelperTest {
     @Order(0)
     void toExcel_withValidProductData_shouldReturnCorrectExcel(ExcelHelper<Product> excelHelper) {
         List<Product> productList = new ArrayList<>();
-        productList.add(new Product("Product A", 100, 90.5, 80.0, true, false, 50, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.A));
-        productList.add(new Product("Product B", 200, 180.75, 150.0, true, true, 30, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B));
+        productList.add(new Product("Product A", 100, 90.5, 80.0, true, false, 50, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.A, LocalDateTime.now()));
+        productList.add(new Product("Product B", 200, 180.75, 150.0, true, true, 30, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B, LocalDateTime.now()));
 
         // Generate Excel file
         String destinationPath = "src/test/resources/products.xlsx";
@@ -90,7 +92,7 @@ class ExcelHelperTest {
                     assertEquals(product.getExpired(), row.getCell(5).getBooleanCellValue());
                     assertEquals((double) product.getUnitsInStock(), row.getCell(6).getNumericCellValue());
                     assertEquals(new SimpleDateFormat().format(product.getCreatedDate()), row.getCell(7).getStringCellValue());
-                    assertEquals(DateTimeFormatter.ofPattern("dd MMM yyyy").format(product.getUpdatedDate()), row.getCell(8).getStringCellValue());
+                    assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(product.getUpdatedDate()), row.getCell(8).getStringCellValue());
                     assertEquals(DateTimeFormatter.ISO_ZONED_DATE_TIME.format(product.getZonedDateTime()), row.getCell(9).getStringCellValue());
                     assertEquals(product.getCategory().toString(), row.getCell(10).getStringCellValue());
                 }
@@ -98,12 +100,13 @@ class ExcelHelperTest {
                 fail("Error reading Excel file: " + e.getMessage());
             }
         }
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"products.xlsx","products2.xlsx","products3.xlsx"})
     @Order(1)
-    void toList_withValidExcelFile_shouldReturnCorrectProductList() throws IOException {
+    void toList_withValidExcelFile_shouldReturnCorrectProductList(String fileName) throws IOException {
 
         // Read the file as an InputStream
-       InputStream inputStream = new ClassPathResource("products.xlsx").getInputStream();
+       InputStream inputStream = new ClassPathResource(fileName).getInputStream();
 
         // Create a MockMultipartFile
         MultipartFile multipartFile = new MockMultipartFile("file", "generatedExcel.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", inputStream);
@@ -142,4 +145,5 @@ class ExcelHelperTest {
 
         assertThrows(ExcelFileException.class, () -> excelHelper.toList(file));
     }
+
     }

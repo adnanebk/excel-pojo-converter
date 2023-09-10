@@ -3,18 +3,21 @@ package com.adnanebk.excelcsvconverter.models;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.ConstructorCells;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Data
 @Builder
 @NoArgsConstructor
-@SheetDefinition(dateFormat = "dd MMM yyyy")
+@AllArgsConstructor
+@SheetDefinition
 public class Product {
     @CellDefinition
     private String name;
@@ -48,6 +51,10 @@ public class Product {
 
     @CellDefinition
     private Category category;
+
+    @CellDefinition
+    private LocalDateTime expiredDate=LocalDateTime.now();
+
 
     @ConstructorCells
     public Product(String name, long price, double promoPrice, Double minPrice, boolean active, Boolean expired, Integer unitsInStock, Date createdDate, LocalDate updatedDate, ZonedDateTime zonedDateTime, Category category) {

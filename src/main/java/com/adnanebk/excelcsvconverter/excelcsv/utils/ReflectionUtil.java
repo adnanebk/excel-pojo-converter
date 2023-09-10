@@ -47,7 +47,7 @@ public class ReflectionUtil<T> {
     public T getInstance(Object... values) {
         try {
             T obj = defaultConstructor.newInstance();
-            for (int i = 0; i < fields.size(); i++) {
+            for (int i = 0; i < values.length; i++) {
                 if (values[i] != null)
                     fields.get(i).setValue(obj, values[i]);
             }
