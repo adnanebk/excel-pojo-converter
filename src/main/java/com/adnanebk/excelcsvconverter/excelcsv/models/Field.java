@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 
-public record Field<T>(String name, Class<?> type, String title, Method getter, Method setter,String[] enumValues) {
+public record Field<T>(String name, Class<?> type, String title, Method getter, Method setter, int colIndex, String[] enumValues) {
     public Object getValue(T obj) {
         try {
             Object value = getter.invoke(obj);

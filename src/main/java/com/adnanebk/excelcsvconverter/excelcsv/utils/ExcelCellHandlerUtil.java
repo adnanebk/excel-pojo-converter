@@ -42,6 +42,8 @@ public class ExcelCellHandlerUtil<T> {
     }
 
     public void setCellValue(Class<?> type, Cell cell, Object value) {
+        if(value==null)
+            return;
         var function = cellValueSetterMap.get(getTypeName(type));
         if(function==null)
             throw new ExcelValidationException("Unsupported field type");

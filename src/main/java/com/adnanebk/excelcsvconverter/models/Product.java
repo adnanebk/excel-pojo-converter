@@ -3,65 +3,52 @@ package com.adnanebk.excelcsvconverter.models;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnumValues;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Data
 @Builder
+@AllArgsConstructor
 @NoArgsConstructor
-@SheetDefinition
+@SheetDefinition(dateFormat = "dd/MM/yyyy")
 public class Product {
-    @CellDefinition
-    private String name;
 
-    @CellDefinition
+    private String name;
     private long price;
-    @CellDefinition
     private double promoPrice;
 
-    @CellDefinition
+    @CellDefinition(3)
     private Double minPrice;
 
-    @CellDefinition
     private boolean active;
 
-    @CellDefinition
+    @CellDefinition(4)
     private Boolean expired;
 
 
-    @CellDefinition
+    @CellDefinition(5)
     private Integer unitsInStock;
 
-    @CellDefinition
+    @CellDefinition(6)
     private Date createdDate;
 
-    @CellDefinition
+    @CellDefinition(7)
     private LocalDate updatedDate;
 
-    @CellDefinition
+    @CellDefinition(8)
     private ZonedDateTime zonedDateTime;
 
     @CellEnumValues(values = {"aa","bb","cc"})
+    @CellDefinition(9)
     private Category category;
 
+    private LocalDateTime localDateTime;
 
-
-    public Product(String name, long price, double promoPrice, Double minPrice, boolean active, Boolean expired, Integer unitsInStock, Date createdDate, LocalDate updatedDate, ZonedDateTime zonedDateTime, Category category) {
-        this.name = name;
-        this.price = price;
-        this.promoPrice = promoPrice;
-        this.minPrice = minPrice;
-        this.active = active;
-        this.expired = expired;
-        this.unitsInStock = unitsInStock;
-        this.createdDate = createdDate;
-        this.updatedDate = updatedDate;
-        this.zonedDateTime = zonedDateTime;
-        this.category = category;
-    }
 }

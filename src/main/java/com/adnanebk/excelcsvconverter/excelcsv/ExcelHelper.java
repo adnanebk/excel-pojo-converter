@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 
@@ -80,11 +79,10 @@ public class ExcelHelper<T> {
 
     private T rowToObject(Row currentRow) {
         var fields = reflectionUtil.getFields();
-        Object[] values = IntStream.range(0, fields.size())
-                .mapToObj(index -> getCurrentCell(index, currentRow)
-                        .map(cell -> getCellValue(cell, fields.get(index).type()))
-                        .orElse(null)
-                ).toArray();
+        Object[] values = fields.stream()
+                .map(field -> getCurrentCell(field.colIndex(), currentRow)
+                .map(cell -> getCellValue(cell, field.type()))
+                .orElse(null)).toArray();
         return reflectionUtil.getInstance(values);
 
     }

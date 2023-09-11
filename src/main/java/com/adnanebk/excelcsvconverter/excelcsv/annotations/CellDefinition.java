@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 public @interface CellDefinition {
     String title() default "";
 
-    int value() default Integer.MAX_VALUE;
+    int value();
 }

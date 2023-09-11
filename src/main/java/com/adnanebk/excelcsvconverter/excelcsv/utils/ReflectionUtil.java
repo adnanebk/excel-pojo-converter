@@ -13,6 +13,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReflectionUtil<T> {
     private String dateTimeFormat;
@@ -77,14 +78,16 @@ public class ReflectionUtil<T> {
         Class<CellDefinition> annotation = CellDefinition.class;
         fields = Arrays.stream(classType.getDeclaredFields()).filter(field -> field.isAnnotationPresent(annotation))
                 .sorted(Comparator.comparing(field -> field.getDeclaredAnnotation(annotation).value()))
-                .map(field -> buildField(List.of(getFieldTitle(field)).iterator(),field)).toList();
+                .map(field -> buildField(List.of(getFieldTitle(field)).iterator()
+                        ,field.getDeclaredAnnotation(annotation).value(),field)).toList();
     }
     private void setAllFields() {
         Class<SheetDefinition> annotation = SheetDefinition.class;
         var titles = Arrays.asList(classType.getAnnotation(annotation).titles()).iterator();
+        AtomicInteger index=new AtomicInteger(0);
         this.fields= Arrays.stream(classType.getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(IgnoreCell.class))
-                .map(field -> buildField(titles,field)).toList();
+                .map(field -> buildField(titles,index.getAndIncrement(),field)).toList();
     }
 
     private String getFieldTitle(java.lang.reflect.Field field) {
@@ -108,12 +111,12 @@ public class ReflectionUtil<T> {
             throw new ReflectionException("No setter found");
         }
     }
-    private Field<T> buildField(Iterator<String> titles, java.lang.reflect.Field field) {
+    private Field<T> buildField(Iterator<String> titles,int index,java.lang.reflect.Field field) {
         var fieldType = field.getType();
         var fieldName = field.getName();
         return new Field<>(fieldName, fieldType, getTitle(titles, fieldName)
-                , getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType),
-                Optional.ofNullable(field.getDeclaredAnnotation(CellEnumValues.class))
+                ,getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType),index
+                ,Optional.ofNullable(field.getDeclaredAnnotation(CellEnumValues.class))
                         .map(CellEnumValues::values).orElse(new String[]{}));
     }
     private String camelCaseWordsToWordsWithSpaces(String str) {

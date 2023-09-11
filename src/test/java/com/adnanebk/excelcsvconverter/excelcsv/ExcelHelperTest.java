@@ -60,7 +60,7 @@ class ExcelHelperTest {
                 Row headerRow = sheet.getRow( 0);
                 assertEquals("name", headerRow.getCell(0).getStringCellValue());
                 assertEquals("price", headerRow.getCell(1).getStringCellValue());
-                assertEquals("promo price", headerRow.getCell(2).getStringCellValue());
+                assertEquals("Promo price", headerRow.getCell(2).getStringCellValue());
                 assertEquals("min price", headerRow.getCell(3).getStringCellValue());
                 assertEquals("active", headerRow.getCell(4).getStringCellValue());
                 assertEquals("expired", headerRow.getCell(5).getStringCellValue());

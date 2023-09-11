@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +57,7 @@ public class ExcelFieldsController {
                 .createdDate(new Date())
                 .zonedDateTime(ZonedDateTime.now())
                 .promoPrice(90.5)
+                .localDateTime(LocalDateTime.now())
                 .minPrice(50.4).build();
     }
 
