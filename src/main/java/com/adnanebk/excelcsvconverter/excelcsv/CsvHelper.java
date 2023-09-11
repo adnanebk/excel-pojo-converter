@@ -42,7 +42,7 @@ public class CsvHelper<T> {
                 String[] columns = row.split(delimiter);
                 Object[] values = new Object[columns.length];
                 var fields = reflectionUtil.getFields();
-                for (int i = 0; i < fields.size(); i++) {
+                for (int i = 0; i < Math.min(columns.length,fields.size()); i++) {
                     String cellValue = columns[i];
                     var field = fields.get(i);
                     values[i] = cellHandlerUtil.getCellValue(cellValue, field.type());
