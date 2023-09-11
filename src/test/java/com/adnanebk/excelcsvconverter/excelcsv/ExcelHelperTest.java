@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -43,8 +44,8 @@ class ExcelHelperTest {
     @Order(0)
     void toExcel_withValidProductData_shouldReturnCorrectExcel() {
         List<Product> productList = new ArrayList<>();
-        productList.add(new Product("Product A", 100, 90.5, 80.0, true, false, 50, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B));
-        productList.add(new Product("Product B", 200, 180.75, 150.0, true, true, 30, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B));
+        productList.add(new Product("Product A", 100, 90.5, 80.0, true, false, 50, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B, LocalDateTime.now()));
+        productList.add(new Product("Product B", 200, 180.75, 150.0, true, true, 30, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B,LocalDateTime.now()));
 
         // Generate Excel file
         String destinationPath = "src/test/resources/products.xlsx";
@@ -84,6 +85,7 @@ class ExcelHelperTest {
                     assertEquals(product.getUpdatedDate().toString(), row.getCell(8).getStringCellValue());
                     assertEquals(DateTimeFormatter.ISO_ZONED_DATE_TIME.format(product.getZonedDateTime()), row.getCell(9).getStringCellValue());
                     assertEquals("bb", row.getCell(10).getStringCellValue());
+                    assertEquals(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(product.getLocalDateTime()), row.getCell(11).getStringCellValue());
                 }
                 } catch (IOException e) {
                 fail("Error reading Excel file: " + e.getMessage());

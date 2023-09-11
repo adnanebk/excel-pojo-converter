@@ -3,23 +3,26 @@ package com.adnanebk.excelcsvconverter.excelcsv.models;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnumValues;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Data
 @Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @SheetDefinition
 public class Product {
-    @CellDefinition
+    @CellDefinition(0)
     private String name;
 
-    @CellDefinition
+    @CellDefinition(1)
     private long price;
     @CellDefinition
     private double promoPrice;
@@ -50,19 +53,7 @@ public class Product {
     @CellEnumValues(values = {"aa","bb","cc"})
     private Category category;
 
+    @CellDefinition
+    private LocalDateTime localDateTime;
 
-
-    public Product(String name, long price, double promoPrice, Double minPrice, boolean active, Boolean expired, Integer unitsInStock, Date createdDate, LocalDate updatedDate, ZonedDateTime zonedDateTime, Category category) {
-        this.name = name;
-        this.price = price;
-        this.promoPrice = promoPrice;
-        this.minPrice = minPrice;
-        this.active = active;
-        this.expired = expired;
-        this.unitsInStock = unitsInStock;
-        this.createdDate = createdDate;
-        this.updatedDate = updatedDate;
-        this.zonedDateTime = zonedDateTime;
-        this.category = category;
-    }
 }

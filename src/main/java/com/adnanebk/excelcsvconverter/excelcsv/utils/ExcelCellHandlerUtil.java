@@ -123,21 +123,6 @@ public class ExcelCellHandlerUtil<T> {
         }
     }
 
-    private Date convertToDate(LocalDateTime dateToConvert) {
-        return java.util.Date.from(dateToConvert.atZone(ZoneId.systemDefault())
-                .toInstant());
-    }
-
-    private Date convertToDate(LocalDate dateToConvert) {
-        return Date.from(dateToConvert.atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
-    }
-
-    private Date convertToDate(ZonedDateTime dateToConvert) {
-        return java.util.Date.from(dateToConvert.toInstant());
-    }
-
     private static String getInvalidCellDateMsg(Cell cell) {
         return String.format("Invalid or unsupported date format in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex()));
     }
