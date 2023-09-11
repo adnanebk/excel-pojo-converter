@@ -1,7 +1,7 @@
 package com.adnanebk.excelcsvconverter.excelcsv;
 
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
-import com.adnanebk.excelcsvconverter.models.Product;
+import com.adnanebk.excelcsvconverter.excelcsv.models.Product;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
@@ -38,6 +38,8 @@ class CsvHelperTest {
 
         // Assuming you know the expected size of the list
         assertEquals(19, result.size());
+        assertEquals("P1", result.get(0).getName());
+        assertEquals(200, result.get(0).getPrice());
 
         // Add more assertions based on the actual data you expect
 
