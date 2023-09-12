@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Disabled
+//@Disabled
 class CsvHelperTest {
     private CsvHelper<Product> csvHelper;
 
@@ -35,7 +35,7 @@ class CsvHelperTest {
 
         // Create a MockMultipartFile
         MultipartFile multipartFile = new MockMultipartFile("file", "generatedCsv.csv", "text/csv", inputStream);
-        List<Product> result = csvHelper.toList(multipartFile);
+        List<Product> result = csvHelper.toList(multipartFile).toList();
 
         // Assuming you know the expected size of the list
         assertEquals(19, result.size());

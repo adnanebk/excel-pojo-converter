@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Disabled
+//@Disabled
 class ExcelHelperTest {
     private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class);
 
@@ -102,7 +102,7 @@ class ExcelHelperTest {
 
         // Create a MockMultipartFile
         MultipartFile multipartFile = new MockMultipartFile("file", "generatedExcel.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", inputStream);
-        List<Product> result = excelHelper.toList(multipartFile);
+        List<Product> result = excelHelper.toList(multipartFile).toList();
 
         // Assuming you know the expected size of the list
         assertEquals(2, result.size());
