@@ -18,20 +18,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ReflectionUtil<T> {
     private String dateTimeFormat;
     private String dateFormat;
-    protected List<Field<T>> fields;
-    protected final Class<T> classType;
-    private Constructor<T> defaultConstructor;
+    private final List<Field<T>> fields;
+    private final Class<T> classType;
+    private final Constructor<T> defaultConstructor;
     private boolean includeAllFields;
 
 
     public ReflectionUtil(Class<T> type) {
         classType = type;
-        this.setDefaultConstructor();
-        setSheetInfos();
-        if(includeAllFields)
-          this.setAllFields();
-        else
-            this.setFields();
+        defaultConstructor=getDefaultConstructor();
+        setSheetInfo();
+        this.fields = includeAllFields?this.getAllFields():getAnnotationFields();
     }
 
     public List<Field<T>> getFields() {
@@ -58,7 +55,7 @@ public class ReflectionUtil<T> {
     public Optional<String> getDateTimeFormat() {
         return Optional.ofNullable(dateTimeFormat).filter(s -> !s.isEmpty());
     }
-    private void setSheetInfos() {
+    private void setSheetInfo() {
         Optional.ofNullable(classType.getAnnotation(SheetDefinition.class))
                 .ifPresent(excelDefinitionAnnotation -> {
                     this.dateFormat = excelDefinitionAnnotation.dateFormat();
@@ -66,26 +63,26 @@ public class ReflectionUtil<T> {
                     this.includeAllFields = excelDefinitionAnnotation.includeAllFields();
                 });
     }
-    private void setDefaultConstructor() {
+    private Constructor<T> getDefaultConstructor() {
         try {
-            defaultConstructor = classType.getDeclaredConstructor();
+            return classType.getDeclaredConstructor();
         } catch (NoSuchMethodException e) {
             throw new ReflectionException("No default constructor found");
         }
     }
 
-    private void setFields() {
+    private List<Field<T>> getAnnotationFields() {
         Class<CellDefinition> annotation = CellDefinition.class;
-        fields = Arrays.stream(classType.getDeclaredFields()).filter(field -> field.isAnnotationPresent(annotation))
+        return Arrays.stream(classType.getDeclaredFields()).filter(field -> field.isAnnotationPresent(annotation))
                 .sorted(Comparator.comparing(field -> field.getDeclaredAnnotation(annotation).value()))
                 .map(field -> buildField(List.of(getFieldTitle(field)).iterator()
                         ,field.getDeclaredAnnotation(annotation).value(),field)).toList();
     }
-    private void setAllFields() {
+    private List<Field<T>> getAllFields() {
         Class<SheetDefinition> annotation = SheetDefinition.class;
         var titles = Arrays.asList(classType.getAnnotation(annotation).titles()).iterator();
         AtomicInteger index=new AtomicInteger(0);
-        this.fields= Arrays.stream(classType.getDeclaredFields())
+        return Arrays.stream(classType.getDeclaredFields())
                 .filter(field -> !field.isAnnotationPresent(IgnoreCell.class))
                 .map(field -> buildField(titles,index.getAndIncrement(),field)).toList();
     }

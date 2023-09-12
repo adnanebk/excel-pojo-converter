@@ -44,7 +44,7 @@ public class CsvCellHandlerUtil<T> {
         cellValueMap.put(LocalDate.class.getSimpleName().toLowerCase(), dateParserFormatterUtil::parseToLocalDate);
         cellValueMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), dateParserFormatterUtil::parseToLocalDateTime);
         cellValueMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), dateParserFormatterUtil::parseToZonedDateTime);
-        cellValueMap.put(Date.class.getSimpleName().toLowerCase(), (value) -> {
+        cellValueMap.put(Date.class.getSimpleName().toLowerCase(), value -> {
             try {
                 return dateParserFormatterUtil.parseToDate(value);
             } catch (ParseException e) {

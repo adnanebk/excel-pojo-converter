@@ -58,10 +58,10 @@ public class ExcelCellHandlerUtil<T> {
         cellValueMap.put(String.class.getSimpleName().toLowerCase(), Cell::getStringCellValue);
         cellValueMap.put(boolean.class.getSimpleName().toLowerCase(), Cell::getBooleanCellValue);
         cellValueMap.put(Enum.class.getSimpleName().toLowerCase(), Cell::getStringCellValue);
-        cellValueMap.put(Integer.class.getSimpleName().toLowerCase(), (cell) -> (int) cell.getNumericCellValue());
-        cellValueMap.put(int.class.getSimpleName().toLowerCase(), (cell) -> (int) cell.getNumericCellValue());
-        cellValueMap.put(short.class.getSimpleName().toLowerCase(), (cell) -> (short) cell.getNumericCellValue());
-        cellValueMap.put(long.class.getSimpleName().toLowerCase(), (cell) -> (long) cell.getNumericCellValue());
+        cellValueMap.put(Integer.class.getSimpleName().toLowerCase(), cell -> (int) cell.getNumericCellValue());
+        cellValueMap.put(int.class.getSimpleName().toLowerCase(), cell -> (int) cell.getNumericCellValue());
+        cellValueMap.put(short.class.getSimpleName().toLowerCase(), cell -> (short) cell.getNumericCellValue());
+        cellValueMap.put(long.class.getSimpleName().toLowerCase(), cell -> (long) cell.getNumericCellValue());
         cellValueMap.put(double.class.getSimpleName().toLowerCase(), Cell::getNumericCellValue);
         cellValueMap.put(LocalDate.class.getSimpleName().toLowerCase(), this::getAsLocalDate);
         cellValueMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), this::getAsLocalDateTime);

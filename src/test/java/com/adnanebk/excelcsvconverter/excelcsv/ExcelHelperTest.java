@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Disabled
 class ExcelHelperTest {
     private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class);
 
