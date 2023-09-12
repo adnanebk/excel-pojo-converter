@@ -34,7 +34,7 @@ public class CsvHelper<T> {
         return new CsvHelper<>(reflectionUtil, cellHandlerUtil,delimiter);
     }
 
-    public Stream<T> toList(MultipartFile file) {
+    public Stream<T> toStream(MultipartFile file) {
         if (!hasCsvFormat(file))
             throw new ExcelFileException("Only csv formats are valid");
         try {

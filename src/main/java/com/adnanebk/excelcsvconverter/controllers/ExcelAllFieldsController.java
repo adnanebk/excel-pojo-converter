@@ -29,7 +29,7 @@ public class ExcelAllFieldsController {
 
     @GetMapping
     public Stream<ProductAllFields> excelToProducts(@RequestBody MultipartFile file){
-        return   excelHelper.toList(file);
+        return   excelHelper.toStream(file);
 
     }
     @GetMapping("/excel")

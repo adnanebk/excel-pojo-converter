@@ -44,7 +44,7 @@ public class ExcelHelper<T> {
     }
 
 
-    public Stream<T> toList(MultipartFile file) {
+    public Stream<T> toStream(MultipartFile file) {
         if (!hasExcelFormat(file))
             throw new ExcelFileException("Only excel formats are valid");
         try (InputStream is = file.getInputStream();

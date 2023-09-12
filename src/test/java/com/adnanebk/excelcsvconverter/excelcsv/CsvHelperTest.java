@@ -35,7 +35,7 @@ class CsvHelperTest {
 
         // Create a MockMultipartFile
         MultipartFile multipartFile = new MockMultipartFile("file", "generatedCsv.csv", "text/csv", inputStream);
-        List<Product> result = csvHelper.toList(multipartFile).toList();
+        List<Product> result = csvHelper.toStream(multipartFile).toList();
 
         // Assuming you know the expected size of the list
         assertEquals(19, result.size());
@@ -55,6 +55,6 @@ class CsvHelperTest {
                 getClass().getClassLoader().getResourceAsStream("invalid.csv")
         );
 
-        assertThrows(ExcelFileException.class, () -> csvHelper.toList(file));
+        assertThrows(ExcelFileException.class, () -> csvHelper.toStream(file));
     }
 }

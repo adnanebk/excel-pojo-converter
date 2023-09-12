@@ -24,7 +24,7 @@ public class CsvFieldsController {
     private final CsvHelper<Product> csvHelper = CsvHelper.create(Product.class,";");
     @GetMapping
     public Stream<Product> csvToProducts(@RequestBody MultipartFile file){
-        return   csvHelper.toList(file);
+        return   csvHelper.toStream(file);
     }
 
     public List<Product> getProducts(){
