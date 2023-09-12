@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
+import java.util.stream.Stream;
 
 
 public class CsvHelper<T> {
@@ -34,11 +34,13 @@ public class CsvHelper<T> {
         return new CsvHelper<>(reflectionUtil, cellHandlerUtil,delimiter);
     }
 
-    public List<T> toList(MultipartFile file) {
+    public Stream<T> toList(MultipartFile file) {
         if (!hasCsvFormat(file))
             throw new ExcelFileException("Only csv formats are valid");
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            return br.lines().skip(1).map(row -> {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()));
+            return br.lines().skip(1)
+                    .map(row -> {
                 String[] columns = row.split(delimiter);
                 Object[] values = new Object[columns.length];
                 var fields = reflectionUtil.getFields();
@@ -48,7 +50,7 @@ public class CsvHelper<T> {
                     values[i] = cellHandlerUtil.getCellValue(cellValue, field.type());
                 }
                 return reflectionUtil.getInstance(values);
-            }).toList();
+            });
         } catch (IOException e) {
             throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
         }

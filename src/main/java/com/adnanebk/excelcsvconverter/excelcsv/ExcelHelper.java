@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
@@ -43,7 +44,7 @@ public class ExcelHelper<T> {
     }
 
 
-    public List<T> toList(MultipartFile file) {
+    public Stream<T> toList(MultipartFile file) {
         if (!hasExcelFormat(file))
             throw new ExcelFileException("Only excel formats are valid");
         try (InputStream is = file.getInputStream();
@@ -53,8 +54,7 @@ public class ExcelHelper<T> {
             return StreamSupport.stream(sheet.spliterator(), false)
                     .filter(this::hasAnyCell)
                     .skip(1)
-                    .map(this::rowToObject)
-                    .toList();
+                    .map(this::rowToObject);
 
         } catch (IOException e) {
             throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());

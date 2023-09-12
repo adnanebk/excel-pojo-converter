@@ -20,33 +20,35 @@ import java.util.Date;
 @SheetDefinition(dateFormat = "dd/MM/yyyy")
 public class Product {
 
+    @CellDefinition(0)
     private String name;
+
+    @CellDefinition(1)
     private long price;
     private double promoPrice;
 
-    @CellDefinition(3)
     private Double minPrice;
 
     private boolean active;
 
-    @CellDefinition(4)
+    @CellDefinition(5)
     private Boolean expired;
 
 
-    @CellDefinition(5)
+    @CellDefinition(6)
     private Integer unitsInStock;
 
-    @CellDefinition(6)
+    @CellDefinition(7)
     private Date createdDate;
 
-    @CellDefinition(7)
+    @CellDefinition(8)
     private LocalDate updatedDate;
 
-    @CellDefinition(8)
+    @CellDefinition(9)
     private ZonedDateTime zonedDateTime;
 
     @CellEnumValues(values = {"aa","bb","cc"})
-    @CellDefinition(9)
+    @CellDefinition(10)
     private Category category;
 
     private LocalDateTime localDateTime;
