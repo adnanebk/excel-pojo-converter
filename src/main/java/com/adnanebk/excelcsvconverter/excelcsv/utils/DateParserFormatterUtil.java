@@ -8,8 +8,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
+import java.util.Optional;
 
-public class DateParserFormatterUtil<T> {
+public class DateParserFormatterUtil {
 
     private static final String[] DATE_TIME_PATTERNS = {
             "yyyy-MM-dd HH:mm:ss",
@@ -41,10 +42,14 @@ public class DateParserFormatterUtil<T> {
     private final DateTimeFormatter localedDateTimeFormatter;
     private final DateTimeFormatter zonedDateTimeFormatter;
 
-    public DateParserFormatterUtil(ReflectionUtil<T> reflectionUtil) {
-        dateFormatter = reflectionUtil.getDateTimeFormat().map(SimpleDateFormat::new).orElse(new SimpleDateFormat());
-        localedDateFormatter = reflectionUtil.getDateFormat().map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE);
-        localedDateTimeFormatter = reflectionUtil.getDateTimeFormat().map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    public DateParserFormatterUtil(String datePattern,String dateTimePattern) {
+
+        dateFormatter = Optional.ofNullable(dateTimePattern).filter(s->!s.isEmpty())
+                        .map(SimpleDateFormat::new).orElse(new SimpleDateFormat());
+        localedDateFormatter = Optional.ofNullable(datePattern).filter(s->!s.isEmpty())
+                        .map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE);
+        localedDateTimeFormatter = Optional.ofNullable(dateTimePattern).filter(s->!s.isEmpty())
+                       .map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         zonedDateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
     }
 

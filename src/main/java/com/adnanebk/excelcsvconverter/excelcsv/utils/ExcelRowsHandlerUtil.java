@@ -1,8 +1,10 @@
 package com.adnanebk.excelcsvconverter.excelcsv.utils;
 
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
+import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -13,19 +15,22 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class ExcelCellHandlerUtil<T> {
+public class ExcelRowsHandlerUtil<T> {
 
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private final Map<String, Function<Cell, Object>> cellValueMap = new HashMap<>();
     private final Map<String, BiConsumer<Cell, Object>> cellValueSetterMap = new HashMap<>();
-    private final DateParserFormatterUtil<T> dateParserFormatterUtil;
+    private final DateParserFormatterUtil dateParserFormatterUtil;
+    private final ReflectionUtil<T> reflectionUtil;
 
 
-    public ExcelCellHandlerUtil(DateParserFormatterUtil<T> dateParserFormatterUtil) {
-        this.dateParserFormatterUtil = dateParserFormatterUtil;
+    public ExcelRowsHandlerUtil(ReflectionUtil<T> reflectionUtil) {
+        this.reflectionUtil = reflectionUtil;
+        this.dateParserFormatterUtil = new DateParserFormatterUtil(reflectionUtil.getDateFormat(),reflectionUtil.getDateTimeFormat());
         initCellValueMap();
         initValueSetterMap();
     }
@@ -50,6 +55,25 @@ public class ExcelCellHandlerUtil<T> {
         function.accept(cell, value);
     }
 
+    public void fillRowFromObject(Row row, T obj) {
+        var fields = reflectionUtil.getFields();
+        for (int i = 0; i < fields.size(); i++) {
+            var field = fields.get(i);
+            setCellValue(field.type(), row.createCell(i),field.getValue(obj));
+        }
+    }
+
+    public T createObjectFromRow(Row currentRow) {
+        var fields = reflectionUtil.getFields();
+        Object[] values = fields.stream()
+                .map(field -> getCurrentCell(field.colIndex(), currentRow)
+                        .map(cell -> getCellValue(field.type(),cell))
+                        .orElse(null)).toArray();
+        return reflectionUtil.getInstance(values);
+    }
+    public String[] getHeaders() {
+        return reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new);
+    }
     private String getTypeName(Class<?> type) {
         return type.isEnum() ? Enum.class.getSimpleName().toLowerCase() : type.getSimpleName().toLowerCase();
     }
@@ -127,6 +151,10 @@ public class ExcelCellHandlerUtil<T> {
 
     private static String getInvalidCellDateMsg(Cell cell) {
         return String.format("Invalid or unsupported date format in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex()));
+    }
+
+    private Optional<Cell> getCurrentCell(int colIndex, Row currentRow) {
+        return Optional.ofNullable(currentRow.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
     }
 
 }

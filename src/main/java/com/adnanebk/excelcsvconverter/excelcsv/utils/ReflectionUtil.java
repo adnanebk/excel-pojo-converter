@@ -48,12 +48,12 @@ public class ReflectionUtil<T> {
         }
     }
 
-    public Optional<String> getDateFormat() {
-        return Optional.ofNullable(dateFormat).filter(s -> !s.isEmpty());
+    public String getDateFormat() {
+        return dateFormat;
     }
 
-    public Optional<String> getDateTimeFormat() {
-        return Optional.ofNullable(dateTimeFormat).filter(s -> !s.isEmpty());
+    public String getDateTimeFormat() {
+        return dateTimeFormat;
     }
     private void setSheetInfo() {
         Optional.ofNullable(classType.getAnnotation(SheetDefinition.class))

@@ -11,13 +11,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public class CsvCellHandlerUtil<T> {
+public class CsvRowsHandlerUtil<T> {
 
     private final Map<String, Function<String,Object>> cellValueMap = new HashMap<>();
-    private final DateParserFormatterUtil<T> dateParserFormatterUtil;
+    private final DateParserFormatterUtil dateParserFormatterUtil;
+    private final ReflectionUtil<T> reflectionUtil;
 
-    public CsvCellHandlerUtil(DateParserFormatterUtil<T> dateParserFormatterUtil) {
-        this.dateParserFormatterUtil = dateParserFormatterUtil;
+    public CsvRowsHandlerUtil(ReflectionUtil<T> reflectionUtil) {
+        this.reflectionUtil = reflectionUtil;
+        this.dateParserFormatterUtil=new DateParserFormatterUtil(reflectionUtil.getDateFormat(),reflectionUtil.getDateTimeFormat());
         initCellValueMap();
     }
 
@@ -54,4 +56,15 @@ public class CsvCellHandlerUtil<T> {
     }
 
 
+    public T createObjectFromCells(String row,String delimiter) {
+        String[] cellsValues = row.split(delimiter);
+        Object[] values = new Object[cellsValues.length];
+        var fields = reflectionUtil.getFields();
+        for (int i = 0; i < Math.min(cellsValues.length,fields.size()); i++) {
+            var field = fields.get(i);
+            String cellValue = cellsValues[field.colIndex()];
+            values[i] = getCellValue(cellValue, field.type());
+        }
+        return reflectionUtil.getInstance(values);
+    }
 }
