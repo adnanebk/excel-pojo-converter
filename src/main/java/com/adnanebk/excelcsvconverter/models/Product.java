@@ -17,7 +17,7 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SheetDefinition(dateFormat = "dd/MM/yyyy")
+@SheetDefinition(datePattern = "dd/MM/yyyy")
 public class Product {
 
     @CellDefinition(0)

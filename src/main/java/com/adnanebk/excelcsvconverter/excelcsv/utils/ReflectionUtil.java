@@ -16,8 +16,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReflectionUtil<T> {
-    private String dateTimeFormat;
-    private String dateFormat;
+    private String dateTimePattern;
+    private String datePattern;
     private final List<Field<T>> fields;
     private final Class<T> classType;
     private final Constructor<T> defaultConstructor;
@@ -48,18 +48,18 @@ public class ReflectionUtil<T> {
         }
     }
 
-    public String getDateFormat() {
-        return dateFormat;
+    public String getDatePattern() {
+        return datePattern;
     }
 
-    public String getDateTimeFormat() {
-        return dateTimeFormat;
+    public String getDateTimePattern() {
+        return dateTimePattern;
     }
     private void setSheetInfo() {
         Optional.ofNullable(classType.getAnnotation(SheetDefinition.class))
                 .ifPresent(excelDefinitionAnnotation -> {
-                    this.dateFormat = excelDefinitionAnnotation.dateFormat();
-                    this.dateTimeFormat = excelDefinitionAnnotation.dateTimeFormat();
+                    this.datePattern = excelDefinitionAnnotation.datePattern();
+                    this.dateTimePattern = excelDefinitionAnnotation.dateTimePattern();
                     this.includeAllFields = excelDefinitionAnnotation.includeAllFields();
                 });
     }

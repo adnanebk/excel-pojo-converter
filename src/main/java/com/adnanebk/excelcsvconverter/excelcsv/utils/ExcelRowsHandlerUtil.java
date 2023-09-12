@@ -30,7 +30,7 @@ public class ExcelRowsHandlerUtil<T> {
 
     public ExcelRowsHandlerUtil(ReflectionUtil<T> reflectionUtil) {
         this.reflectionUtil = reflectionUtil;
-        this.dateParserFormatterUtil = new DateParserFormatterUtil(reflectionUtil.getDateFormat(),reflectionUtil.getDateTimeFormat());
+        this.dateParserFormatterUtil = new DateParserFormatterUtil(reflectionUtil.getDatePattern(),reflectionUtil.getDateTimePattern());
         initCellValueMap();
         initValueSetterMap();
     }
