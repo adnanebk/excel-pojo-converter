@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("products")
@@ -27,7 +28,7 @@ public class ExcelFieldsController {
     private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class);
 
     @GetMapping
-    public List<Product> excelToProducts(@RequestBody MultipartFile file){
+    public Stream<Product> excelToProducts(@RequestBody MultipartFile file){
         return excelHelper.toList(file);
     }
     @GetMapping("/excel")

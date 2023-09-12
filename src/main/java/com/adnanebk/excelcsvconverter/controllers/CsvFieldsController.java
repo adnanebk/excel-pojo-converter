@@ -16,14 +16,15 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("csv/products")
 public class CsvFieldsController {
     private final CsvHelper<Product> csvHelper = CsvHelper.create(Product.class,";");
     @GetMapping
-    public List<Product> csvToProducts(@RequestBody MultipartFile file){
-      return csvHelper.toList(file);
+    public Stream<Product> csvToProducts(@RequestBody MultipartFile file){
+        return   csvHelper.toList(file);
     }
 
     public List<Product> getProducts(){
