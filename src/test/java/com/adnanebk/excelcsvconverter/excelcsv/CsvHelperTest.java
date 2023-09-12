@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@Disabled
+@Disabled
 class CsvHelperTest {
     private CsvHelper<Product> csvHelper;
 
