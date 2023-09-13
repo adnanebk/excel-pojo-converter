@@ -24,14 +24,10 @@ public class CsvRowsHandlerUtil<T> {
     }
 
     public Object getCellValue(String value, Class<?> type) {
-        var function = cellValueMap.get(getTypeName(type));
+        var function = cellValueMap.get(reflectionUtil.getTypeName(type));
         if(function==null)
             throw new ExcelValidationException("Unsupported field type");
         return function.apply(value);
-    }
-
-    private String getTypeName(Class<?> type) {
-        return type.isEnum() ? Enum.class.getSimpleName().toLowerCase() : type.getSimpleName().toLowerCase();
     }
 
     private void initCellValueMap() {

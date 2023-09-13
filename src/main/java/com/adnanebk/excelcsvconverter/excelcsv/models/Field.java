@@ -20,12 +20,14 @@ public record Field<T>(String name, Class<?> type, String title, Method getter, 
     }
    public void setValue(Object obj,Object value){
        try {
-           if(!type.isEnum())
-               setter.invoke(obj,value);
-           else if(enumValues.length>0) {
-               setter.invoke(obj,type.getEnumConstants()[getEnumOrdinal(value)]);
+           if(!type.isEnum()) {
+               setter.invoke(obj, value);
+               return;
            }
-           else setter.invoke(obj,Enum.valueOf(type.asSubclass(Enum.class),value.toString()));
+           var enumConstant = enumValues.length>0
+                                     ?type.getEnumConstants()[getEnumOrdinal(value)]
+                                     :Enum.valueOf(type.asSubclass(Enum.class),value.toString());
+               setter.invoke(obj,enumConstant);
        } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
            throw new ReflectionException(e.getMessage());
        }

@@ -108,19 +108,27 @@ public class ReflectionUtil<T> {
             throw new ReflectionException("No setter found");
         }
     }
-    private Field<T> buildField(Iterator<String> titles,int index,java.lang.reflect.Field field) {
+    private Field<T> buildField(Iterator<String> titles,int colIndex,java.lang.reflect.Field field) {
         var fieldType = field.getType();
         var fieldName = field.getName();
         return new Field<>(fieldName, fieldType, getTitle(titles, fieldName)
-                ,getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType),index
-                ,Optional.ofNullable(field.getDeclaredAnnotation(CellEnumValues.class))
-                        .map(CellEnumValues::values).orElse(new String[]{}));
+                ,getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType),colIndex, getEnumValues(field));
     }
+
+    private static String[] getEnumValues(java.lang.reflect.Field field) {
+        return Optional.ofNullable(field.getDeclaredAnnotation(CellEnumValues.class))
+                .map(CellEnumValues::values).orElse(new String[]{});
+    }
+
     private String camelCaseWordsToWordsWithSpaces(String str) {
         if (StringUtils.hasLength(str))
             return str.toLowerCase().equals(str) ? str : StringUtils
                     .uncapitalize(str.replaceAll("([a-z])([A-Z]+)", "$1 $2").toLowerCase());
         return str;
+    }
+
+    public String getTypeName(Class<?> fieldType) {
+        return fieldType.isEnum() ? Enum.class.getSimpleName().toLowerCase() : fieldType.getSimpleName().toLowerCase();
     }
 }
 

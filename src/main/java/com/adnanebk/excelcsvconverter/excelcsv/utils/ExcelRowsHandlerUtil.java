@@ -35,9 +35,9 @@ public class ExcelRowsHandlerUtil<T> {
         initValueSetterMap();
     }
 
-    public Object getCellValue(Class<?> type, Cell cell) {
+    public Object getCellValue(Class<?> fieldType, Cell cell) {
         try {
-            var function = cellValueMap.get(getTypeName(type));
+            var function = cellValueMap.get(reflectionUtil.getTypeName(fieldType));
             if(function==null)
                 throw new ExcelValidationException("Unsupported field type");
             return function.apply(cell);
@@ -49,7 +49,7 @@ public class ExcelRowsHandlerUtil<T> {
     public void setCellValue(Class<?> type, Cell cell, Object value) {
         if(value==null)
             return;
-        var function = cellValueSetterMap.get(getTypeName(type));
+        var function = cellValueSetterMap.get(reflectionUtil.getTypeName(type));
         if(function==null)
             throw new ExcelValidationException("Unsupported field type");
         function.accept(cell, value);
@@ -73,9 +73,6 @@ public class ExcelRowsHandlerUtil<T> {
     }
     public String[] getHeaders() {
         return reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new);
-    }
-    private String getTypeName(Class<?> type) {
-        return type.isEnum() ? Enum.class.getSimpleName().toLowerCase() : type.getSimpleName().toLowerCase();
     }
 
     private void initCellValueMap() {
