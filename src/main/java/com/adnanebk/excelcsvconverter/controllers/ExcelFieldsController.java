@@ -31,7 +31,7 @@ public class ExcelFieldsController {
     public Stream<Product> excelToProducts(@RequestBody MultipartFile file){
         return excelHelper.toStream(file);
     }
-    @GetMapping("/excel")
+    @GetMapping("/download")
     public ResponseEntity<InputStreamResource>
     downloadExcelFromProducts() {
         String filename = "products-" + LocalDate.now() + ".xlsx";
