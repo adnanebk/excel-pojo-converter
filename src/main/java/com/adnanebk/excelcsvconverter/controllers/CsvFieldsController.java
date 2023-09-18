@@ -8,11 +8,15 @@ import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
 import com.adnanebk.excelcsvconverter.models.Category;
 import com.adnanebk.excelcsvconverter.models.ProductV2;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -48,11 +52,14 @@ public class CsvFieldsController {
     }
 
     @GetMapping("/download")
-    public void
-    downloadCsvFromProducts(HttpServletResponse response) throws IOException {
-        response.setContentType("text/csv");
-        response.setHeader("Content-Disposition", "attachment; filename=data.csv");
-        csvHelper.toCsv(getProducts(),response.getWriter());
+    public ResponseEntity<InputStreamResource>
+    downloadCsvFromProducts() throws IOException {
+        String filename = "products-" + LocalDate.now() + ".csv";
+        InputStreamResource file = new InputStreamResource(csvHelper.toCsv(getProducts()));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(file);
 
     }
 
