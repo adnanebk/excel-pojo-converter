@@ -7,7 +7,6 @@ import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationExcepti
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
 import com.adnanebk.excelcsvconverter.models.Category;
 import com.adnanebk.excelcsvconverter.models.ProductV2;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Date;

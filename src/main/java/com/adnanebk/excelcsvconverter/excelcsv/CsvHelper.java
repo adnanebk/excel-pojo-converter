@@ -30,16 +30,28 @@ public class CsvHelper<T> {
         return new CsvHelper<>( new CsvRowsHandlerUtil<>(new ReflectionUtil<>(type)),delimiter);
     }
 
-    public Stream<T> toStream(MultipartFile file) {
-        if (!hasCsvFormat(file))
-            throw new ExcelFileException("Only csv formats are valid");
+    public Stream<T> toStream(File file){
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()));
-            return br.lines().skip(1)
-                    .map(row -> this.cellHandlerUtil.createObjectFromCells(row,delimiter));
+            return toStream(new FileInputStream(file));
         } catch (IOException e) {
             throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
         }
+    }
+
+    public Stream<T> toStream(MultipartFile file){
+      try {
+        if (!hasCsvFormat(file))
+            throw new ExcelFileException("Only csv formats are valid");
+        return toStream(file.getInputStream());
+    } catch (IOException e) {
+        throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
+    }
+    }
+
+    private Stream<T> toStream(InputStream inputStream) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+            return br.lines().skip(1)
+                    .map(row -> this.cellHandlerUtil.createObjectFromCells(row,delimiter));
     }
 
     public ByteArrayInputStream toCsv(List<T> list) throws IOException {

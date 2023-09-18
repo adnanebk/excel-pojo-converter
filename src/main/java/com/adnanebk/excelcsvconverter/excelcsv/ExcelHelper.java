@@ -9,10 +9,7 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
@@ -35,21 +32,32 @@ public class ExcelHelper<T> {
         return new ExcelHelper<>(type.getSimpleName(), cellHandlerUtil);
     }
 
+    public Stream<T> toStream(File file){
+        try {
+            return toStream(new FileInputStream(file));
+        } catch (IOException e) {
+            throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
+        }
+    }
 
-    public Stream<T> toStream(MultipartFile file) {
-        if (!hasExcelFormat(file))
-            throw new ExcelFileException("Only excel formats are valid");
-        try (InputStream is = file.getInputStream();
-             Workbook workbook = new XSSFWorkbook(is)
-        ) {
+    public Stream<T> toStream(MultipartFile file){
+        try {
+            if (!hasExcelFormat(file))
+                throw new ExcelFileException("Only csv formats are valid");
+            return toStream(file.getInputStream());
+        } catch (IOException e) {
+            throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
+        }
+    }
+
+    private Stream<T> toStream(InputStream inputStream) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             return StreamSupport.stream(sheet.spliterator(), false)
                     .filter(this::hasAnyCell)
                     .skip(1)
                     .map(cellsHandlerUtil::createObjectFromRow);
 
-        } catch (IOException e) {
-            throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
         }
     }
 
