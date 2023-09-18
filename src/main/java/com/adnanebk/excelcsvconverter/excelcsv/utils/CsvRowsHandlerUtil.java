@@ -1,6 +1,7 @@
 package com.adnanebk.excelcsvconverter.excelcsv.utils;
 
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
+import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
 
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -24,15 +25,47 @@ public class CsvRowsHandlerUtil<T> {
     }
 
     public Object getCellValue(String value, Class<?> type) {
-        var function = cellValueMap.get(reflectionUtil.getTypeName(type));
-        if(function==null)
-            throw new ExcelValidationException("Unsupported field type");
-        return function.apply(value);
+        try {
+            var function = cellValueMap.get(reflectionUtil.getTypeName(type));
+            if (function == null)
+                throw new ExcelValidationException("Unsupported field type");
+            return function.apply(value);
+        }catch (RuntimeException ex){
+            throw new ExcelValidationException("Unexpected or Invalid cell value {"+value+"}  ");
+        }
+    }
+    public T createObjectFromCells(String row,String delimiter) {
+        String[] cellsValues = row.split(delimiter);
+        Object[] values = new Object[cellsValues.length];
+        var fields = reflectionUtil.getFields();
+        for (int i = 0; i < Math.min(cellsValues.length,fields.size()); i++) {
+            var field = fields.get(i);
+            String cellValue = cellsValues[field.colIndex()];
+            values[i] = getCellValue(cellValue, field.type());
+        }
+        return reflectionUtil.getInstance(values);
+    }
+    public String[] convertObjectToStringsOfColumns(T obj) {
+        return  reflectionUtil.getFields().stream()
+                .map(field -> {
+                    Object value = field.getValue(obj);
+                    if(field.type().equals(Date.class))
+                        return dateParserFormatterUtil.format((Date) value);
+                    if(field.type().equals(LocalDate.class))
+                        return dateParserFormatterUtil.format((LocalDate) value);
+                    if(field.type().equals(LocalDateTime.class))
+                        return dateParserFormatterUtil.format((LocalDateTime) value);
+                    if(field.type().equals(ZonedDateTime.class))
+                        return dateParserFormatterUtil.format((ZonedDateTime) value);
+                    return value.toString();
+                })
+                .toArray(String[]::new);
+
     }
 
     private void initCellValueMap() {
         cellValueMap.put(String.class.getSimpleName().toLowerCase(), value -> value);
-        cellValueMap.put(boolean.class.getSimpleName().toLowerCase(), Boolean::valueOf);
+        cellValueMap.put(boolean.class.getSimpleName().toLowerCase(), Boolean::parseBoolean);
         cellValueMap.put(Enum.class.getSimpleName().toLowerCase(), value -> value);
         cellValueMap.put(Integer.class.getSimpleName().toLowerCase(), Integer::parseInt);
         cellValueMap.put(int.class.getSimpleName().toLowerCase(), Integer::parseInt);
@@ -51,16 +84,8 @@ public class CsvRowsHandlerUtil<T> {
         });
     }
 
-
-    public T createObjectFromCells(String row,String delimiter) {
-        String[] cellsValues = row.split(delimiter);
-        Object[] values = new Object[cellsValues.length];
-        var fields = reflectionUtil.getFields();
-        for (int i = 0; i < Math.min(cellsValues.length,fields.size()); i++) {
-            var field = fields.get(i);
-            String cellValue = cellsValues[field.colIndex()];
-            values[i] = getCellValue(cellValue, field.type());
-        }
-        return reflectionUtil.getInstance(values);
+    public String[] getHeaders(){
+        return reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new);
     }
+
 }

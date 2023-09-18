@@ -4,11 +4,16 @@ package com.adnanebk.excelcsvconverter.excelcsv;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.CsvRowsHandlerUtil;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.ReflectionUtil;
+import com.opencsv.CSVWriter;
+import com.opencsv.ICSVWriter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Stream;
 
 
@@ -37,6 +42,16 @@ public class CsvHelper<T> {
         } catch (IOException e) {
             throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
         }
+    }
+
+    public void toCsv(List<T> list, PrintWriter writer) {
+        CSVWriter csvWriter = new CSVWriter(writer, delimiter.charAt(0), ICSVWriter.NO_QUOTE_CHARACTER,'\t',"\n");
+        List<String[]> data = new LinkedList<>();
+        data.add(cellHandlerUtil.getHeaders());
+        for(T obj:list){
+            data.add(cellHandlerUtil.convertObjectToStringsOfColumns(obj));
+        }
+        csvWriter.writeAll(data);
     }
 
     private boolean hasCsvFormat(MultipartFile file) {

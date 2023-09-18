@@ -18,7 +18,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @SheetDefinition(includeAllFields = true)
-public class ProductAllFields {
+public class ProductV2 {
 
     private String name;
 

@@ -23,7 +23,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("products")
+@RequestMapping("excel/products")
 public class ExcelFieldsController {
     private final ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class);
 

@@ -19,6 +19,7 @@ public class DateParserFormatterUtil {
             "yyyy-MM-dd'T'HH:mm:ss",
             "yyyy-MM-dd HH:mm",
             "EEE, dd MMM yyyy HH:mm:ss z",
+            "EEE MMM dd HH:mm:ss zzz yyyy",
             "dd-MM-yyyy HH:mm:ss",
             "dd/MM/yyyy HH:mm",
             "dd/MM/yyyy HH:mm:ss",

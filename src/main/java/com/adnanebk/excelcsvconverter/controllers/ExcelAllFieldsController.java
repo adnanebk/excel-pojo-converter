@@ -6,7 +6,7 @@ import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
 import com.adnanebk.excelcsvconverter.models.Category;
-import com.adnanebk.excelcsvconverter.models.ProductAllFields;
+import com.adnanebk.excelcsvconverter.models.ProductV2;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,16 +23,16 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("products/all")
+@RequestMapping("excel/products/v2")
 public class ExcelAllFieldsController {
-    private final ExcelHelper<ProductAllFields> excelHelper = ExcelHelper.create(ProductAllFields.class);
+    private final ExcelHelper<ProductV2> excelHelper = ExcelHelper.create(ProductV2.class);
 
     @GetMapping
-    public Stream<ProductAllFields> excelToProducts(@RequestBody MultipartFile file){
+    public Stream<ProductV2> excelToProducts(@RequestBody MultipartFile file){
         return   excelHelper.toStream(file);
 
     }
-    @GetMapping("/excel")
+    @GetMapping("/download")
     public ResponseEntity<InputStreamResource>
     downloadExcelFromProducts() {
         String filename = "products-" + LocalDate.now() + ".xlsx";
@@ -44,11 +44,11 @@ public class ExcelAllFieldsController {
     }
 
 
-    public List<ProductAllFields> getProducts(){
+    public List<ProductV2> getProducts(){
         return IntStream.range(0,20).mapToObj(e->getProduct()).toList();
     }
-    public ProductAllFields getProduct(){
-        return  ProductAllFields.builder()
+    public ProductV2 getProduct(){
+        return  ProductV2.builder()
                 .expired(true)
                 .active(false)
                 .category(Category.B)
