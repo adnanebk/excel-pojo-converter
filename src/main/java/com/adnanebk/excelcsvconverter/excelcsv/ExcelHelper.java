@@ -19,17 +19,15 @@ import java.util.stream.StreamSupport;
 public class ExcelHelper<T> {
 
     private static final String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    private final String sheetName;
     private final ExcelRowsHandlerUtil<T> cellsHandlerUtil;
 
-    private ExcelHelper(String fileName, ExcelRowsHandlerUtil<T> cellsHandlerUtil) {
+    private ExcelHelper(ExcelRowsHandlerUtil<T> cellsHandlerUtil) {
         this.cellsHandlerUtil = cellsHandlerUtil;
-        sheetName = fileName + "-" + LocalDate.now();
     }
 
     public static <T> ExcelHelper<T> create(Class<T> type) {
-        var cellHandlerUtil = new ExcelRowsHandlerUtil<>(new ReflectionUtil<>(type));
-        return new ExcelHelper<>(type.getSimpleName(), cellHandlerUtil);
+        var rowsHandlerUtil = new ExcelRowsHandlerUtil<>(new ReflectionUtil<>(type));
+        return new ExcelHelper<>(rowsHandlerUtil);
     }
 
     public Stream<T> toStream(File file){
@@ -64,7 +62,7 @@ public class ExcelHelper<T> {
     public ByteArrayInputStream toExcel(List<T> list) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet(sheetName);
+            Sheet sheet = workbook.createSheet();
             createHeaders(sheet, workbook);
             for (int i = 0; i < list.size(); i++) {
                 this.cellsHandlerUtil.fillRowFromObject(sheet.createRow(i+1), list.get(i));

@@ -19,10 +19,10 @@ public class CsvHelper<T> {
 
     private static final String TYPE = "text/csv";
     public  final String delimiter;
-    private final CsvRowsHandlerUtil<T> cellHandlerUtil;
+    private final CsvRowsHandlerUtil<T> rowsHandlerUtil;
 
-    private CsvHelper(CsvRowsHandlerUtil<T> cellHandlerUtil, String delimiter) {
-        this.cellHandlerUtil = cellHandlerUtil;
+    private CsvHelper(CsvRowsHandlerUtil<T> rowsHandlerUtil, String delimiter) {
+        this.rowsHandlerUtil = rowsHandlerUtil;
         this.delimiter =delimiter;
     }
 
@@ -34,7 +34,7 @@ public class CsvHelper<T> {
         try {
             return toStream(new FileInputStream(file));
         } catch (IOException e) {
-            throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
+            throw new ExcelFileException("fail to parse Csv file: " + e.getMessage());
         }
     }
 
@@ -44,23 +44,23 @@ public class CsvHelper<T> {
             throw new ExcelFileException("Only csv formats are valid");
         return toStream(file.getInputStream());
     } catch (IOException e) {
-        throw new ExcelFileException("fail to parse Excel file: " + e.getMessage());
+        throw new ExcelFileException("fail to parse Csv file: " + e.getMessage());
     }
     }
 
     private Stream<T> toStream(InputStream inputStream) {
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
             return br.lines().skip(1)
-                    .map(row -> this.cellHandlerUtil.createObjectFromCells(row,delimiter));
+                    .map(row -> this.rowsHandlerUtil.createObjectFromCells(row,delimiter));
     }
 
     public ByteArrayInputStream toCsv(List<T> list) throws IOException {
         StringWriter stringWriter=new StringWriter();
         try(CSVWriter csvWriter = new CSVWriter(stringWriter, delimiter.charAt(0), ICSVWriter.NO_QUOTE_CHARACTER,'\t',"\n")) {
             List<String[]> data = new LinkedList<>();
-            data.add(cellHandlerUtil.getHeaders());
+            data.add(rowsHandlerUtil.getHeaders());
             for (T obj : list) {
-                data.add(cellHandlerUtil.convertObjectToStringsOfColumns(obj));
+                data.add(rowsHandlerUtil.convertObjectToStringsOfColumns(obj));
             }
             csvWriter.writeAll(data);
             return new ByteArrayInputStream(stringWriter.toString().getBytes(StandardCharsets.UTF_8));
