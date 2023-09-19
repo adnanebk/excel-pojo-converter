@@ -45,7 +45,7 @@ public class CsvRowsHandlerUtil<T> {
         }
         return reflectionUtil.getInstance(values);
     }
-    public String[] convertObjectToStringsOfColumns(T obj) {
+    public String[] convertObjectToStringColumns(T obj) {
         return  reflectionUtil.getFields().stream()
                 .map(field -> {
                     Object value = field.getValue(obj);

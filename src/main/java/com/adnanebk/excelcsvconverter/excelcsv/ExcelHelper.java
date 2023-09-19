@@ -10,7 +10,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -18,7 +17,7 @@ import java.util.stream.StreamSupport;
 
 public class ExcelHelper<T> {
 
-    private static final String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    private static final String FILE_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private final ExcelRowsHandlerUtil<T> cellsHandlerUtil;
 
     private ExcelHelper(ExcelRowsHandlerUtil<T> cellsHandlerUtil) {
@@ -77,7 +76,7 @@ public class ExcelHelper<T> {
 
 
     private boolean hasExcelFormat(MultipartFile file) {
-        return TYPE.equals(file.getContentType());
+        return FILE_TYPE.equals(file.getContentType());
     }
 
     private void createHeaders(Sheet sheet, Workbook workbook) {

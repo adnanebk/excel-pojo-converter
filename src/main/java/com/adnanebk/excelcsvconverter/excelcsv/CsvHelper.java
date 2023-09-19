@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 public class CsvHelper<T> {
 
-    private static final String TYPE = "text/csv";
+    private static final String FILE_TYPE = "text/csv";
     public  final String delimiter;
     private final CsvRowsHandlerUtil<T> rowsHandlerUtil;
 
@@ -60,7 +60,7 @@ public class CsvHelper<T> {
             List<String[]> data = new LinkedList<>();
             data.add(rowsHandlerUtil.getHeaders());
             for (T obj : list) {
-                data.add(rowsHandlerUtil.convertObjectToStringsOfColumns(obj));
+                data.add(rowsHandlerUtil.convertObjectToStringColumns(obj));
             }
             csvWriter.writeAll(data);
             return new ByteArrayInputStream(stringWriter.toString().getBytes(StandardCharsets.UTF_8));
@@ -68,7 +68,7 @@ public class CsvHelper<T> {
     }
 
     private boolean hasCsvFormat(MultipartFile file) {
-        return TYPE.equals(file.getContentType());
+        return FILE_TYPE.equals(file.getContentType());
     }
 
 }
