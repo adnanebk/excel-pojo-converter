@@ -4,42 +4,53 @@ import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Objects;
 
 public record Field<T>(String name, Class<?> type, String title, Method getter, Method setter, int colIndex, String[] enumValues) {
     public Object getValue(T obj) {
         try {
+            if(enumValues.length==0)
+                return getter.invoke(obj);
             Object value = getter.invoke(obj);
-            if(enumValues.length>0)
-                return getEnumValue(value);
-            return getter.invoke(obj);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+            String enumValue = getEnumValue(value);
+            return enumValue.isEmpty()?value:enumValue;
+        } catch (IllegalAccessException | InvocationTargetException | IndexOutOfBoundsException e) {
             throw new ReflectionException(e.getMessage());
         }
     }
-   public void setValue(Object obj,Object value){
-       try {
-           if(!type.isEnum()) {
-               setter.invoke(obj, value);
-               return;
-           }
-           var enumConstant = enumValues.length>0
-                                     ?type.getEnumConstants()[getEnumOrdinal(value)]
-                                     :Enum.valueOf(type.asSubclass(Enum.class),value.toString());
-               setter.invoke(obj,enumConstant);
-       } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
-           throw new ReflectionException(e.getMessage());
-       }
-   }
+    public void setValue(Object obj,Object value){
+        try {
+            if(value==null || value.toString().isEmpty())
+                return;
+            if(!type.isEnum()) {
+                setter.invoke(obj, value);
+                return;
+            }
+            if(enumValues.length>0){
+                int index=getEnumOrdinal(value);
+                if(index>=0) {
+                    setter.invoke(obj, type.getEnumConstants()[index]);
+                    return;
+                }
+            }
+            setter.invoke(obj,Enum.valueOf(type.asSubclass(Enum.class),value.toString().toUpperCase()));
+        } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+            throw new ReflectionException(e.getMessage());
+        }
+    }
 
     private int getEnumOrdinal(Object value) {
-        return List.of(enumValues).indexOf(value.toString());
+        for (int i = 0; i < enumValues.length; i++) {
+            String enumVal = enumValues[i];
+            if (enumVal.equalsIgnoreCase(value.toString()))
+                return i;
+        }
+        return  -1;
     }
 
     private String getEnumValue(Object value) {
         int ordinal = ((Enum<?>) value).ordinal();
-        return enumValues[ordinal];
+        return ordinal<enumValues.length?enumValues[ordinal]:"";
     }
 
 

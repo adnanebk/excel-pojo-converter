@@ -39,8 +39,7 @@ public class ReflectionUtil<T> {
         try {
             T obj = defaultConstructor.newInstance();
             for (int i = 0; i < values.length; i++) {
-                if (values[i] != null)
-                    fields.get(i).setValue(obj, values[i]);
+                fields.get(i).setValue(obj, values[i]);
             }
             return obj;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
