@@ -27,11 +27,8 @@ public record Field<T>(String name, Class<?> type, String title, Method getter, 
                 return;
             }
             if(enumValues.length>0){
-                int index=getEnumOrdinal(value);
-                if(index>=0) {
-                    setter.invoke(obj, type.getEnumConstants()[index]);
+                    setter.invoke(obj, type.getEnumConstants()[getEnumOrdinal(value)]);
                     return;
-                }
             }
             setter.invoke(obj,Enum.valueOf(type.asSubclass(Enum.class),value.toString().toUpperCase()));
         } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
@@ -45,7 +42,7 @@ public record Field<T>(String name, Class<?> type, String title, Method getter, 
             if (enumVal.equalsIgnoreCase(value.toString()))
                 return i;
         }
-        return  -1;
+        throw new ReflectionException("Unknown or invalid enum value { "+value.toString()+" }");
     }
 
     private String getEnumValue(Object value) {
