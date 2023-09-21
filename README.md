@@ -3,15 +3,17 @@
 Data processing tasks often involve converting Excel or CSV files into Java objects (POJOs) and vice versa. This can be a complex process, but with the right tools and techniques, it becomes much more manageable. In this guide, we’ll explore a powerful Java library that leverages Java reflection, making data processing a seamless experience.
 
 First we add the dependency to maven
-
+```
 <dependency>
   <groupId>com.adnanebk</groupId>
   <artifactId>excel-csv-converter</artifactId>
   <version>0.0.2-SNAPSHOT</version>
 </dependency>
+```
 Understanding the POJO Class
 Before we dive into the library, let’s take a close look at a sample Java class that serves as our data model:
 
+```
 @Data
 @Builder
 @AllArgsConstructor
@@ -37,6 +39,7 @@ public class Product {
     @CellDefinition(11)
     private LocalDateTime localDateTime;
 }
+```
 This Product class is annotated with various annotations that play a crucial role in the conversion process. Each field is annotated with @CellDefinition, indicating its position in the Excel or CSV file.
 
 we can also define the title of the of the cell, by default it will convert the camel case name of the field to a name with spaces (ex: firstName=>First name)
@@ -51,7 +54,7 @@ In the Product class, we make use of the @CellEnumValues annotation. This annota
 Here, the enum values are explicitly defined as “aa”, “bb”, and “cc”, which will be used during conversion if we don’t want to use the enum constants as values (note that the orders of the enum values must be the same as defined in the constants in the enum type).
 
 Now, let’s introduce an updated version of our POJO class, ProductV2:
-
+```
 @Data
 @Builder
 @AllArgsConstructor
@@ -69,11 +72,13 @@ public class ProductV2 {
     @IgnoreCell
     private LocalDateTime localDateTime;
 }
+```
 Converting Excel/csv to POJOs and vice versa
 Converting Excel files to POJOs becomes even simpler with the annotation provided in the class to map the fields to corresponding cells in the Excel file.
 
 With theProductV2 class, annotated with@SheetDefinition(includeAllFields = true) fields are automatically mapped in sequential order starting from index 0 and ignoring fields that have@IgnoreCell annotation.
 
+```
 @RestController
 @RequestMapping("excel/products")
 public class ExcelFieldsController {
@@ -95,6 +100,7 @@ public class ExcelFieldsController {
                 .body(file);
     }
 }
+```
 the same applicable for converting csv files except we need to define the delimiter that will be used
 
     private final CsvHelper<ProductV2> csvHelper = CsvHelper.create(ProductV2.class,";");
