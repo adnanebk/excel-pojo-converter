@@ -22,18 +22,21 @@ public record Field<T>(String name, Class<?> type, String title, Method getter, 
         try {
             if(value==null || value.toString().isEmpty())
                 return;
-            if(!type.isEnum()) {
-                setter.invoke(obj, value);
-                return;
-            }
-            if(enumValues.length>0){
-                    setter.invoke(obj, type.getEnumConstants()[getEnumOrdinal(value)]);
-                    return;
-            }
-            setter.invoke(obj,Enum.valueOf(type.asSubclass(Enum.class),value.toString().toUpperCase()));
+            if(!type.isEnum())
+             setter.invoke(obj, value);
+            else setEnumValue(obj, value);
         } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
             throw new ReflectionException(e.getMessage());
         }
+    }
+
+    private void setEnumValue(Object obj, Object value) throws InvocationTargetException, IllegalAccessException {
+        try {
+           setter.invoke(obj,Enum.valueOf(type.asSubclass(Enum.class), value.toString().toUpperCase().trim()));
+       } catch (IllegalArgumentException ex) {
+           if (enumValues.length > 0)
+               setter.invoke(obj, type.getEnumConstants()[getEnumOrdinal(value)]);
+       }
     }
 
     private int getEnumOrdinal(Object value) {
@@ -42,7 +45,7 @@ public record Field<T>(String name, Class<?> type, String title, Method getter, 
             if (enumVal.equalsIgnoreCase(value.toString()))
                 return i;
         }
-        throw new ReflectionException("Unknown or invalid enum value { "+value.toString()+" }");
+        throw new ReflectionException("Unknown or invalid enum value {"+value.toString()+"}");
     }
 
     private String getEnumValue(Object value) {
