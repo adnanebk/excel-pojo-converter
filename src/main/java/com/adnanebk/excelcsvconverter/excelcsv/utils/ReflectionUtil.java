@@ -7,7 +7,6 @@ import com.adnanebk.excelcsvconverter.excelcsv.annotations.IgnoreCell;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
-import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -35,7 +34,7 @@ public class ReflectionUtil<T> {
         return fields;
     }
 
-    public T getInstance(Object... values) {
+    public T getInstance(Object[] values) {
         try {
             T obj = defaultConstructor.newInstance();
             for (int i = 0; i < values.length; i++) {
@@ -72,7 +71,8 @@ public class ReflectionUtil<T> {
 
     private List<Field<T>> getAnnotationFields() {
         Class<CellDefinition> annotation = CellDefinition.class;
-        return Arrays.stream(classType.getDeclaredFields()).filter(field -> field.isAnnotationPresent(annotation))
+        return Arrays.stream(classType.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(annotation))
                 .sorted(Comparator.comparing(field -> field.getDeclaredAnnotation(annotation).value()))
                 .map(field -> buildField(List.of(getFieldTitle(field)).iterator()
                         ,field.getDeclaredAnnotation(annotation).value(),field)).toList();
@@ -88,10 +88,10 @@ public class ReflectionUtil<T> {
 
     private String getFieldTitle(java.lang.reflect.Field field) {
         return Optional.of(field.getDeclaredAnnotation(CellDefinition.class).title()).filter(s -> !s.isEmpty())
-                .orElseGet(() -> camelCaseWordsToWordsWithSpaces(field.getName()));
+                .orElseGet(() -> camelCaseWordsToTitleWords(field.getName()));
     }
     private String getTitle(Iterator<String> titles, String fieldName) {
-        return titles.hasNext() ? titles.next() : camelCaseWordsToWordsWithSpaces(fieldName);
+        return titles.hasNext() ? titles.next() : camelCaseWordsToTitleWords(fieldName);
     }
     private Method getFieldGetter(String fieldName, Class<?> fieldType) {
         try {
@@ -119,11 +119,9 @@ public class ReflectionUtil<T> {
                 .map(CellEnumValues::value).orElse(new String[]{});
     }
 
-    private String camelCaseWordsToWordsWithSpaces(String str) {
-        if (StringUtils.hasLength(str))
-            return str.toLowerCase().equals(str) ? str : StringUtils
-                    .uncapitalize(str.replaceAll("([a-z])([A-Z]+)", "$1 $2").toLowerCase());
-        return str;
+    private String camelCaseWordsToTitleWords(String word) {
+        String titleWord = word.replaceAll("([a-z])([A-Z])", "$1 $2");
+        return Character.toUpperCase(titleWord.charAt(0)) + titleWord.substring(1);
     }
 
     public String getTypeName(Class<?> fieldType) {
