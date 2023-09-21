@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface CellEnumValues {
 
-    String[] values() default {};
+    String[] value() default {};
 }

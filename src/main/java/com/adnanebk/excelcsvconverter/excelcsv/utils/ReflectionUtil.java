@@ -116,7 +116,7 @@ public class ReflectionUtil<T> {
 
     private static String[] getEnumValues(java.lang.reflect.Field field) {
         return Optional.ofNullable(field.getDeclaredAnnotation(CellEnumValues.class))
-                .map(CellEnumValues::values).orElse(new String[]{});
+                .map(CellEnumValues::value).orElse(new String[]{});
     }
 
     private String camelCaseWordsToWordsWithSpaces(String str) {
