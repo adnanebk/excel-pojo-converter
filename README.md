@@ -49,7 +49,7 @@ The @SheetDefinition annotation provides additional information like date format
 The Enum Annotation: @CellEnumValues
 In the Product class, we make use of the @CellEnumValues annotation. This annotation allows us to define formatted enum values for conversion, providing a high level of customization:
 
-@CellEnumValues({“aa”,”bb”,”cc”})
+```@CellEnumValues({“aa”,”bb”,”cc”})```
 
 Here, the enum values are explicitly defined as “aa”, “bb”, and “cc”, which will be used during conversion if we don’t want to use the enum constants as values (note that the orders of the enum values must be the same as defined in the constants in the enum type).
 
@@ -107,14 +107,14 @@ the same applicable for converting csv files except we need to define the delimi
 The ReflectionUtil Class: Dynamic Class Examination
 The ReflectionUtil class serves as the backbone of this Java library, facilitating dynamic class examination and manipulation through the power of Java reflection. It plays a pivotal role in the seamless conversion of Excel and CSV files to Java objects (POJOs) and vice versa.
 
-public T craeteIstance(Object[] values): This method is a of the ReflectionUtil class. It create instance of a specified class T. Subsequently, it iterates through provided values and sets corresponding fields, thereby initializing the object for further processing.
+```public T craeteIstance(Object[] values``` This method is a of the ReflectionUtil class. It create instance of a specified class T. Subsequently, it iterates through provided values and sets corresponding fields, thereby initializing the object for further processing.
 One noteworthy feature of the ReflectionUtil class is the optimization applied to enhance performance. During initialization, all getters, setters, and fields are eagerly loaded and encapsulated in the custom field class. This deliberate action minimizes the need for reflection lookups in subsequent operations and boosts overall efficiency.
 
 Field Record Overview
 The Field record is a fundamental component of the library, designed to encapsulate information about a class field. It includes attributes such as field name, type, title, corresponding getter and setter methods, index for column mapping, and enum values (if applicable).
 
 Key Methods:
-public Object getValue(T obj): Retrieves the value of the field from an object using its getter method. If the field is an enum, it provides formatted values based on defined enum mappings.
-public void setValue(Object obj, Object value): Sets the value of the field in an object using its setter method. It handles enum values and ensures proper conversion.
+```public Object getValue(T obj)```: Retrieves the value of the field from an object using its getter method. If the field is an enum, it provides formatted values based on defined enum mappings.
+```public void setValue(Object obj, Object value)```: Sets the value of the field in an object using its setter method. It handles enum values and ensures proper conversion.
 Conclusion
 By leveraging this custom library, developers can significantly simplify the process of converting Excel and CSV files to POJOs in Java. The integration of Java reflection, along with thoughtful design considerations, empowers dynamic mapping, making it a valuable tool for data processing tasks.
