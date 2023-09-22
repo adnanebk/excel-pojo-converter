@@ -52,17 +52,17 @@ class ExcelHelperTest {
                 assertEquals(2, sheet.getLastRowNum());
                 // Verify headers
                 Row headerRow = sheet.getRow( 0);
-                assertEquals("name", headerRow.getCell(0).getStringCellValue());
-                assertEquals("price", headerRow.getCell(1).getStringCellValue());
+                assertEquals("Name", headerRow.getCell(0).getStringCellValue());
+                assertEquals("Price", headerRow.getCell(1).getStringCellValue());
                 assertEquals("Promo price", headerRow.getCell(2).getStringCellValue());
-                assertEquals("min price", headerRow.getCell(3).getStringCellValue());
-                assertEquals("active", headerRow.getCell(4).getStringCellValue());
-                assertEquals("expired", headerRow.getCell(5).getStringCellValue());
-                assertEquals("units in stock", headerRow.getCell(6).getStringCellValue());
-                assertEquals("created date", headerRow.getCell(7).getStringCellValue());
-                assertEquals("updated date", headerRow.getCell(8).getStringCellValue());
-                assertEquals("zoned date time", headerRow.getCell(9).getStringCellValue());
-                assertEquals("category", headerRow.getCell(10).getStringCellValue());
+                assertEquals("Min price", headerRow.getCell(3).getStringCellValue());
+                assertEquals("Active", headerRow.getCell(4).getStringCellValue());
+                assertEquals("Expired", headerRow.getCell(5).getStringCellValue());
+                assertEquals("Units in stock", headerRow.getCell(6).getStringCellValue());
+                assertEquals("Created date", headerRow.getCell(7).getStringCellValue());
+                assertEquals("Updated date", headerRow.getCell(8).getStringCellValue());
+                assertEquals("Zoned date time", headerRow.getCell(9).getStringCellValue());
+                assertEquals("Category", headerRow.getCell(10).getStringCellValue());
                 // Verify data rows
                 for (int i = 0; i < productList.size(); i++) {
                     Row row = sheet.getRow(i + 1);

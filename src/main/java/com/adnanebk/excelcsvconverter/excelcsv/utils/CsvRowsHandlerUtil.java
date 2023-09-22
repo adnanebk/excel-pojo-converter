@@ -43,7 +43,7 @@ public class CsvRowsHandlerUtil<T> {
             String cellValue = cellsValues[field.colIndex()];
             values[i] = getCellValue(cellValue, field.type());
         }
-        return reflectionUtil.getInstance(values);
+        return reflectionUtil.createInstance(values);
     }
     public String[] convertObjectToStringColumns(T obj) {
         return  reflectionUtil.getFields().stream()

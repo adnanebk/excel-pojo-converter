@@ -34,7 +34,7 @@ public class ReflectionUtil<T> {
         return fields;
     }
 
-    public T getInstance(Object[] values) {
+    public T createInstance(Object[] values) {
         try {
             T obj = defaultConstructor.newInstance();
             for (int i = 0; i < values.length; i++) {
@@ -120,8 +120,10 @@ public class ReflectionUtil<T> {
     }
 
     private String camelCaseWordsToTitleWords(String word) {
-        String titleWord = word.replaceAll("([a-z])([A-Z])", "$1 $2");
-        return Character.toUpperCase(titleWord.charAt(0)) + titleWord.substring(1);
+        String firstChar = Character.toUpperCase(word.charAt(0))+"";
+        String remaining = word.substring(1);
+            return firstChar + (remaining.toLowerCase().equals(remaining)?remaining:
+                    remaining.replaceAll("([a-z])([A-Z]+)", "$1 $2").toLowerCase());
     }
 
     public String getTypeName(Class<?> fieldType) {

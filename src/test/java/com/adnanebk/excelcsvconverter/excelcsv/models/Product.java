@@ -50,7 +50,7 @@ public class Product {
     @CellDefinition(9)
     private ZonedDateTime zonedDateTime;
 
-    @CellEnumValues(values = {"aa","bb","cc"})
+    @CellEnumValues(value = {"aa","bb","cc"})
     @CellDefinition(10)
     private Category category;
 
