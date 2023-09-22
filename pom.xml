@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.adnanebk</groupId>
 	<artifactId>excel-csv-converter</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>excel-csv-converter</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
