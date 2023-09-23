@@ -108,6 +108,7 @@ public class ReflectionUtil<T> {
         }
     }
     private Field<T> buildField(Iterator<String> titles,int colIndex,java.lang.reflect.Field field) {
+        field.setAccessible(true); // to improve performance
         var fieldType = field.getType();
         var fieldName = field.getName();
         return new Field<>(fieldName, fieldType, getTitle(titles, fieldName)
