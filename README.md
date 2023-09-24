@@ -8,7 +8,7 @@ Data processing tasks often involve converting Excel or CSV files into Java obje
 <dependency>
   <groupId>com.adnanebk</groupId>
   <artifactId>excel-csv-converter</artifactId>
-  <version>1.0</version>
+  <version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
 ## Understanding the POJO Class
