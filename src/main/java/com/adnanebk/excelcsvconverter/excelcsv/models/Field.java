@@ -31,8 +31,8 @@ public record Field<T>(String name, Class<?> type, String title, Method getter, 
     private Object getEnumValue(T obj) throws IllegalAccessException, InvocationTargetException {
         Object value = getter.invoke(obj);
         int ordinal = ((Enum<?>) value).ordinal();
-        String enumValue = ordinal<enumValues.length?enumValues[ordinal]:"";
-        return enumValue.isEmpty() ? value : enumValue;
+        return ordinal<enumValues.length?enumValues[ordinal]:"";
+
     }
     private void setEnumValue(Object obj, Object value) throws InvocationTargetException, IllegalAccessException {
         try {
