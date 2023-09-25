@@ -112,12 +112,25 @@ public class ReflectionUtil<T> {
         var fieldType = field.getType();
         var fieldName = field.getName();
         return new Field<>(fieldName, fieldType, getTitle(titles, fieldName)
-                ,getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType),colIndex, getEnumValues(field));
+                ,getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType),colIndex, createEnumMapper(field));
     }
 
-    private static String[] getEnumValues(java.lang.reflect.Field field) {
-        return Optional.ofNullable(field.getDeclaredAnnotation(CellEnumValues.class))
-                .map(CellEnumValues::value).orElse(new String[]{});
+    private static Map<Object,Object> createEnumMapper(java.lang.reflect.Field field) {
+        Map<Object,Object> enumMapper = new HashMap<>();
+        if(!field.getType().isEnum())
+            return enumMapper;
+        var enumsAnnotation = Optional.ofNullable(field.getDeclaredAnnotation(CellEnumValues.class));
+        var formattedValues=enumsAnnotation.map(CellEnumValues::value).orElse(new String[]{});
+        var constants = field.getType().asSubclass(Enum.class).getEnumConstants();
+
+        for (int i = 0; i < constants.length; i++) {
+            var constant = constants[i];
+            String formattedValue = i< formattedValues.length?formattedValues[i]:constant.toString();
+            enumMapper.put(constant,formattedValue);
+            enumMapper.put(formattedValue,constant);
+        }
+        return enumMapper;
+
     }
 
     private String camelCaseWordsToTitleWords(String word) {
