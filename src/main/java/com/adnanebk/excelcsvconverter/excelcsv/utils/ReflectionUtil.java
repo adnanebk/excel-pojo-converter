@@ -140,8 +140,8 @@ public class ReflectionUtil<T> {
                     remaining.replaceAll("([a-z])([A-Z]+)", "$1 $2").toLowerCase());
     }
 
-    public String getTypeName(Class<?> fieldType) {
-        return fieldType.isEnum() ? Enum.class.getSimpleName().toLowerCase() : fieldType.getSimpleName().toLowerCase();
+    public String getFieldTypeName(Class<?> fieldType) {
+        return fieldType.isEnum() ? "enum" : fieldType.getSimpleName().toLowerCase();
     }
 }
 

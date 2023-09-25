@@ -13,17 +13,11 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class ExcelRowsHandlerUtil<T> {
 
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private final Map<String, Function<Cell, Object>> cellValueMap = new HashMap<>();
-    private final Map<String, BiConsumer<Cell, Object>> cellValueSetterMap = new HashMap<>();
     private final DateParserFormatterUtil dateParserFormatterUtil;
     private final ReflectionUtil<T> reflectionUtil;
 
@@ -31,35 +25,49 @@ public class ExcelRowsHandlerUtil<T> {
     public ExcelRowsHandlerUtil(ReflectionUtil<T> reflectionUtil) {
         this.reflectionUtil = reflectionUtil;
         this.dateParserFormatterUtil = new DateParserFormatterUtil(reflectionUtil.getDatePattern(),reflectionUtil.getDateTimePattern());
-        initCellValueMap();
-        initValueSetterMap();
     }
 
-    public Object getCellValue(Class<?> fieldType, Cell cell) {
+    public Object getCellValue(Field<T> field, Cell cell) {
         try {
-            var function = cellValueMap.get(reflectionUtil.getTypeName(fieldType));
-            if(function==null)
-                throw new ExcelValidationException("Unsupported field type");
-            return function.apply(cell);
+            return switch (reflectionUtil.getFieldTypeName(field.type())) {
+                case "string", "enum" -> cell.getStringCellValue();
+                case "boolean" -> cell.getBooleanCellValue();
+                case "integer", "int" -> (int) cell.getNumericCellValue();
+                case "short" -> (short) cell.getNumericCellValue();
+                case "long" -> (long) cell.getNumericCellValue();
+                case "double" -> cell.getNumericCellValue();
+                case "localdate" -> getAsLocalDate(cell);
+                case "localdatetime" -> getAsLocalDateTime(cell);
+                case "zoneddatetime" -> getAsZonedDateTime(cell);
+                case "date" -> getAsDate(cell);
+                default -> throw new ExcelValidationException("Unsupported field type");
+            };
         } catch (RuntimeException e) {
             throw new ExcelValidationException(String.format("Unexpected or Invalid cell value in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
         }
     }
 
-    public void setCellValue(Class<?> type, Cell cell, Object value) {
+    public void setCellValue(Field<T> field, Cell cell, Object value) {
         if(value==null)
             return;
-        var function = cellValueSetterMap.get(reflectionUtil.getTypeName(type));
-        if(function==null)
-            throw new ExcelValidationException("Unsupported field type");
-        function.accept(cell, value);
+        switch (reflectionUtil.getFieldTypeName(field.type())) {
+            case "string", "enum" -> cell.setCellValue(value.toString());
+            case "double", "float", "integer", "int", "long", "short" ->
+                    cell.setCellValue(Double.parseDouble(value.toString()));
+            case "boolean" -> cell.setCellValue(Boolean.parseBoolean(value.toString()));
+            case "localdate" -> cell.setCellValue(dateParserFormatterUtil.format((LocalDate) value));
+            case "localdatetime" -> cell.setCellValue(dateParserFormatterUtil.format((LocalDateTime) value));
+            case "zoneddatetime" -> cell.setCellValue(dateParserFormatterUtil.format((ZonedDateTime) value));
+            case "date" -> cell.setCellValue(dateParserFormatterUtil.format((Date) value));
+            default -> throw new ExcelValidationException("Unsupported field type");
+        }
     }
 
     public void fillRowFromObject(Row row, T obj) {
         var fields = reflectionUtil.getFields();
         for (int i = 0; i < fields.size(); i++) {
             var field = fields.get(i);
-            setCellValue(field.type(), row.createCell(i),field.getValue(obj));
+            setCellValue(field, row.createCell(i),field.getValue(obj));
         }
     }
 
@@ -67,7 +75,7 @@ public class ExcelRowsHandlerUtil<T> {
         var fields = reflectionUtil.getFields();
         Object[] values = fields.stream()
                 .map(field -> getCurrentCell(field.colIndex(), currentRow)
-                        .map(cell -> getCellValue(field.type(),cell))
+                        .map(cell -> getCellValue(field,cell))
                         .orElse(null)).toArray();
         return reflectionUtil.createInstance(values);
     }
@@ -75,36 +83,8 @@ public class ExcelRowsHandlerUtil<T> {
         return reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new);
     }
 
-    private void initCellValueMap() {
-        cellValueMap.put(String.class.getSimpleName().toLowerCase(), Cell::getStringCellValue);
-        cellValueMap.put(boolean.class.getSimpleName().toLowerCase(), Cell::getBooleanCellValue);
-        cellValueMap.put(Enum.class.getSimpleName().toLowerCase(), Cell::getStringCellValue);
-        cellValueMap.put(Integer.class.getSimpleName().toLowerCase(), cell -> (int) cell.getNumericCellValue());
-        cellValueMap.put(int.class.getSimpleName().toLowerCase(), cell -> (int) cell.getNumericCellValue());
-        cellValueMap.put(short.class.getSimpleName().toLowerCase(), cell -> (short) cell.getNumericCellValue());
-        cellValueMap.put(long.class.getSimpleName().toLowerCase(), cell -> (long) cell.getNumericCellValue());
-        cellValueMap.put(double.class.getSimpleName().toLowerCase(), Cell::getNumericCellValue);
-        cellValueMap.put(LocalDate.class.getSimpleName().toLowerCase(), this::getAsLocalDate);
-        cellValueMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), this::getAsLocalDateTime);
-        cellValueMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), this::getAsZonedDateTime);
-        cellValueMap.put(Date.class.getSimpleName().toLowerCase(), this::getAsDate);
-    }
 
-    private void initValueSetterMap() {
-        cellValueSetterMap.put(String.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(value.toString()));
-        cellValueSetterMap.put(Double.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(double.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(Integer.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(int.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(long.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(short.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Double.parseDouble(value.toString())));
-        cellValueSetterMap.put(boolean.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(Boolean.parseBoolean(value.toString())));
-        cellValueSetterMap.put(Enum.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(value.toString()));
-        cellValueSetterMap.put(LocalDate.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.format((LocalDate)value)));
-        cellValueSetterMap.put(LocalDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.format((LocalDateTime) value)));
-        cellValueSetterMap.put(ZonedDateTime.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.format((ZonedDateTime) value)));
-        cellValueSetterMap.put(Date.class.getSimpleName().toLowerCase(), (cell, value) -> cell.setCellValue(dateParserFormatterUtil.format((Date) value)));
-    }
+
 
     private Date getAsDate(Cell cell) {
         try {
