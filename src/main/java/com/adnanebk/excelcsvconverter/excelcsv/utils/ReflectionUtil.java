@@ -2,9 +2,10 @@ package com.adnanebk.excelcsvconverter.excelcsv.utils;
 
 
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnumValues;
+import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnumFormat;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.IgnoreCell;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
+import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
 
@@ -116,20 +117,35 @@ public class ReflectionUtil<T> {
     }
 
     private static Map<Object,Object> createEnumMapper(java.lang.reflect.Field field) {
-        Map<Object,Object> enumMapper = new HashMap<>();
+        Map<Object,Object> enumsMapper = new HashMap<>();
         if(!field.getType().isEnum())
-            return enumMapper;
-        var enumsAnnotation = Optional.ofNullable(field.getDeclaredAnnotation(CellEnumValues.class));
-        var formattedValues=enumsAnnotation.map(CellEnumValues::value).orElse(new String[]{});
-        var constants = field.getType().asSubclass(Enum.class).getEnumConstants();
+            return enumsMapper;
+        var enumsAnnotation = Optional.ofNullable(field.getDeclaredAnnotation(CellEnumFormat.class));
 
-        for (int i = 0; i < constants.length; i++) {
-            var constant = constants[i];
-            String formattedValue = i< formattedValues.length?formattedValues[i]:constant.toString();
-            enumMapper.put(constant,formattedValue);
-            enumMapper.put(formattedValue,constant);
+        var formattedValues=enumsAnnotation.map(CellEnumFormat::formattedValues).orElse(new String[]{});
+        var constants = field.getType().asSubclass(Enum.class).getEnumConstants();
+        var mappedConstants=enumsAnnotation.map(CellEnumFormat::mappedConstants)
+                .filter(e->e.length>0).orElse(Arrays.stream(constants)
+                        .map(Enum::toString)
+                        .limit(formattedValues.length)
+                        .toArray(String[]::new));
+        if(mappedConstants.length!=formattedValues.length)
+            throw new ExcelValidationException("count of mapped constants and enum values not much");
+        for (int i = 0; i < formattedValues.length; i++) {
+            try {
+                var constant = Enum.valueOf(field.getType().asSubclass(Enum.class), mappedConstants[i]);
+                enumsMapper.put(formattedValues[i], constant);
+                enumsMapper.put(constant, formattedValues[i]);
+            } catch (IllegalArgumentException e) {
+                throw new ExcelValidationException("Invalid enum constant {" + mappedConstants[i] + "}");
+            }
         }
-        return enumMapper;
+
+        for (var constant : Arrays.stream(constants).filter(constant -> !enumsMapper.containsKey(constant)).toList()) {
+            enumsMapper.put(constant, constant.toString());
+            enumsMapper.put(constant.toString(), constant);
+        }
+        return enumsMapper;
 
     }
 

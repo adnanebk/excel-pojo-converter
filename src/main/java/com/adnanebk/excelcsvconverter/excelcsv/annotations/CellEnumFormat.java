@@ -7,7 +7,9 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface CellEnumValues {
+public @interface CellEnumFormat {
 
-    String[] value() default {};
+    String[] formattedValues();
+
+    String[] mappedConstants() default {};
 }
