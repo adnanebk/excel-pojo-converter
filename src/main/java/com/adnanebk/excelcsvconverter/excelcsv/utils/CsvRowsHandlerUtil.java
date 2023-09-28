@@ -56,7 +56,7 @@ public class CsvRowsHandlerUtil<T> {
             String cellValue = cellsValues[field.colIndex()];
             values[i] = getCellValue(cellValue, field);
         }
-        return reflectionUtil.createInstance(values);
+        return reflectionUtil.createInstanceAndSetValues(values);
     }
     public String[] convertObjectToStringColumns(T obj) {
         return  reflectionUtil.getFields().stream()

@@ -5,7 +5,6 @@ import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnumFormat;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.IgnoreCell;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
-import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
 
@@ -35,16 +34,13 @@ public class ReflectionUtil<T> {
         return fields;
     }
 
-    public T createInstance(Object[] values) {
-        try {
-            T obj = defaultConstructor.newInstance();
-            for (int i = 0; i < values.length; i++) {
+    public T createInstanceAndSetValues(Object[] values) {
+
+        T obj = createInstance();
+        for (int i = 0; i < values.length; i++) {
                 fields.get(i).setValue(obj, values[i]);
             }
             return obj;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new ReflectionException(e.getMessage());
-        }
     }
 
     public String getDatePattern() {
@@ -61,6 +57,13 @@ public class ReflectionUtil<T> {
                     this.dateTimePattern = excelDefinitionAnnotation.dateTimePattern();
                     this.includeAllFields = excelDefinitionAnnotation.includeAllFields();
                 });
+    }
+    private  T createInstance(){
+        try{
+            return defaultConstructor.newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new ReflectionException(e.getMessage());
+        }
     }
     private Constructor<T> getDefaultConstructor() {
         try {
@@ -113,40 +116,39 @@ public class ReflectionUtil<T> {
         var fieldType = field.getType();
         var fieldName = field.getName();
         return new Field<>(fieldName, fieldType, getTitle(titles, fieldName)
-                ,getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType),colIndex, createEnumMapper(field));
+                ,getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType),colIndex, createEnumsMapper(field));
     }
 
-    private static Map<Object,Object> createEnumMapper(java.lang.reflect.Field field) {
-        Map<Object,Object> enumsMapper = new HashMap<>();
-        if(!field.getType().isEnum())
+    private  Map<Object,Object> createEnumsMapper(java.lang.reflect.Field field) {
+        Map<Object, Object> enumsMapper = new HashMap<>();
+        if (!field.getType().isEnum())
             return enumsMapper;
-        var enumsAnnotation = Optional.ofNullable(field.getDeclaredAnnotation(CellEnumFormat.class));
-
-        var formattedValues=enumsAnnotation.map(CellEnumFormat::formattedValues).orElse(new String[]{});
-        var constants = field.getType().asSubclass(Enum.class).getEnumConstants();
-        var mappedConstants=enumsAnnotation.map(CellEnumFormat::mappedConstants)
-                .filter(e->e.length>0).orElse(Arrays.stream(constants)
-                        .map(Enum::toString)
-                        .limit(formattedValues.length)
-                        .toArray(String[]::new));
-        if(mappedConstants.length!=formattedValues.length)
-            throw new ExcelValidationException("count of mapped constants and enum values not much");
-        for (int i = 0; i < formattedValues.length; i++) {
-            try {
-                var constant = Enum.valueOf(field.getType().asSubclass(Enum.class), mappedConstants[i]);
-                enumsMapper.put(formattedValues[i], constant);
-                enumsMapper.put(constant, formattedValues[i]);
-            } catch (IllegalArgumentException e) {
-                throw new ExcelValidationException("Invalid enum constant {" + mappedConstants[i] + "}");
-            }
+        for(var entry : getEnumsMapper(field).entrySet()){
+            enumsMapper.put(entry.getKey(),entry.getValue());
+            enumsMapper.put(entry.getValue(),entry.getKey());
         }
-
+        var constants = field.getType().asSubclass(Enum.class).getEnumConstants();
         for (var constant : Arrays.stream(constants).filter(constant -> !enumsMapper.containsKey(constant)).toList()) {
             enumsMapper.put(constant, constant.toString());
             enumsMapper.put(constant.toString(), constant);
         }
         return enumsMapper;
+    }
 
+    private Map<?, ?> getEnumsMapper( java.lang.reflect.Field field) {
+        var enumsAnnotation = Optional.ofNullable(field.getDeclaredAnnotation(CellEnumFormat.class));
+        var enumMapperMethod = enumsAnnotation.map(CellEnumFormat::enumsMapperMethod).orElse("");
+        try {
+            Method method = field.getDeclaringClass().getDeclaredMethod(enumMapperMethod);
+            method.setAccessible(true);
+            if(method.invoke(createInstance()) instanceof Map<?, ?> enumsMapper
+                    && enumsMapper.entrySet().stream().allMatch(entry -> field.getType().isInstance(entry.getKey())
+                                                                 && entry.getValue() instanceof String))
+              return enumsMapper;
+            else throw new ReflectionException("expecting a method that return a map of type  Map<"+field.getName()+",String>");
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new ReflectionException("no method found for the argument enumsMapMethod,you must create a method that returns a map");
+        }
     }
 
     private String camelCaseWordsToTitleWords(String word) {

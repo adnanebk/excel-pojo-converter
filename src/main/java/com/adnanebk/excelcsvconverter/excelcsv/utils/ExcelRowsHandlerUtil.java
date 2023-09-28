@@ -77,7 +77,7 @@ public class ExcelRowsHandlerUtil<T> {
                 .map(field -> getCurrentCell(field.colIndex(), currentRow)
                         .map(cell -> getCellValue(field,cell))
                         .orElse(null)).toArray();
-        return reflectionUtil.createInstance(values);
+        return reflectionUtil.createInstanceAndSetValues(values);
     }
     public String[] getHeaders() {
         return reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new);

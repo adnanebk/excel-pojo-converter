@@ -6,12 +6,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-public record Field<T>(String name, Class<?> type, String title, Method getter, Method setter, int colIndex, Map<?,?> enumMapper) {
+public record Field<T>(String name, Class<?> type, String title, Method getter, Method setter, int colIndex, Map<?,?> enumsMapper) {
     public Object getValue(T obj) {
         try {
             if(!type.isEnum())
                 return getter.invoke(obj);
-            return enumMapper.get(getter.invoke(obj));
+            return enumsMapper.get(getter.invoke(obj));
         } catch (IllegalAccessException | InvocationTargetException | IndexOutOfBoundsException e) {
             throw new ReflectionException(e.getMessage());
         }
@@ -23,7 +23,7 @@ public record Field<T>(String name, Class<?> type, String title, Method getter, 
                 return;
             if(!type.isEnum())
              setter.invoke(obj, value);
-            else  setter.invoke(obj, enumMapper.get(value));
+            else  setter.invoke(obj, enumsMapper.get(value));
         } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
             throw new ReflectionException(e.getMessage());
         }

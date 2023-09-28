@@ -9,7 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface CellEnumFormat {
 
-    String[] formattedValues();
-
-    String[] mappedConstants() default {};
+    String enumsMapperMethod();
 }
