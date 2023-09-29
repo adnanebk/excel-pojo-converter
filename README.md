@@ -53,7 +53,8 @@ we can also define the title of the of the cell, by default it will convert the 
 
 The @SheetDefinition annotation provides additional information like date formatting patterns that will be used during conversion of date field types.
 
-The Enum Annotation: @CellEnumFormat(enumsMapperMethod = "categoryMap")
+### The Enum Annotation: @CellEnumFormat(enumsMapperMethod = "categoryMap")
+
 In the Product class, we make use of the @CellEnumFormat annotation in the enum Category field. the enumsMapperMethod argument allows us to define a method name, this method should return a map that define the mapping (conversions) between the enum constants and the formatted values in the excel/csv cells (by default the enum constants will be used)
 note that the method name must much the enumsMapperMethod argument value.
 
