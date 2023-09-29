@@ -1,6 +1,6 @@
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=adnanebk_excel-pojo-converter)](https://sonarcloud.io/summary/new_code?id=adnanebk_excel-pojo-converter)
 
-Data processing tasks often involve converting Excel or CSV files into Java objects (POJOs) and vice versa. This can be a complex process, but with the right tools and techniques, it becomes much more manageable. In this guide, we’ll explore a powerful Java library that leverages Java reflection, making data processing a seamless experience.
+Converting Excel or CSV files into Java objects (POJOs) and vice versa can be a complex process, but with the right tools and techniques, it becomes much more manageable. In this guide, we’ll explore a powerful Java library that leverages Java reflection.
 
 ## First we add the dependency to maven
 
