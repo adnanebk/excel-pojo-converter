@@ -112,7 +112,7 @@ the same applicable for converting csv files except we need to define the delimi
 
 The ReflectionUtil class serves as the backbone of this Java library, facilitating dynamic class examination and manipulation through the power of Java reflection. It plays a pivotal role in the seamless conversion of Excel and CSV files to Java objects (POJOs) and vice versa.
 
-```public T craeteIstance(Object[] values``` This method is a of the ReflectionUtil class. It create instance of a specified class T. Subsequently, it iterates through provided values and sets corresponding fields, thereby initializing the object for further processing.
+```public T createInstanceAndSetValues(Object[] values``` This method is a of the ReflectionUtil class. It create instance of a specified class T. Subsequently, it iterates through provided values and sets corresponding fields, thereby initializing the object for further processing.
 
 One noteworthy feature of the ReflectionUtil class is the optimization applied to enhance performance. During initialization, all getters, setters, and fields are eagerly loaded and encapsulated in the custom field class. This deliberate action minimizes the need for reflection lookups in subsequent operations and boosts overall efficiency.
 
