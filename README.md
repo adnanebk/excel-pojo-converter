@@ -34,12 +34,17 @@ public class Product {
 
     // Additional fields...
 
-    @CellEnumValues({"aa","bb","cc"})
+   @CellEnumFormat(enumsMapperMethod = "categoryMap")
     @CellDefinition(10)
     private Category category;
 
     @CellDefinition(11)
     private LocalDateTime localDateTime;
+
+    private Map<Category,String> categoryMap(){
+        return Map.of(Category.A,"Formatted A",
+                      Category.B,"Formatted B");
+    }
 }
 ```
 This Product class is annotated with various annotations that play a crucial role in the conversion process. Each field is annotated with @CellDefinition, indicating its position in the Excel or CSV file.
@@ -48,12 +53,10 @@ we can also define the title of the of the cell, by default it will convert the 
 
 The @SheetDefinition annotation provides additional information like date formatting patterns that will be used during conversion of date field types.
 
-The Enum Annotation: @CellEnumValues
-In the Product class, we make use of the @CellEnumValues annotation. This annotation allows us to define formatted enum values for conversion, providing a high level of customization:
+### The Enum Annotation: @CellEnumFormat(enumsMapperMethod = "categoryMap")
 
-```@CellEnumValues({“aa”,”bb”,”cc”})```
-
-Here, the enum values are explicitly defined as “aa”, “bb”, and “cc”, which will be used during conversion if we don’t want to use the enum constants as values (note that the orders of the enum values must be the same as defined in the constants in the enum type).
+In the Product class, we make use of the @CellEnumFormat annotation in the enum Category field. the enumsMapperMethod argument allows us to define a method name, this method should return a map that define the mapping (conversions) between the enum constants and the formatted values in the excel/csv cells (by default the enum constants will be used)
+note that the method name must much the enumsMapperMethod argument value.
 
 Now, let’s introduce an updated version of our POJO class, ProductV2:
 ```
@@ -68,7 +71,6 @@ public class ProductV2 {
 
     // Additional fields...
 
-    @CellEnumValues({"aa","bb","cc"})
     private Category category;
 
     @IgnoreCell
@@ -115,8 +117,9 @@ The ReflectionUtil class serves as the backbone of this Java library, facilitati
 One noteworthy feature of the ReflectionUtil class is the optimization applied to enhance performance. During initialization, all getters, setters, and fields are eagerly loaded and encapsulated in the custom field class. This deliberate action minimizes the need for reflection lookups in subsequent operations and boosts overall efficiency.
 
 ## Field Record Overview
+```public record Field<T>(String name, Class<?> type, String title, Method getter, Method setter, int colIndex, Map<?,?> enumMapper)```
 
-The Field record is a fundamental component of the library, designed to encapsulate information about a class field. It includes attributes such as field name, type, title, corresponding getter and setter methods, index for column mapping, and enum values (if applicable).
+The Field record is a fundamental component of the library, designed to encapsulate information about a class field. It includes attributes such as field name, type, title, corresponding getter and setter methods, index for column mapping, and enumMapper that that maps enum values to constants and vise versa.
 
 ### Key Methods:
 ```public Object getValue(T obj)```: Retrieves the value of the field from an object using its getter method. If the field is an enum, it provides formatted values based on defined enum mappings.
