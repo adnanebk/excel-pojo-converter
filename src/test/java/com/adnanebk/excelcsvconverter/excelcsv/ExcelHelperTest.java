@@ -94,7 +94,7 @@ class ExcelHelperTest {
        File file = new ClassPathResource(fileName).getFile();
         // Create a MockMultipartFile
        // MultipartFile multipartFile = new MockMultipartFile("file", "generatedExcel.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", inputStream);
-        List<Product> result = excelHelper.toStream(file).toList();
+        List<Product> result = excelHelper.toStream(new FileInputStream(file)).toList();
 
         // Assuming you know the expected size of the list
         assertEquals(2, result.size());
@@ -127,7 +127,7 @@ class ExcelHelperTest {
                 getClass().getClassLoader().getResourceAsStream("invalid.xlsx")
         );
 
-        assertThrows(ExcelFileException.class, () -> excelHelper.toStream(file));
+        assertThrows(ExcelFileException.class, () -> excelHelper.toStream(file.getInputStream()));
     }
 
     }

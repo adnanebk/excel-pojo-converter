@@ -17,19 +17,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ReflectionUtil<T> {
     private String dateTimePattern;
     private String datePattern;
-    private final List<Field<T>> fields;
+    private  List<Field<T>> fields;
     private final Class<T> classType;
     private final Constructor<T> defaultConstructor;
-    private boolean includeAllFields;
-
 
     public ReflectionUtil(Class<T> type) {
         classType = type;
         defaultConstructor=getDefaultConstructor();
-        setSheetInfo();
-        this.fields = includeAllFields?this.getAllFields():getAnnotationFields();
+        this.fields = getAnnotatedFields();
+        getSheetInfo().ifPresent(sheetInfo->{
+            this.datePattern = sheetInfo.datePattern();
+            this.dateTimePattern = sheetInfo.dateTimePattern();
+            if(sheetInfo.includeAllFields())
+              this.fields = getAllFields();
+        });
     }
-
     public List<Field<T>> getFields() {
         return fields;
     }
@@ -50,13 +52,8 @@ public class ReflectionUtil<T> {
     public String getDateTimePattern() {
         return dateTimePattern;
     }
-    private void setSheetInfo() {
-        Optional.ofNullable(classType.getAnnotation(SheetDefinition.class))
-                .ifPresent(excelDefinitionAnnotation -> {
-                    this.datePattern = excelDefinitionAnnotation.datePattern();
-                    this.dateTimePattern = excelDefinitionAnnotation.dateTimePattern();
-                    this.includeAllFields = excelDefinitionAnnotation.includeAllFields();
-                });
+    private Optional<SheetDefinition> getSheetInfo() {
+        return Optional.ofNullable(classType.getAnnotation(SheetDefinition.class));
     }
     private  T createInstance(){
         try{
@@ -73,7 +70,7 @@ public class ReflectionUtil<T> {
         }
     }
 
-    private List<Field<T>> getAnnotationFields() {
+    private List<Field<T>> getAnnotatedFields() {
         Class<CellDefinition> annotation = CellDefinition.class;
         return Arrays.stream(classType.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(annotation))
@@ -112,11 +109,14 @@ public class ReflectionUtil<T> {
         }
     }
     private Field<T> buildField(Iterator<String> titles,int colIndex,java.lang.reflect.Field field) {
-        field.setAccessible(true); // to improve performance
         var fieldType = field.getType();
         var fieldName = field.getName();
-        return new Field<>(fieldName, fieldType, getTitle(titles, fieldName)
-                ,getFieldGetter(fieldName, fieldType), getFieldSetter(fieldName, fieldType),colIndex, createEnumsMapper(field));
+        Method getter=getFieldGetter(fieldName, fieldType);
+        Method setter=getFieldSetter(fieldName, fieldType);
+        //just for optimization
+        getter.setAccessible(true);
+        setter.setAccessible(true);
+        return new Field<>(fieldType, getTitle(titles, fieldName),getter,setter,colIndex, createEnumsMapper(field));
     }
 
     private  Map<Object,Object> createEnumsMapper(java.lang.reflect.Field field) {
@@ -136,8 +136,10 @@ public class ReflectionUtil<T> {
     }
 
     private Map<?, ?> getEnumsMapper( java.lang.reflect.Field field) {
-        var enumsAnnotation = Optional.ofNullable(field.getDeclaredAnnotation(CellEnumFormat.class));
-        var enumMapperMethod = enumsAnnotation.map(CellEnumFormat::enumsMapperMethod).orElse("");
+        var enumsAnnotation = field.getDeclaredAnnotation(CellEnumFormat.class);
+        if(enumsAnnotation==null)
+            return new HashMap<>();
+        var enumMapperMethod = enumsAnnotation.enumsMapperMethod();
         try {
             Method method = field.getDeclaringClass().getDeclaredMethod(enumMapperMethod);
             method.setAccessible(true);
