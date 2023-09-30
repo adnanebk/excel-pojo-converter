@@ -90,7 +90,7 @@ public class ExcelFieldsController {
 
     @GetMapping
     public List<Product> excelToProducts(@RequestBody MultipartFile file){
-        return excelHelper.toStream(file).toList();
+        return excelHelper.toStream(file.getInputStream()).toList();
     }
 
        @GetMapping("/download")
@@ -117,9 +117,9 @@ The ReflectionUtil class serves as the backbone of this Java library, facilitati
 One noteworthy feature of the ReflectionUtil class is the optimization applied to enhance performance. During initialization, all getters, setters, and fields are eagerly loaded and encapsulated in the custom field class. This deliberate action minimizes the need for reflection lookups in subsequent operations and boosts overall efficiency.
 
 ## Field Record Overview
-```public record Field<T>(String name, Class<?> type, String title, Method getter, Method setter, int colIndex, Map<?,?> enumMapper)```
+```public record Field<T>(Class<?> type, String title, Method getter, Method setter, int colIndex, Map<?,?> enumMapper)```
 
-The Field record is a fundamental component of the library, designed to encapsulate information about a class field. It includes attributes such as field name, type, title, corresponding getter and setter methods, index for column mapping, and enumMapper that that maps enum values to constants and vise versa.
+The Field record is a fundamental component of the library, designed to encapsulate information about a class field. It includes attributes such as field type, title, corresponding getter and setter methods, index for column mapping, and enumMapper that that maps enum values to constants and vise versa.
 
 ### Key Methods:
 ```public Object getValue(T obj)```: Retrieves the value of the field from an object using its getter method. If the field is an enum, it provides formatted values based on defined enum mappings.
