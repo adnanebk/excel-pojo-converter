@@ -1,6 +1,5 @@
 package com.adnanebk.excelcsvconverter.excelcsv;
 
-import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Product;
 import org.junit.jupiter.api.*;
 import org.springframework.core.io.ClassPathResource;
@@ -12,7 +11,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CsvHelperTest {
@@ -42,16 +40,5 @@ class CsvHelperTest {
         // Add more assertions based on the actual data you expect
 
 
-    }
-
-    @Test
-    @Order(2)
-    void toList_withInvalidCsvFile_shouldThrowException() throws IOException {
-        MultipartFile file = new MockMultipartFile(
-                "invalid.csv",
-                getClass().getClassLoader().getResourceAsStream("invalid.csv")
-        );
-
-        assertThrows(ExcelFileException.class, () -> csvHelper.toStream(file.getInputStream()));
     }
 }

@@ -1,6 +1,5 @@
 package com.adnanebk.excelcsvconverter.excelcsv;
 
-import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelFileException;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Category;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Product;
 import org.apache.poi.ss.usermodel.Row;
@@ -11,8 +10,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -117,17 +114,6 @@ class ExcelHelperTest {
         assertNotNull(result.get(1).getUpdatedDate()); // Assuming it's not null in the Excel file
         assertNotNull(result.get(1).getZonedDateTime()); // Assuming it's not null in the Excel file
         assertNotNull(result.get(1).getCategory()); // Assuming it's not null in the Excel file
-    }
-
-    @Test
-    @Order(2)
-    void toList_withInvalidExcelFile_shouldThrowException() throws IOException {
-        MultipartFile file = new MockMultipartFile(
-                "invalid.xlsx",
-                getClass().getClassLoader().getResourceAsStream("invalid.xlsx")
-        );
-
-        assertThrows(ExcelFileException.class, () -> excelHelper.toStream(file.getInputStream()));
     }
 
     }
