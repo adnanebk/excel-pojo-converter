@@ -27,9 +27,9 @@ public class ExcelRowsHandlerUtil<T> {
         this.dateParserFormatterUtil = new DateParserFormatterUtil(reflectionUtil.getDatePattern(),reflectionUtil.getDateTimePattern());
     }
 
-    public Object getCellValue(Field<T> field, Cell cell) {
+    public Object getCellValue(String typeName, Cell cell) {
         try {
-            return switch (reflectionUtil.getFieldTypeName(field.type())) {
+            return switch (typeName) {
                 case "string", "enum" -> cell.getStringCellValue();
                 case "boolean" -> cell.getBooleanCellValue();
                 case "integer", "int" -> (int) cell.getNumericCellValue();
@@ -40,7 +40,7 @@ public class ExcelRowsHandlerUtil<T> {
                 case "localdatetime" -> getAsLocalDateTime(cell);
                 case "zoneddatetime" -> getAsZonedDateTime(cell);
                 case "date" -> getAsDate(cell);
-                default -> throw new ExcelValidationException("Unsupported field type");
+                default -> throw new ExcelValidationException("Unsupported field type "+typeName);
             };
         } catch (RuntimeException e) {
             throw new ExcelValidationException(String.format("Unexpected or Invalid cell value in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
@@ -75,7 +75,7 @@ public class ExcelRowsHandlerUtil<T> {
         var fields = reflectionUtil.getFields();
         Object[] values = fields.stream()
                 .map(field -> getCurrentCell(field.colIndex(), currentRow)
-                        .map(cell -> getCellValue(field,cell))
+                        .map(cell -> getCellValue(reflectionUtil.getFieldTypeName(field.type()),cell))
                         .orElse(null)).toArray();
         return reflectionUtil.createInstanceAndSetValues(values);
     }
