@@ -113,9 +113,6 @@ public class ReflectionUtil<T> {
         var fieldName = field.getName();
         Method getter=getFieldGetter(fieldName, fieldType);
         Method setter=getFieldSetter(fieldName, fieldType);
-        //just for optimization
-        getter.setAccessible(true);
-        setter.setAccessible(true);
         return new Field<>(fieldType, getTitle(titles, fieldName),getter,setter,colIndex, createEnumsMapper(field));
     }
 
