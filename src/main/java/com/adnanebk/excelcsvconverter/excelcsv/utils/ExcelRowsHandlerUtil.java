@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 public class ExcelRowsHandlerUtil<T> {
@@ -27,7 +28,36 @@ public class ExcelRowsHandlerUtil<T> {
         this.dateParserFormatterUtil = new DateParserFormatterUtil(reflectionUtil.getDatePattern(),reflectionUtil.getDateTimePattern());
     }
 
-    public Object getCellValue(String typeName, Cell cell) {
+    public void fillRowFromObject(Row row, T obj) {
+        var fields = reflectionUtil.getFields();
+        for (int i = 0; i < fields.size(); i++) {
+            var field = fields.get(i);
+            setCellValue(reflectionUtil.getFieldTypeName(field.type()), row.createCell(i),field.getValue(obj));
+        }
+    }
+
+    public T createObjectFromRow(Row currentRow) {
+        var fields = reflectionUtil.getFields();
+        Object[] values = fields.stream()
+                .map(field -> getCurrentCell(field.colIndex(), currentRow)
+                        .map(cell -> getCellValue(reflectionUtil.getFieldTypeName(field.type()),cell))
+                        .orElse(null)
+                ).toArray();
+        return createObjectAndSetFieldsValues(values,fields);
+    }
+    public String[] getHeaders() {
+        return reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new);
+    }
+
+    private T createObjectAndSetFieldsValues(Object[] values, List<Field<T>> fields) {
+        T obj = reflectionUtil.createInstance();
+        for (int i = 0; i < values.length; i++) {
+            fields.get(i).setValue(obj, values[i]);
+        }
+        return obj;
+    }
+
+    private Object getCellValue(String typeName, Cell cell) {
         try {
             return switch (typeName) {
                 case "string", "enum" -> cell.getStringCellValue();
@@ -47,10 +77,10 @@ public class ExcelRowsHandlerUtil<T> {
         }
     }
 
-    public void setCellValue(Field<T> field, Cell cell, Object value) {
+    private void setCellValue(String typeName, Cell cell, Object value) {
         if(value==null)
             return;
-        switch (reflectionUtil.getFieldTypeName(field.type())) {
+        switch (typeName) {
             case "string", "enum" -> cell.setCellValue(value.toString());
             case "double", "float", "integer", "int", "long", "short" ->
                     cell.setCellValue(Double.parseDouble(value.toString()));
@@ -62,27 +92,6 @@ public class ExcelRowsHandlerUtil<T> {
             default -> throw new ExcelValidationException("Unsupported field type");
         }
     }
-
-    public void fillRowFromObject(Row row, T obj) {
-        var fields = reflectionUtil.getFields();
-        for (int i = 0; i < fields.size(); i++) {
-            var field = fields.get(i);
-            setCellValue(field, row.createCell(i),field.getValue(obj));
-        }
-    }
-
-    public T createObjectFromRow(Row currentRow) {
-        var fields = reflectionUtil.getFields();
-        Object[] values = fields.stream()
-                .map(field -> getCurrentCell(field.colIndex(), currentRow)
-                        .map(cell -> getCellValue(reflectionUtil.getFieldTypeName(field.type()),cell))
-                        .orElse(null)).toArray();
-        return reflectionUtil.createInstanceAndSetValues(values);
-    }
-    public String[] getHeaders() {
-        return reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new);
-    }
-
 
 
 

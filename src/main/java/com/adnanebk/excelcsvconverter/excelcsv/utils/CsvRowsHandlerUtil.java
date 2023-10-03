@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 
 public class CsvRowsHandlerUtil<T> {
 
@@ -19,7 +20,48 @@ public class CsvRowsHandlerUtil<T> {
         this.dateParserFormatterUtil=new DateParserFormatterUtil(reflectionUtil.getDatePattern(),reflectionUtil.getDateTimePattern());
     }
 
-    public Object convertToTypedValue(String value, String typeName) {
+    public T createObjectFromCells(String row,String delimiter) {
+        String[] cellsValues = row.split(delimiter);
+        Object[] values = new Object[cellsValues.length];
+        var fields = reflectionUtil.getFields();
+        for (int i = 0; i < Math.min(cellsValues.length,fields.size()); i++) {
+            var field = fields.get(i);
+            String cellValue = cellsValues[field.colIndex()];
+            values[i] = convertToTypedValue(cellValue, reflectionUtil.getFieldTypeName(field.type()));
+        }
+        return createObjectAndSetFieldsValues(values, fields);
+    }
+
+    public String[] getFieldValuesAsStrings(T obj) {
+        return  reflectionUtil.getFields().stream()
+                .map(field -> {
+                    Object value = field.getValue(obj);
+                    if(value instanceof Date date)
+                        return dateParserFormatterUtil.format(date);
+                    if(value instanceof LocalDate date)
+                        return dateParserFormatterUtil.format(date);
+                    if(value instanceof LocalDateTime date)
+                        return dateParserFormatterUtil.format(date);
+                    if(value instanceof ZonedDateTime date)
+                        return dateParserFormatterUtil.format(date);
+                    return value.toString();
+                })
+                .toArray(String[]::new);
+
+    }
+
+    public String[] getHeaders(){
+        return reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new);
+    }
+    private T createObjectAndSetFieldsValues(Object[] values, List<Field<T>> fields) {
+        T obj = reflectionUtil.createInstance();
+        for (int i = 0; i < values.length; i++) {
+            fields.get(i).setValue(obj, values[i]);
+        }
+        return obj;
+    }
+
+    private Object convertToTypedValue(String value, String typeName) {
         try {
             return switch (typeName) {
                 case "string", "enum" -> value;
@@ -45,39 +87,6 @@ public class CsvRowsHandlerUtil<T> {
         } catch (ParseException e) {
             throw new ExcelValidationException("Invalid date format");
         }
-    }
-
-    public T createObjectFromCells(String row,String delimiter) {
-        String[] cellsValues = row.split(delimiter);
-        Object[] values = new Object[cellsValues.length];
-        var fields = reflectionUtil.getFields();
-        for (int i = 0; i < Math.min(cellsValues.length,fields.size()); i++) {
-            var field = fields.get(i);
-            String cellValue = cellsValues[field.colIndex()];
-            values[i] = convertToTypedValue(cellValue, reflectionUtil.getFieldTypeName(field.type()));
-        }
-        return reflectionUtil.createInstanceAndSetValues(values);
-    }
-    public String[] convertObjectToStringColumns(T obj) {
-        return  reflectionUtil.getFields().stream()
-                .map(field -> {
-                    Object value = field.getValue(obj);
-                    if(field.type().equals(Date.class))
-                        return dateParserFormatterUtil.format((Date) value);
-                    if(field.type().equals(LocalDate.class))
-                        return dateParserFormatterUtil.format((LocalDate) value);
-                    if(field.type().equals(LocalDateTime.class))
-                        return dateParserFormatterUtil.format((LocalDateTime) value);
-                    if(field.type().equals(ZonedDateTime.class))
-                        return dateParserFormatterUtil.format((ZonedDateTime) value);
-                    return value.toString();
-                })
-                .toArray(String[]::new);
-
-    }
-
-    public String[] getHeaders(){
-        return reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new);
     }
 
 }

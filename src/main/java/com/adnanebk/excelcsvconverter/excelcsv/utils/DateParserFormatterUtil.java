@@ -45,12 +45,9 @@ public class DateParserFormatterUtil {
 
     public DateParserFormatterUtil(String datePattern,String dateTimePattern) {
 
-        dateFormatter = Optional.ofNullable(dateTimePattern).filter(s->!s.isEmpty())
-                        .map(SimpleDateFormat::new).orElse(new SimpleDateFormat());
-        localedDateFormatter = Optional.ofNullable(datePattern).filter(s->!s.isEmpty())
-                        .map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE);
-        localedDateTimeFormatter = Optional.ofNullable(dateTimePattern).filter(s->!s.isEmpty())
-                       .map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        dateFormatter = Optional.ofNullable(dateTimePattern).map(SimpleDateFormat::new).orElse(new SimpleDateFormat());
+        localedDateFormatter = Optional.ofNullable(datePattern).map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE);
+        localedDateTimeFormatter = Optional.ofNullable(dateTimePattern).map(DateTimeFormatter::ofPattern).orElse(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         zonedDateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
     }
 

@@ -36,15 +36,13 @@ public class ReflectionUtil<T> {
         return fields;
     }
 
-    public T createInstanceAndSetValues(Object[] values) {
-
-        T obj = createInstance();
-        for (int i = 0; i < values.length; i++) {
-                fields.get(i).setValue(obj, values[i]);
-            }
-            return obj;
+    public T createInstance(){
+        try{
+            return defaultConstructor.newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new ReflectionException(e.getMessage());
+        }
     }
-
     public String getDatePattern() {
         return datePattern;
     }
@@ -55,13 +53,7 @@ public class ReflectionUtil<T> {
     private Optional<SheetDefinition> getSheetInfo() {
         return Optional.ofNullable(classType.getAnnotation(SheetDefinition.class));
     }
-    private  T createInstance(){
-        try{
-            return defaultConstructor.newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new ReflectionException(e.getMessage());
-        }
-    }
+
     private Constructor<T> getDefaultConstructor() {
         try {
             return classType.getDeclaredConstructor();

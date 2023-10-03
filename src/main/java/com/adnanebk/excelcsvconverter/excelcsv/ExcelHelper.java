@@ -81,7 +81,7 @@ public class ExcelHelper<T> {
     private boolean hasAnyCell(Row currentRow) {
         return currentRow.getPhysicalNumberOfCells() > 0;
     }
-    public void autoSizeColumns(Sheet sheet) {
+    private void autoSizeColumns(Sheet sheet) {
         for (int i = 0; i < sheet.getLastRowNum(); i++)
             sheet.autoSizeColumn(i);
     }

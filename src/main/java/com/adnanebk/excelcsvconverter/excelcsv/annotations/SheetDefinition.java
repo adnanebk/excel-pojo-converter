@@ -12,9 +12,9 @@ public @interface SheetDefinition {
 
     String[] titles() default {};
 
-    String datePattern() default "";
+    String datePattern();
 
-    String dateTimePattern() default "";
+    String dateTimePattern();
 
 
 

@@ -45,7 +45,7 @@ public class CsvHelper<T> {
             List<String[]> data = new LinkedList<>();
             data.add(headers);
             for (T obj : list) {
-                data.add(rowsHandlerUtil.convertObjectToStringColumns(obj));
+                data.add(rowsHandlerUtil.getFieldValuesAsStrings(obj));
             }
             csvWriter.writeAll(data);
             return new ByteArrayInputStream(stringWriter.toString().getBytes(StandardCharsets.UTF_8));
