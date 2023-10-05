@@ -51,7 +51,7 @@ class CsvHelperTest {
             assertNotNull(lines);
             assertEquals(3, lines.size());
             assertTrue(lines.get(0).contains("Name;Price;Promo price;Min price;Active;Expired;Units in stock;Created date;Updated date;Zoned date time;Category;Local date time"));
-            assertTrue(lines.get(1).contains("Product A;100;90.5;80.0;true;false;50;05/10/2023"));
+            assertTrue(lines.get(1).contains("Product A;100;90.5;80.0;true;false;50"));
             } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

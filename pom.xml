@@ -18,7 +18,7 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
 		<sonar.language>java</sonar.language>
-		<sonar.inclusions>**/**/*Util.java,**/**/*Helper.java</sonar.inclusions>
+		<sonar.inclusions>**/**/*Util.java,**/**/*Helper.java,**/**/*Field.java</sonar.inclusions>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
@@ -106,8 +106,8 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>3.7.1</version>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.2</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -126,22 +126,14 @@
 						</goals>
 					</execution>
 					<execution>
-						<id>report-aggregate</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>report-aggregate</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.basedir}/../target/site/jacoco-aggregate</outputDirectory>
-						</configuration>
-					</execution>
-					<execution>
 						<id>jacoco-site</id>
-						<phase>package</phase>
+						<phase>test</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
 					</execution>
+
+
 				</executions>
 			</plugin>
 		</plugins>
