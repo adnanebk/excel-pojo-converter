@@ -1,7 +1,7 @@
 package com.adnanebk.excelcsvconverter.excelcsv.utils;
 
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
-import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
+import com.adnanebk.excelcsvconverter.excelcsv.models.SheetField;
 
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -15,9 +15,10 @@ public class CsvRowsHandlerUtil<T> {
     private final DateParserFormatterUtil dateParserFormatterUtil;
     private final ReflectionUtil<T> reflectionUtil;
 
-    public CsvRowsHandlerUtil(ReflectionUtil<T> reflectionUtil) {
+    public CsvRowsHandlerUtil(ReflectionUtil<T> reflectionUtil,DateParserFormatterUtil dateParserFormatterUtil) {
         this.reflectionUtil = reflectionUtil;
-        this.dateParserFormatterUtil=new DateParserFormatterUtil(reflectionUtil.getDatePattern(),reflectionUtil.getDateTimePattern());
+        this.dateParserFormatterUtil=dateParserFormatterUtil;
+
     }
 
     public T createObjectFromCells(String row,String delimiter) {
@@ -27,7 +28,7 @@ public class CsvRowsHandlerUtil<T> {
         for (int i = 0; i < Math.min(cellsValues.length,fields.size()); i++) {
             var field = fields.get(i);
             String cellValue = cellsValues[field.colIndex()];
-            values[i] = convertToTypedValue(cellValue, reflectionUtil.getFieldTypeName(field.type()));
+            values[i] = convertToTypedValue(cellValue, reflectionUtil.getFieldTypeName(field));
         }
         return createObjectAndSetFieldsValues(values, fields);
     }
@@ -51,9 +52,9 @@ public class CsvRowsHandlerUtil<T> {
     }
 
     public String[] getHeaders(){
-        return reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new);
+        return reflectionUtil.getFields().stream().map(SheetField::title).toArray(String[]::new);
     }
-    private T createObjectAndSetFieldsValues(Object[] values, List<Field<T>> fields) {
+    private T createObjectAndSetFieldsValues(Object[] values, List<SheetField<T>> fields) {
         T obj = reflectionUtil.createInstance();
         for (int i = 0; i < values.length; i++) {
             fields.get(i).setValue(obj, values[i]);

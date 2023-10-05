@@ -1,7 +1,7 @@
 package com.adnanebk.excelcsvconverter.excelcsv.utils;
 
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
-import com.adnanebk.excelcsvconverter.excelcsv.models.Field;
+import com.adnanebk.excelcsvconverter.excelcsv.models.SheetField;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -23,16 +23,16 @@ public class ExcelRowsHandlerUtil<T> {
     private final ReflectionUtil<T> reflectionUtil;
 
 
-    public ExcelRowsHandlerUtil(ReflectionUtil<T> reflectionUtil) {
+    public ExcelRowsHandlerUtil(ReflectionUtil<T> reflectionUtil,DateParserFormatterUtil dateParserFormatterUtil) {
         this.reflectionUtil = reflectionUtil;
-        this.dateParserFormatterUtil = new DateParserFormatterUtil(reflectionUtil.getDatePattern(),reflectionUtil.getDateTimePattern());
+        this.dateParserFormatterUtil = dateParserFormatterUtil;
     }
 
     public void fillRowFromObject(Row row, T obj) {
         var fields = reflectionUtil.getFields();
         for (int i = 0; i < fields.size(); i++) {
             var field = fields.get(i);
-            setCellValue(reflectionUtil.getFieldTypeName(field.type()), row.createCell(i),field.getValue(obj));
+            setCellValue(reflectionUtil.getFieldTypeName(field), row.createCell(i),field.getValue(obj));
         }
     }
 
@@ -40,16 +40,16 @@ public class ExcelRowsHandlerUtil<T> {
         var fields = reflectionUtil.getFields();
         Object[] values = fields.stream()
                 .map(field -> getCurrentCell(field.colIndex(), currentRow)
-                        .map(cell -> getCellValue(reflectionUtil.getFieldTypeName(field.type()),cell))
+                        .map(cell -> getCellValue(reflectionUtil.getFieldTypeName(field),cell))
                         .orElse(null)
                 ).toArray();
         return createObjectAndSetFieldsValues(values,fields);
     }
     public String[] getHeaders() {
-        return reflectionUtil.getFields().stream().map(Field::title).toArray(String[]::new);
+        return reflectionUtil.getFields().stream().map(SheetField::title).toArray(String[]::new);
     }
 
-    private T createObjectAndSetFieldsValues(Object[] values, List<Field<T>> fields) {
+    private T createObjectAndSetFieldsValues(Object[] values, List<SheetField<T>> fields) {
         T obj = reflectionUtil.createInstance();
         for (int i = 0; i < values.length; i++) {
             fields.get(i).setValue(obj, values[i]);

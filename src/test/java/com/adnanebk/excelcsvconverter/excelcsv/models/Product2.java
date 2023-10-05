@@ -2,6 +2,7 @@ package com.adnanebk.excelcsvconverter.excelcsv.models;
 
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnumFormat;
+import com.adnanebk.excelcsvconverter.excelcsv.annotations.IgnoreCell;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,41 +19,41 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product {
+@SheetDefinition(includeAllFields = true,datePattern = "dd/MM/yyyy")
+public class Product2 {
 
-    @CellDefinition(0)
+
     private String name;
 
-    @CellDefinition(1)
+
     private long price;
-    @CellDefinition(value = 2,title = "Promo price")
+
     private double promoPrice;
 
-    @CellDefinition(5)
-    private Boolean expired;
-
-    @CellDefinition(3)
     private Double minPrice;
 
-    @CellDefinition(4)
+    @IgnoreCell
     private boolean active;
-    @CellDefinition(6)
+    @IgnoreCell
+    private Boolean expired;
+
+
     private Integer unitsInStock;
 
-    @CellDefinition(7)
+
     private Date createdDate;
 
-    @CellDefinition(8)
+
     private LocalDate updatedDate;
 
-    @CellDefinition(9)
+
     private ZonedDateTime zonedDateTime;
 
     @CellEnumFormat(enumsMapperMethod = "categoryMap")
     @CellDefinition(10)
     private Category category;
 
-    @CellDefinition(11)
+
     private LocalDateTime localDateTime;
 
     private Map<Category,String> categoryMap(){
@@ -62,19 +63,5 @@ public class Product {
         );
     }
 
-    public Product(String name, long price, double promoPrice, Double minPrice, boolean active, Boolean expired, Integer unitsInStock, Date createdDate, LocalDate updatedDate, ZonedDateTime zonedDateTime, Category category, LocalDateTime localDateTime) {
-        this.name = name;
-        this.price = price;
-        this.promoPrice = promoPrice;
-        this.minPrice = minPrice;
-        this.active = active;
-        this.expired = expired;
-        this.unitsInStock = unitsInStock;
-        this.createdDate = createdDate;
-        this.updatedDate = updatedDate;
-        this.zonedDateTime = zonedDateTime;
-        this.category = category;
-        this.localDateTime = localDateTime;
-    }
 
 }

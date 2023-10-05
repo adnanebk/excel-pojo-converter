@@ -1,6 +1,7 @@
 package com.adnanebk.excelcsvconverter.excelcsv;
 
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
+import com.adnanebk.excelcsvconverter.excelcsv.utils.DateParserFormatterUtil;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.ExcelRowsHandlerUtil;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.ReflectionUtil;
 import org.apache.poi.ss.usermodel.*;
@@ -27,11 +28,14 @@ public class ExcelHelper<T> {
     }
 
     public static <T> ExcelHelper<T> create(Class<T> type) {
-        var rowsHandlerUtil = new ExcelRowsHandlerUtil<>(new ReflectionUtil<>(type));
-        return new ExcelHelper<>(rowsHandlerUtil,null);
+        return create(type,null);
     }
     public static <T> ExcelHelper<T> create(Class<T> type,String[] headers) {
-        var rowsHandlerUtil = new ExcelRowsHandlerUtil<>(new ReflectionUtil<>(type));
+        var reflectionUtil = new ReflectionUtil<T>(type);
+        var dateParserFormatterUtil = reflectionUtil.getSheetInfo()
+                .map(info->new DateParserFormatterUtil(info.datePattern(),info.dateTimePattern()))
+                .orElse(new DateParserFormatterUtil("",""));
+        var rowsHandlerUtil = new ExcelRowsHandlerUtil<>(reflectionUtil,dateParserFormatterUtil);
         return new ExcelHelper<>(rowsHandlerUtil,headers);
     }
 

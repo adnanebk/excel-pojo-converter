@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-public record Field<T>(Class<?> type, String title, Method getter, Method setter, int colIndex, Map<?,?> enumsMapper) {
+public record SheetField<T>(Class<?> type, String title, Method getter, Method setter, int colIndex, Map<?,?> enumsMapper) {
     public Object getValue(T obj) {
         try {
             if(!type.isEnum())

@@ -2,6 +2,7 @@ package com.adnanebk.excelcsvconverter.excelcsv;
 
 
 import com.adnanebk.excelcsvconverter.excelcsv.utils.CsvRowsHandlerUtil;
+import com.adnanebk.excelcsvconverter.excelcsv.utils.DateParserFormatterUtil;
 import com.adnanebk.excelcsvconverter.excelcsv.utils.ReflectionUtil;
 import com.opencsv.CSVWriter;
 import com.opencsv.ICSVWriter;
@@ -27,10 +28,14 @@ public class CsvHelper<T> {
     }
 
     public static <T> CsvHelper<T> create(Class<T> type,String delimiter) {
-        return new CsvHelper<>( new CsvRowsHandlerUtil<>(new ReflectionUtil<>(type)),delimiter,null);
+        return create(type,delimiter,null);
     }
     public static <T> CsvHelper<T> create(Class<T> type,String delimiter,String[] headers) {
-        return new CsvHelper<>( new CsvRowsHandlerUtil<>(new ReflectionUtil<>(type)),delimiter,headers);
+        var reflectionUtil = new ReflectionUtil<T>(type);
+        var dateParserFormatterUtil = reflectionUtil.getSheetInfo()
+                .map(info->new DateParserFormatterUtil(info.datePattern(),info.dateTimePattern()))
+                .orElse(new DateParserFormatterUtil("",""));
+        return new CsvHelper<>( new CsvRowsHandlerUtil<>(reflectionUtil,dateParserFormatterUtil),delimiter,headers);
     }
 
     public Stream<T> toStream(InputStream inputStream) {
