@@ -28,7 +28,7 @@ public class CsvRowsHandlerUtil<T> {
         for (int i = 0; i < Math.min(cellsValues.length,fields.size()); i++) {
             var field = fields.get(i);
             String cellValue = cellsValues[field.colIndex()];
-            values[i] = convertToTypedValue(cellValue, reflectionUtil.getFieldTypeName(field));
+            values[i] = convertToTypedValue(cellValue, field.typeName());
         }
         return createObjectAndSetFieldsValues(values, fields);
     }
@@ -75,7 +75,7 @@ public class CsvRowsHandlerUtil<T> {
                 case "localdatetime" -> dateParserFormatterUtil.parseToLocalDateTime(value);
                 case "zoneddatetime" -> dateParserFormatterUtil.parseToZonedDateTime(value);
                 case "date" -> convertToDate(value);
-                default -> throw new ExcelValidationException("Unsupported type: " + typeName);
+                default -> throw new ExcelValidationException("Unsupported typeName: " + typeName);
             };
         }catch (RuntimeException ex){
             throw new ExcelValidationException("Unexpected or Invalid cell value {"+value+"}  ");

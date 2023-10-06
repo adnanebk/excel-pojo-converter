@@ -32,7 +32,7 @@ public class ExcelRowsHandlerUtil<T> {
         var fields = reflectionUtil.getFields();
         for (int i = 0; i < fields.size(); i++) {
             var field = fields.get(i);
-            setCellValue(reflectionUtil.getFieldTypeName(field), row.createCell(i),field.getValue(obj));
+            setCellValue(field.typeName(), row.createCell(i),field.getValue(obj));
         }
     }
 
@@ -40,7 +40,7 @@ public class ExcelRowsHandlerUtil<T> {
         var fields = reflectionUtil.getFields();
         Object[] values = fields.stream()
                 .map(field -> getCurrentCell(field.colIndex(), currentRow)
-                        .map(cell -> getCellValue(reflectionUtil.getFieldTypeName(field),cell))
+                        .map(cell -> getCellValue(field.typeName(),cell))
                         .orElse(null)
                 ).toArray();
         return createObjectAndSetFieldsValues(values,fields);
@@ -70,7 +70,7 @@ public class ExcelRowsHandlerUtil<T> {
                 case "localdatetime" -> getAsLocalDateTime(cell);
                 case "zoneddatetime" -> getAsZonedDateTime(cell);
                 case "date" -> getAsDate(cell);
-                default -> throw new ExcelValidationException("Unsupported field type "+typeName);
+                default -> throw new ExcelValidationException("Unsupported field typeName "+typeName);
             };
         } catch (IllegalStateException | NumberFormatException e) {
             throw new ExcelValidationException(String.format("Unexpected or Invalid cell value in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
@@ -89,7 +89,7 @@ public class ExcelRowsHandlerUtil<T> {
             case "localdatetime" -> cell.setCellValue(dateParserFormatterUtil.format((LocalDateTime) value));
             case "zoneddatetime" -> cell.setCellValue(dateParserFormatterUtil.format((ZonedDateTime) value));
             case "date" -> cell.setCellValue(dateParserFormatterUtil.format((Date) value));
-            default -> throw new ExcelValidationException("Unsupported field type");
+            default -> throw new ExcelValidationException("Unsupported field typeName");
         }
     }
 

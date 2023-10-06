@@ -90,11 +90,11 @@ public class ReflectionUtil<T> {
         }
     }
     private SheetField<T> buildField(String title, int colIndex, Field field) {
-        var fieldType = field.getType();
-        var fieldName = field.getName();
-        Method getter=getFieldGetter(fieldName, fieldType);
-        Method setter=getFieldSetter(fieldName, fieldType);
-        return new SheetField<>(fieldType, title,getter,setter,colIndex, createEnumsMapper(field));
+        String fieldTypeName = field.getType().isEnum() ? "enum" : field.getType().getSimpleName().toLowerCase();
+        String fieldName = field.getName();
+        Method getter=getFieldGetter(fieldName, field.getType());
+        Method setter=getFieldSetter(fieldName, field.getType());
+        return new SheetField<>(fieldTypeName, title,getter,setter,colIndex, createEnumsMapper(field));
     }
 
     private  Map<Object,Object> createEnumsMapper(Field field) {
@@ -125,7 +125,7 @@ public class ReflectionUtil<T> {
                     && enumsMapper.entrySet().stream().allMatch(entry -> field.getType().isInstance(entry.getKey())
                     && entry.getValue() instanceof String))
                 return enumsMapper;
-            else throw new ReflectionException("expecting a method that return a map of type  Map<"+field.getName()+",String>");
+            else throw new ReflectionException("expecting a method that return a map of typeName  Map<"+field.getName()+",String>");
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new ReflectionException("no method found for the argument enumsMapMethod,you must create a method that returns a map");
         }
@@ -138,8 +138,5 @@ public class ReflectionUtil<T> {
                 remaining.replaceAll("([a-z])([A-Z]+)", "$1 $2").toLowerCase());
     }
 
-    public String getFieldTypeName(SheetField<T> field) {
-        return field.type().isEnum() ? "enum" : field.type().getSimpleName().toLowerCase();
-    }
 }
 
