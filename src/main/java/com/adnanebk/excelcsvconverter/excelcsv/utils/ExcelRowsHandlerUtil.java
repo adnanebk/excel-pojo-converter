@@ -72,7 +72,7 @@ public class ExcelRowsHandlerUtil<T> {
                 case "date" -> getAsDate(cell);
                 default -> throw new ExcelValidationException("Unsupported field type "+typeName);
             };
-        } catch (RuntimeException e) {
+        } catch (IllegalStateException | NumberFormatException e) {
             throw new ExcelValidationException(String.format("Unexpected or Invalid cell value in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
         }
     }
