@@ -80,7 +80,7 @@ public class ReflectionUtil<T> {
     private Function<T,Object> getFieldGetter(String fieldName, Class<?> fieldType, Map<Object, Object> enumsMapper) {
         try {
             var getterMethod=  classType.getDeclaredMethod((fieldType.equals(boolean.class) ? "is" : "get") + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1));
-             return (obj)-> {
+             return obj-> {
                  try {
                      return fieldType.isEnum() ? enumsMapper.get(getterMethod.invoke(obj)) : getterMethod.invoke(obj);
                  } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
