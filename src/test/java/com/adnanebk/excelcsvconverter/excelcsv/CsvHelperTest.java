@@ -3,11 +3,6 @@ package com.adnanebk.excelcsvconverter.excelcsv;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Category;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Product;
 import org.junit.jupiter.api.*;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -17,8 +12,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 

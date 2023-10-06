@@ -21,7 +21,7 @@ public class CsvRowsHandlerUtil<T> {
 
     }
 
-    public T createObjectFromCells(String row,String delimiter) {
+    public T createObjectFromRow(String row, String delimiter) {
         String[] cellsValues = row.split(delimiter);
         Object[] values = new Object[cellsValues.length];
         var fields = reflectionUtil.getFields();
@@ -33,7 +33,7 @@ public class CsvRowsHandlerUtil<T> {
         return createObjectAndSetFieldsValues(values, fields);
     }
 
-    public String[] getFieldValuesAsStrings(T obj) {
+    public String[] convertFieldValuesToStrings(T obj) {
         return  reflectionUtil.getFields().stream()
                 .map(field -> {
                     Object value = field.getValue(obj);

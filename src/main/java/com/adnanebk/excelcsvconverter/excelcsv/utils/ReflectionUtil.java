@@ -13,6 +13,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class ReflectionUtil<T> {
     private final List<SheetField<T>> fields;
@@ -75,16 +77,32 @@ public class ReflectionUtil<T> {
         }
         return sheetFields;
     }
-    private Method getFieldGetter(String fieldName, Class<?> fieldType) {
+    private Function<T,Object> getFieldGetter(String fieldName, Class<?> fieldType, Map<Object, Object> enumsMapper) {
         try {
-            return classType.getDeclaredMethod((fieldType.equals(boolean.class) ? "is" : "get") + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1));
+            var getterMethod=  classType.getDeclaredMethod((fieldType.equals(boolean.class) ? "is" : "get") + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1));
+             return (obj)-> {
+                 try {
+                     return fieldType.isEnum() ? enumsMapper.get(getterMethod.invoke(obj)) : getterMethod.invoke(obj);
+                 } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+                     throw new ReflectionException(e.getMessage());
+                 }
+             };
         } catch (NoSuchMethodException ex) {
             throw new ReflectionException("No getter found");
         }
     }
-    private Method getFieldSetter(String fieldName, Class<?> fieldType) {
+    private BiConsumer<T,Object> getFieldSetter(String fieldName, Class<?> fieldType, Map<Object, Object> enumsMapper) {
         try {
-            return classType.getDeclaredMethod("set" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1), fieldType);
+            var setterMethod = classType.getDeclaredMethod("set" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1), fieldType);
+             return (obj,value)-> {
+                 try {
+                     if(fieldType.isEnum())
+                         setterMethod.invoke(obj,enumsMapper.get(value));
+                     else setterMethod.invoke(obj,value);
+                 } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+                     throw new ReflectionException(e.getMessage());
+                 }
+             };
         } catch (NoSuchMethodException ex) {
             throw new ReflectionException("No setter found");
         }
@@ -92,9 +110,10 @@ public class ReflectionUtil<T> {
     private SheetField<T> buildField(String title, int colIndex, Field field) {
         String fieldTypeName = field.getType().isEnum() ? "enum" : field.getType().getSimpleName().toLowerCase();
         String fieldName = field.getName();
-        Method getter=getFieldGetter(fieldName, field.getType());
-        Method setter=getFieldSetter(fieldName, field.getType());
-        return new SheetField<>(fieldTypeName, title,getter,setter,colIndex, createEnumsMapper(field));
+        var enumsMapper = createEnumsMapper(field);
+        var getter=getFieldGetter(fieldName, field.getType(),enumsMapper);
+        var setter=getFieldSetter(fieldName, field.getType(),enumsMapper);
+        return new SheetField<>(fieldTypeName,title,getter,setter,colIndex);
     }
 
     private  Map<Object,Object> createEnumsMapper(Field field) {

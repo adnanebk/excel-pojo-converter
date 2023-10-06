@@ -41,7 +41,7 @@ public class CsvHelper<T> {
     public Stream<T> toStream(InputStream inputStream) {
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
             return br.lines().skip(1)
-                    .map(row -> this.rowsHandlerUtil.createObjectFromCells(row,delimiter));
+                    .map(row -> this.rowsHandlerUtil.createObjectFromRow(row,delimiter));
     }
 
     public ByteArrayInputStream toCsv(List<T> list) throws IOException {
@@ -50,7 +50,7 @@ public class CsvHelper<T> {
             List<String[]> data = new LinkedList<>();
             data.add(headers);
             for (T obj : list) {
-                data.add(rowsHandlerUtil.getFieldValuesAsStrings(obj));
+                data.add(rowsHandlerUtil.convertFieldValuesToStrings(obj));
             }
             csvWriter.writeAll(data);
             return new ByteArrayInputStream(stringWriter.toString().getBytes(StandardCharsets.UTF_8));
