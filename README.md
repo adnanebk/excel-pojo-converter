@@ -86,9 +86,9 @@ public class ProductV2 {
 }
 ```
 
-Converting Excel files to POJOs becomes even simpler with the @SheetDefinition annotation provided in the class to map the fields to corresponding cells in the Excel file.
+when includeAllFields argument set to true the fields are automatically included and mapped in the cells based on its declared order and ignoring fields that annotated with @IgnoreCell annotation,
 
-when includeAllFields argument set to true the fields are automatically mapped in sequential order starting from index 0 and ignoring fields that annotated with  @IgnoreCell annotation.
+their titles can be defined in the titles argument,note that the order of the titles must be the same as the order of the fields.
 
 ## Converting Excel/csv to POJOs and vice versa
 ```
