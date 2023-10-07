@@ -143,7 +143,7 @@ public class ReflectionUtil<T> {
     }
 
     private Map<?, ?> getEnumsMapper( Field field) {
-        var enumsAnnotation = field.getDeclaredAnnotation(CellEnumFormat.class);
+        var enumsAnnotation = field.getDeclaredAnnotation(CellEnum.class);
         if(enumsAnnotation==null)
             return new HashMap<>();
         var enumMapperMethod = enumsAnnotation.enumsMapperMethod();

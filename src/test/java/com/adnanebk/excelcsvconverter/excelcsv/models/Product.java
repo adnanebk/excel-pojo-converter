@@ -2,7 +2,7 @@ package com.adnanebk.excelcsvconverter.excelcsv.models;
 
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellBoolean;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnumFormat;
+import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -49,7 +49,7 @@ public class Product {
     @CellDefinition(9)
     private ZonedDateTime zonedDateTime;
 
-    @CellEnumFormat(enumsMapperMethod = "categoryMap")
+    @CellEnum(enumsMapperMethod = "categoryMap")
     @CellDefinition(10)
     private Category category;
 
