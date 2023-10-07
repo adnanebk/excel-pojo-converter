@@ -85,11 +85,12 @@ public class ProductV2 {
     private LocalDateTime localDateTime;
 }
 ```
-Converting Excel/csv to POJOs and vice versa
-Converting Excel files to POJOs becomes even simpler with the annotation provided in the class to map the fields to corresponding cells in the Excel file.
 
-With theProductV2 class, annotated with@SheetDefinition(includeAllFields = true) fields are automatically mapped in sequential order starting from index 0 and ignoring fields that have@IgnoreCell annotation.
+Converting Excel files to POJOs becomes even simpler with the @SheetDefinition annotation provided in the class to map the fields to corresponding cells in the Excel file.
 
+when includeAllFields argument set to true the fields are automatically mapped in sequential order starting from index 0 and ignoring fields that annotated with  @IgnoreCell annotation.
+
+## Converting Excel/csv to POJOs and vice versa
 ```
 @RestController
 @RequestMapping("excel/products")
