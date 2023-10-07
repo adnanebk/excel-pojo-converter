@@ -1,10 +1,7 @@
 package com.adnanebk.excelcsvconverter.excelcsv.utils;
 
 
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnumFormat;
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.IgnoreCell;
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
+import com.adnanebk.excelcsvconverter.excelcsv.annotations.*;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
 import com.adnanebk.excelcsvconverter.excelcsv.models.SheetField;
 
@@ -77,12 +74,19 @@ public class ReflectionUtil<T> {
         }
         return sheetFields;
     }
-    private Function<T,Object> getFieldGetter(String fieldName, Class<?> fieldType, Map<Object, Object> enumsMapper) {
+    private Function<T,Object> getFieldGetter(String fieldName, Class<?> fieldType, Map<Object, Object> enumsMapper, String falseValue, String trueValue) {
         try {
             var getterMethod=  classType.getDeclaredMethod((fieldType.equals(boolean.class) ? "is" : "get") + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1));
-             return obj-> {
+            boolean isBoolean = fieldType.equals(boolean.class) || fieldType.equals(Boolean.class);
+            boolean isEnum=fieldType.isEnum();
+            return obj-> {
                  try {
-                     return fieldType.isEnum() ? enumsMapper.get(getterMethod.invoke(obj)) : getterMethod.invoke(obj);
+                     Object value=getterMethod.invoke(obj);
+                     if (isEnum)
+                         return enumsMapper.get(value);
+                     else if (isBoolean)
+                          return ((boolean) value) ? trueValue : falseValue;
+                     return value;
                  } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
                      throw new ReflectionException(e.getMessage());
                  }
@@ -91,15 +95,19 @@ public class ReflectionUtil<T> {
             throw new ReflectionException("No getter found");
         }
     }
-    private BiConsumer<T,Object> getFieldSetter(String fieldName, Class<?> fieldType, Map<Object, Object> enumsMapper) {
+    private BiConsumer<T,Object> getFieldSetter(String fieldName, Class<?> fieldType, Map<Object, Object> enumsMapper, String trueValue) {
         try {
             var setterMethod = classType.getDeclaredMethod("set" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1), fieldType);
-             return (obj,value)-> {
+            boolean isBoolean = fieldType.equals(boolean.class) || fieldType.equals(Boolean.class);
+            boolean isEnum=fieldType.isEnum();
+            return (obj,value)-> {
                  try {
-                     if(fieldType.isEnum())
+                     if(isEnum)
                          setterMethod.invoke(obj,enumsMapper.get(value));
+                     else if (isBoolean)
+                         setterMethod.invoke(obj,String.valueOf(value).equalsIgnoreCase(trueValue));
                      else setterMethod.invoke(obj,value);
-                 } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+                 } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException | ClassCastException e) {
                      throw new ReflectionException(e.getMessage());
                  }
              };
@@ -111,8 +119,10 @@ public class ReflectionUtil<T> {
         String fieldTypeName = field.getType().isEnum() ? "enum" : field.getType().getSimpleName().toLowerCase();
         String fieldName = field.getName();
         var enumsMapper = createEnumsMapper(field);
-        var getter=getFieldGetter(fieldName, field.getType(),enumsMapper);
-        var setter=getFieldSetter(fieldName, field.getType(),enumsMapper);
+        String falseValue= getBooleanFalseValue(field);
+        String trueValue= getBooleanTrueValue(field);
+        var getter=getFieldGetter(fieldName, field.getType(),enumsMapper,falseValue,trueValue);
+        var setter=getFieldSetter(fieldName, field.getType(),enumsMapper,trueValue);
         return new SheetField<>(fieldTypeName,title,getter,setter,colIndex);
     }
 
@@ -148,6 +158,14 @@ public class ReflectionUtil<T> {
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new ReflectionException("no method found for the argument enumsMapMethod,you must create a method that returns a map");
         }
+    }
+    private String getBooleanTrueValue(Field field){
+       return Optional.ofNullable(field.getDeclaredAnnotation(CellBoolean.class))
+                .map(CellBoolean::trueValue).orElse("true");
+    }
+    private String getBooleanFalseValue(Field field){
+        return Optional.ofNullable(field.getDeclaredAnnotation(CellBoolean.class))
+                .map(CellBoolean::falseValue).orElse("false");
     }
 
     private String camelCaseWordsToTitleWords(String word) {

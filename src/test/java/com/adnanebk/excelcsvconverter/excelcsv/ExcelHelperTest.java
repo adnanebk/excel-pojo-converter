@@ -34,13 +34,13 @@ class ExcelHelperTest {
     private static List<Product> getProducts() {
         List<Product> productList = new ArrayList<>();
         productList.add(new Product("Product A", 100, 90.5, 80.0, true, false, 50, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B, LocalDateTime.now()));
-        productList.add(new Product("Product B", 200, 180.75, 150.0, true, true, 30, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B,LocalDateTime.now()));
+        productList.add(new Product("Product B", 200, 180.75, 150.0, true, false, 30, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B,LocalDateTime.now()));
         return productList;
     }
     private static List<Product2> getProducts2() {
         List<Product2> productList = new ArrayList<>();
         productList.add(new Product2("Product A", 100, 90.5, 80.0, true, false, 50, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B, LocalDateTime.now()));
-        productList.add(new Product2("Product B", 200, 180.75, 150.0, true, true, 30, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B,LocalDateTime.now()));
+        productList.add(new Product2("Product B", 200, 180.75, 150.0, true, false, 30, new Date(), LocalDate.now(), ZonedDateTime.now(), Category.B,LocalDateTime.now()));
         return productList;
     }
     @Test
@@ -124,8 +124,8 @@ class ExcelHelperTest {
                     assertEquals(product.getPrice(), row.getCell(1).getNumericCellValue());
                     assertEquals(product.getPromoPrice(), row.getCell(2).getNumericCellValue());
                     assertEquals(product.getMinPrice(), row.getCell(3).getNumericCellValue());
-                    assertEquals(product.isActive(), row.getCell(4).getBooleanCellValue());
-                    assertEquals(product.getExpired(), row.getCell(5).getBooleanCellValue());
+                    assertEquals("true", row.getCell(4).getStringCellValue());
+                    assertEquals("no", row.getCell(5).getStringCellValue());
                     assertEquals((double) product.getUnitsInStock(), row.getCell(6).getNumericCellValue());
                     assertEquals(new SimpleDateFormat().format(product.getCreatedDate()), row.getCell(7).getStringCellValue());
                     assertEquals(product.getUpdatedDate().toString(), row.getCell(8).getStringCellValue());
@@ -163,7 +163,7 @@ class ExcelHelperTest {
             assertEquals(200, result.get(1).getPrice());
             assertEquals(180.75, result.get(1).getPromoPrice()); // Delta for double comparison
             assertTrue(result.get(1).isActive());
-            assertTrue(result.get(1).getExpired());
+            assertFalse(result.get(1).getExpired());
             assertEquals(30, result.get(1).getUnitsInStock());
             assertNotNull(result.get(1).getCreatedDate()); // Assuming it's not null in the Excel file
             assertTrue(LocalDate.now().isEqual(result.get(1).getUpdatedDate())); // Assuming it's not null in the Excel file

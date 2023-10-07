@@ -60,8 +60,8 @@ public class ExcelRowsHandlerUtil<T> {
     private Object getCellValue(String typeName, Cell cell) {
         try {
             return switch (typeName) {
-                case "string", "enum" -> cell.getStringCellValue();
-                case "boolean" -> cell.getBooleanCellValue();
+                case "string","enum" -> cell.getStringCellValue();
+                case "boolean" -> cell.getCellType()==CellType.BOOLEAN?cell.getBooleanCellValue():cell.getStringCellValue();
                 case "integer", "int" -> (int) cell.getNumericCellValue();
                 case "short" -> (short) cell.getNumericCellValue();
                 case "long" -> (long) cell.getNumericCellValue();
@@ -81,10 +81,8 @@ public class ExcelRowsHandlerUtil<T> {
         if(value==null)
             return;
         switch (typeName) {
-            case "string", "enum" -> cell.setCellValue(value.toString());
-            case "double", "float", "integer", "int", "long", "short" ->
-                    cell.setCellValue(Double.parseDouble(value.toString()));
-            case "boolean" -> cell.setCellValue(Boolean.parseBoolean(value.toString()));
+            case "string","enum","boolean" -> cell.setCellValue(value.toString());
+            case "double", "float", "integer", "int", "long", "short" -> cell.setCellValue(Double.parseDouble(value.toString()));
             case "localdate" -> cell.setCellValue(dateParserFormatterUtil.format((LocalDate) value));
             case "localdatetime" -> cell.setCellValue(dateParserFormatterUtil.format((LocalDateTime) value));
             case "zoneddatetime" -> cell.setCellValue(dateParserFormatterUtil.format((ZonedDateTime) value));

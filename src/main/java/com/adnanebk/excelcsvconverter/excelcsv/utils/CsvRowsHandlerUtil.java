@@ -65,8 +65,7 @@ public class CsvRowsHandlerUtil<T> {
     private Object convertToTypedValue(String value, String typeName) {
         try {
             return switch (typeName) {
-                case "string", "enum" -> value;
-                case "boolean" -> Boolean.parseBoolean(value);
+                case "string","enum","boolean" -> value;
                 case "integer", "int" -> Integer.parseInt(value);
                 case "short" -> Short.parseShort(value);
                 case "long" -> Long.parseLong(value);
