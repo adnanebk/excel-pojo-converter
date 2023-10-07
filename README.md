@@ -88,7 +88,7 @@ public class ProductV2 {
 
 when includeAllFields argument set to true the fields are automatically included and mapped in the cells based on its declared order and ignoring fields that annotated with @IgnoreCell annotation,
 
-their titles can be defined in the titles argument,note that the order of the titles must be the same as the order of the fields.
+we can define the titles in the titles argument with the condition that they must be in the same order as the fields.
 
 ## Converting Excel/csv to POJOs and vice versa
 ```
@@ -125,7 +125,7 @@ One noteworthy feature of the ReflectionUtil class is the optimization applied t
 ## Field Record Overview
 ```public record SheetField<T>(String typeName, String title, Function<T,Object> getter, BiConsumer<T,Object> setter, int colIndex)```
 
-The Field record is a fundamental component of the library, designed to encapsulate information about a class field. It includes attributes such as field type, title, corresponding getter and setter methods, index for column mapping, and enumMapper that that maps enum values to constants and vise versa.
+The Field record is a fundamental component of the library, designed to encapsulate information about the field of a class.
 
 ### Key Methods:
 ```public Object getValue(T obj)```: Retrieves the value of the field from an object using its getter method.
