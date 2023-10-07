@@ -1,0 +1,3 @@
+Name;Price;Promo price;Min price;Active;Expired;Units in stock;Created date;Updated date;Zoned date time;Category;Local date time
+Product A;100;90.5;80.0;true;no;50;07/10/2023 22:13;2023-10-07;2023-10-07T22:13:24.5995252+01:00[Africa/Casablanca];bb;2023-10-07T22:13:24.5995252
+Product B;200;180.75;150.0;true;yes;30;07/10/2023 22:13;2023-10-07;2023-10-07T22:13:24.5995252+01:00[Africa/Casablanca];bb;2023-10-07T22:13:24.5995252
