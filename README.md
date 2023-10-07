@@ -72,7 +72,7 @@ Now, let’s introduce an updated version of our POJO class, ProductV2:
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SheetDefinition(includeAllFields = true)
+@SheetDefinition(includeAllFields = true,titles={"Name","Category","Date"})
 public class ProductV2 {
 
     private String name;
