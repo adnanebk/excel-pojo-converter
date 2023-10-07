@@ -31,7 +31,7 @@ public class Product {
 
     @CellDefinition(2)
     @CellBoolean(trueValue = "yes",falseValue = "no")
-    private Double minPrice;
+    private boolean active;
 
     @CellDefinition(value = 3, title = "Promo price")
     private double promoPrice;
@@ -129,7 +129,7 @@ The Field record is a fundamental component of the library, designed to encapsul
 ### Key Methods:
 ```public Object getValue(T obj)```: Retrieves the value of the field from an object using its getter method.
 
-```public void setValue(Object obj, Object value)```: Sets the value of the field in an object using its setter method.
+```public void setValue(T obj, Object value)```: Sets the value of the field in an object using its setter method.
 
 ## Conclusion :
 By leveraging this custom library, developers can significantly simplify the process of converting Excel and CSV files to POJOs in Java. The integration of Java reflection, along with thoughtful design considerations, empowers dynamic mapping, making it a valuable tool for data processing tasks.
