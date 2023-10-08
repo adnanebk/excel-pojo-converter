@@ -21,13 +21,13 @@ public class CsvRowsHandlerUtil<T> {
 
     }
 
-    public T createObjectFromRow(String row, String delimiter) {
+    public T createObjectFromRow(String row, String delimiter,char quoteChar) {
         String[] cellsValues = row.split(delimiter);
         Object[] values = new Object[cellsValues.length];
         var fields = reflectionUtil.getFields();
         for (int i = 0; i < Math.min(cellsValues.length,fields.size()); i++) {
             var field = fields.get(i);
-            String cellValue = cellsValues[field.colIndex()];
+            String cellValue = cellsValues[field.colIndex()].replace(quoteChar+"","");
             values[i] = convertToTypedValue(cellValue, field.typeName());
         }
         return createObjectAndSetFieldsValues(values, fields);

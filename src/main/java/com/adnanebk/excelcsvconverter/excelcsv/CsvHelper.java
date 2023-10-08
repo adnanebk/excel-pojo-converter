@@ -16,6 +16,9 @@ import java.util.stream.Stream;
 
 public class CsvHelper<T> {
 
+    public static final char QUOTE_CHARACTER = ICSVWriter.NO_QUOTE_CHARACTER;
+    public static final char ESCAPE_CHARACTER = '\t';
+    public static final String LINE_END = "\n";
     public  final String delimiter;
     private final String[] headers;
     private final CsvRowsHandlerUtil<T> rowsHandlerUtil;
@@ -41,12 +44,12 @@ public class CsvHelper<T> {
     public Stream<T> toStream(InputStream inputStream) {
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
             return br.lines().skip(1)
-                    .map(row -> this.rowsHandlerUtil.createObjectFromRow(row,delimiter));
+                    .map(row -> this.rowsHandlerUtil.createObjectFromRow(row,delimiter,QUOTE_CHARACTER));
     }
 
     public ByteArrayInputStream toCsv(List<T> list) throws IOException {
         StringWriter stringWriter=new StringWriter();
-        try(CSVWriter csvWriter = new CSVWriter(stringWriter, delimiter.charAt(0), ICSVWriter.NO_QUOTE_CHARACTER,'\t',"\n")) {
+        try(CSVWriter csvWriter = new CSVWriter(stringWriter, delimiter.charAt(0), QUOTE_CHARACTER, ESCAPE_CHARACTER, LINE_END)) {
             List<String[]> data = new LinkedList<>();
             data.add(headers);
             for (T obj : list) {
