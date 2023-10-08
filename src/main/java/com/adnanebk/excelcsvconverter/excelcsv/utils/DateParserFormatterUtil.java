@@ -53,12 +53,12 @@ public class DateParserFormatterUtil {
         zonedDateTimeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
     }
 
-    public Date parseToDate(String date) throws ParseException {
+    public synchronized Date parseToDate(String date) throws ParseException {
         try {
             return dateFormatter.parse(date);
         } catch (ParseException | NumberFormatException ex) {
             for (String pattern : DATE_TIME_PATTERNS) {
-                dateFormatter = new SimpleDateFormat(pattern);
+                dateFormatter.applyPattern(pattern);
                 try {
                     return dateFormatter.parse(date);
                 } catch (ParseException | NumberFormatException ignored) {
