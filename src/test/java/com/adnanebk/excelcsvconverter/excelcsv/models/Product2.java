@@ -1,7 +1,5 @@
 package com.adnanebk.excelcsvconverter.excelcsv.models;
 
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnum;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.IgnoreCell;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
 import lombok.AllArgsConstructor;
@@ -13,13 +11,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.Map;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SheetDefinition(includeAllFields = true,datePattern = "dd/MM/yyyy")
+@SheetDefinition(includeAllFields = true,datePattern = "yyyy-dd-MM",dateTimePattern = "yyyy-dd-MM HH:mm")
 public class Product2 {
 
 
@@ -34,7 +31,7 @@ public class Product2 {
 
     @IgnoreCell
     private boolean active;
-    @IgnoreCell
+
     private Boolean expired;
 
 
@@ -49,19 +46,10 @@ public class Product2 {
 
     private ZonedDateTime zonedDateTime;
 
-    @CellEnum(enumsMapperMethod = "categoryMap")
-    @CellDefinition(10)
     private Category category;
 
 
     private LocalDateTime localDateTime;
-
-    private Map<Category,String> categoryMap(){
-        return Map.of(Category.A,"aa",
-                Category.B,"bb",
-                Category.C,"cc"
-        );
-    }
 
 
 }

@@ -1,5 +1,6 @@
 package com.adnanebk.excelcsvconverter.excelcsv;
 
+import com.adnanebk.excelcsvconverter.excelcsv.core.heplers.ExcelHelper;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Category;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Product;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Product2;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter.DEFAULT_DATE_PATTERN;
+import static com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter.DEFAULT_DATE_TIME_PATTERN;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -63,11 +66,12 @@ class ExcelHelperTest {
             assertEquals("Price", headerRow.getCell(1).getStringCellValue());
             assertEquals("Promo price", headerRow.getCell(2).getStringCellValue());
             assertEquals("Min price", headerRow.getCell(3).getStringCellValue());
-            assertEquals("Units in stock", headerRow.getCell(4).getStringCellValue());
-            assertEquals("Created date", headerRow.getCell(5).getStringCellValue());
-            assertEquals("Updated date", headerRow.getCell(6).getStringCellValue());
-            assertEquals("Zoned date time", headerRow.getCell(7).getStringCellValue());
-            assertEquals("Category", headerRow.getCell(8).getStringCellValue());
+            assertEquals("Expired", headerRow.getCell(4).getStringCellValue());
+            assertEquals("Units in stock", headerRow.getCell(5).getStringCellValue());
+            assertEquals("Created date", headerRow.getCell(6).getStringCellValue());
+            assertEquals("Updated date", headerRow.getCell(7).getStringCellValue());
+            assertEquals("Zoned date time", headerRow.getCell(8).getStringCellValue());
+            assertEquals("Category", headerRow.getCell(9).getStringCellValue());
             // Verify data rows
             for (int i = 0; i < productList.size(); i++) {
                 Row row = sheet.getRow(i + 1);
@@ -77,12 +81,13 @@ class ExcelHelperTest {
                 assertEquals(product.getPrice(), row.getCell(1).getNumericCellValue());
                 assertEquals(product.getPromoPrice(), row.getCell(2).getNumericCellValue());
                 assertEquals(product.getMinPrice(), row.getCell(3).getNumericCellValue());
-                assertEquals((double) product.getUnitsInStock(), row.getCell(4).getNumericCellValue());
-                assertEquals(new SimpleDateFormat().format(product.getCreatedDate()), row.getCell(5).getStringCellValue());
-                assertEquals(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(product.getUpdatedDate()), row.getCell(6).getStringCellValue());
-                assertEquals(DateTimeFormatter.ISO_ZONED_DATE_TIME.format(product.getZonedDateTime()), row.getCell(7).getStringCellValue());
-                assertEquals("bb", row.getCell(8).getStringCellValue());
-                assertTrue(product.getLocalDateTime().toString().startsWith(row.getCell(9).getStringCellValue()));
+                assertEquals(product.getExpired().toString(), row.getCell(4).getStringCellValue());
+                assertEquals((double) product.getUnitsInStock(), row.getCell(5).getNumericCellValue());
+                assertEquals(new SimpleDateFormat("yyyy-dd-MM HH:mm").format(product.getCreatedDate()), row.getCell(6).getStringCellValue());
+                assertEquals(DateTimeFormatter.ofPattern("yyyy-dd-MM").format(product.getUpdatedDate()), row.getCell(7).getStringCellValue());
+                assertEquals(DateTimeFormatter.ofPattern("yyyy-dd-MM HH:mm").format(product.getZonedDateTime()), row.getCell(8).getStringCellValue());
+                assertEquals("B", row.getCell(9).getStringCellValue());
+                assertEquals(DateTimeFormatter.ofPattern("yyyy-dd-MM HH:mm").format(product.getLocalDateTime()),row.getCell(10).getStringCellValue());
             }
         } catch (IOException e) {
             fail("Error reading Excel file: " + e.getMessage());
@@ -96,47 +101,47 @@ class ExcelHelperTest {
         // Generate Excel file
         String destinationPath = "src/test/resources/products.xlsx";
         try (ByteArrayInputStream excelBytes = excelHelper.toExcel(productList);
-                Workbook workbook = new XSSFWorkbook(excelBytes);
+             Workbook workbook = new XSSFWorkbook(excelBytes);
              FileOutputStream outputStream = new FileOutputStream(destinationPath)
         ) {
             workbook.write(outputStream);
             Sheet sheet = workbook.getSheetAt(0);
-                assertEquals(2, sheet.getLastRowNum());
-                // Verify headers
-                Row headerRow = sheet.getRow( 0);
-                assertEquals("Name", headerRow.getCell(0).getStringCellValue());
-                assertEquals("Price", headerRow.getCell(1).getStringCellValue());
-                assertEquals("Promo price", headerRow.getCell(2).getStringCellValue());
-                assertEquals("Min price", headerRow.getCell(3).getStringCellValue());
-                assertEquals("Active", headerRow.getCell(4).getStringCellValue());
-                assertEquals("Expired", headerRow.getCell(5).getStringCellValue());
-                assertEquals("Units in stock", headerRow.getCell(6).getStringCellValue());
-                assertEquals("Created date", headerRow.getCell(7).getStringCellValue());
-                assertEquals("Updated date", headerRow.getCell(8).getStringCellValue());
-                assertEquals("Zoned date time", headerRow.getCell(9).getStringCellValue());
-                assertEquals("Category", headerRow.getCell(10).getStringCellValue());
-                // Verify data rows
-                for (int i = 0; i < productList.size(); i++) {
-                    Row row = sheet.getRow(i + 1);
-                    Product product = productList.get(i);
+            assertEquals(2, sheet.getLastRowNum());
+            // Verify headers
+            Row headerRow = sheet.getRow( 0);
+            assertEquals("Name", headerRow.getCell(0).getStringCellValue());
+            assertEquals("Price", headerRow.getCell(1).getStringCellValue());
+            assertEquals("Promotion price", headerRow.getCell(2).getStringCellValue());
+            assertEquals("Min price", headerRow.getCell(3).getStringCellValue());
+            assertEquals("Active", headerRow.getCell(4).getStringCellValue());
+            assertEquals("Expired", headerRow.getCell(5).getStringCellValue());
+            assertEquals("Units in stock", headerRow.getCell(6).getStringCellValue());
+            assertEquals("Created date", headerRow.getCell(7).getStringCellValue());
+            assertEquals("Updated date", headerRow.getCell(8).getStringCellValue());
+            assertEquals("Zoned date time", headerRow.getCell(9).getStringCellValue());
+            assertEquals("Category", headerRow.getCell(10).getStringCellValue());
+            // Verify data rows
+            for (int i = 0; i < productList.size(); i++) {
+                Row row = sheet.getRow(i + 1);
+                Product product = productList.get(i);
 
-                    assertEquals(product.getName(), row.getCell(0).getStringCellValue());
-                    assertEquals(product.getPrice(), row.getCell(1).getNumericCellValue());
-                    assertEquals(product.getPromoPrice(), row.getCell(2).getNumericCellValue());
-                    assertEquals(product.getMinPrice(), row.getCell(3).getNumericCellValue());
-                    assertEquals("true", row.getCell(4).getStringCellValue());
-                    assertEquals("no", row.getCell(5).getStringCellValue());
-                    assertEquals((double) product.getUnitsInStock(), row.getCell(6).getNumericCellValue());
-                    assertEquals(new SimpleDateFormat().format(product.getCreatedDate()), row.getCell(7).getStringCellValue());
-                    assertEquals(product.getUpdatedDate().toString(), row.getCell(8).getStringCellValue());
-                    assertEquals(DateTimeFormatter.ISO_ZONED_DATE_TIME.format(product.getZonedDateTime()), row.getCell(9).getStringCellValue());
-                    assertEquals("bb", row.getCell(10).getStringCellValue());
-                    assertTrue(product.getLocalDateTime().toString().startsWith(row.getCell(11).getStringCellValue()));
-                }
-                } catch (IOException e) {
-                fail("Error reading Excel file: " + e.getMessage());
+                assertEquals(product.getName(), row.getCell(0).getStringCellValue());
+                assertEquals(product.getPrice(), row.getCell(1).getNumericCellValue());
+                assertEquals(product.getPromoPrice(), row.getCell(2).getNumericCellValue());
+                assertEquals(product.getMinPrice(), row.getCell(3).getNumericCellValue());
+                assertEquals("true", row.getCell(4).getStringCellValue());
+                assertEquals("no", row.getCell(5).getStringCellValue());
+                assertEquals((double) product.getUnitsInStock(), row.getCell(6).getNumericCellValue());
+                assertEquals(new SimpleDateFormat(DEFAULT_DATE_TIME_PATTERN).format(product.getCreatedDate()), row.getCell(7).getStringCellValue());
+                assertEquals(DateTimeFormatter.ofPattern(DEFAULT_DATE_PATTERN).format(product.getUpdatedDate()), row.getCell(8).getStringCellValue());
+                assertEquals(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_PATTERN).format(product.getZonedDateTime()), row.getCell(9).getStringCellValue());
+                assertEquals("bb", row.getCell(10).getStringCellValue());
+                assertEquals(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_PATTERN).format(product.getLocalDateTime()), row.getCell(11).getStringCellValue());
             }
+        } catch (IOException e) {
+            fail("Error reading Excel file: " + e.getMessage());
         }
+    }
 
     @Test
     @Order(2)
@@ -193,13 +198,13 @@ class ExcelHelperTest {
             assertEquals(200, result.get(1).getPrice());
             assertEquals(180.75, result.get(1).getPromoPrice()); // Delta for double comparison
             assertFalse(result.get(1).isActive());
-            assertNull(result.get(1).getExpired());
+            assertFalse(result.get(1).getExpired());
             assertEquals(30, result.get(1).getUnitsInStock());
             assertNotNull(result.get(1).getCreatedDate()); // Assuming it's not null in the Excel file
             assertTrue(LocalDate.now().isEqual(result.get(1).getUpdatedDate())); // Assuming it's not null in the Excel file
             assertNotNull(result.get(1).getZonedDateTime()); // Assuming it's not null in the Excel file
-            assertSame(Category.B, result.get(1).getCategory()); // Assuming it's not null in the Excel file
+            assertSame(null, result.get(1).getCategory());
         }
     }
 
-    }
+}

@@ -18,7 +18,7 @@
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
 		<sonar.language>java</sonar.language>
-		<sonar.inclusions>**/**/*Util.java,**/**/*Helper.java,**/**/*Field.java</sonar.inclusions>
+		<sonar.inclusions>**/core/**/*.java</sonar.inclusions>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
@@ -27,12 +27,12 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.3</version>
+			<version>5.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
-			<version>5.7.1</version>
+			<version>5.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -56,6 +56,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<version>6.0.11</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -83,27 +84,12 @@
 					<value>true</value>
 				</property>
 			</activation>
-			<distributionManagement>
-				<repository>
-					<id>github</id>
-					<name>adnanebk</name>
-					<url>https://maven.pkg.github.com/adnanebk/excel-csv-pojo-converter</url>
-				</repository>
-			</distributionManagement>
 		</profile>
 	</profiles>
 
 	<build>
 		<plugins>
 
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>3.1.2</version>
-				<configuration>
-					<classifier>exec</classifier>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>

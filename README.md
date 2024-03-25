@@ -1,6 +1,6 @@
 [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=adnanebk_excel-pojo-converter)](https://sonarcloud.io/summary/new_code?id=adnanebk_excel-pojo-converter)
 
-Converting Excel or CSV files into Java objects (POJOs) and vice versa can be a complex process, but with the right tools and techniques, it becomes much more manageable. In this guide, we’ll explore a powerful Java library that leverages Java reflection.
+Converting Excel or CSV files into Java objects (POJOs) and vice versa can be a complex process, this is why i have created a java library that handles both excel and csv conversions to pojo objects in both directions (read and wrire ) by leveraguling Java reflection.
 
 ## First we add the dependency to maven
 
@@ -23,7 +23,7 @@ Before we dive into the library, let’s take a close look at a sample Java clas
 @SheetDefinition(datePattern = "dd/MM/yyyy")
 public class Product {
 
-    @CellDefinition(0)
+    @CellDefinition(0,converter=NameConverter.class)
     private String name;
 
     @CellDefinition(1)
@@ -38,7 +38,7 @@ public class Product {
 
     // Additional fields...
 
-    @CellEnum(enumsMapperMethod = "categoryMap")
+    @CellEnum(converter = CategoryConverter.class)
     @CellDefinition(10)
     private Category category;
 
@@ -50,23 +50,45 @@ public class Product {
                       Category.B,"Formatted B");
     }
 }
+
+public class CategoryConverter implements EnumConverter<Category> {
+    Map<Category,String> map =  Map.of(Category.A,"aa",
+            Category.B,"bb",
+            Category.C,"cc"
+    );
+    
+    @Override
+    public Map<Category, String> convert() {
+        return map;
+    }
+}
+class NameConverter implements Converter<String> {
+
+    @Override
+    public String convertToCellValue(String fieldValue) {
+        return fieldValue + " added text";
+    }
+
+    @Override
+    public String convertToFieldValue(String cellValue) {
+        return cellValue + " added";
+    }
+}
 ```
 This Product class is annotated with various annotations that play a crucial role in the conversion process. Each field is annotated with @CellDefinition, indicating its position in the Excel or CSV file.
 
-we can also define the title of the of the cell, by default it will convert the camel case name of the field to a name with spaces (ex: firstName=>First name)
+we can also define the title of the cell, by default it will convert the camel case name of the field to a name with spaces (ex: firstName=>First name)
 
 The @SheetDefinition annotation provides additional information like date formatting patterns that will be used during conversion of date field types.
 
-### The Enum Annotation: @CellEnum(enumsMapperMethod = "categoryMap")
+we make use of the @CellEnum annotation in the enum Category field, and we define a converter class that contains the conversions (by using a map) between the enum constants and the cell values in the excel/csv (by default the enum constants will be used as cell values).
 
-In the Product class, we make use of the @CellEnum annotation in the enum Category field. the enumsMapperMethod argument allows us to define a method name, this method should return a map that define the mapping (conversions) between the enum constants and the formatted values in the excel/csv cells (by default the enum constants will be used)
-note that the method name must much the enumsMapperMethod argument value.
+we make use of the @CellBoolean annotation in the boolean active field,it has two arguments witch represents the converted cells values in the excel/csv file .
 
-### The Boolean Annotation: @CellBoolean(trueValue = "yes",falseValue = "no")
+We can also use a custom converter to convert a field value to its cell value, to do that we define
+the converter argument in the cellDefinition annotation like the example in the name field, or we can use the annotation @CellConverter(converter = MyConverter.class)  
 
-we make use of the @CellBoolean annotation in the boolean active field,it has two arguments witch represents the formatting values we want to use in the excel/csv fields.
-
-Now, let’s introduce an updated version of our POJO class, ProductV2:
+Now, let’s introduce a second version of our POJO class, ProductV2:
 ```
 @Data
 @Builder
@@ -88,7 +110,7 @@ public class ProductV2 {
 
 when includeAllFields argument set to true the fields are automatically included and mapped in the cells based on its declared order and ignoring fields that annotated with @IgnoreCell annotation,
 
-we can define the titles in the titles argument with the condition that they must be in the same order as the fields.
+we can define the titles in the titles argument with the role that they must be in the same order as the fields.
 
 ## Converting Excel/csv to POJOs and vice versa
 ```
@@ -117,20 +139,7 @@ public class ExcelFieldsController {
 the same applicable for converting csv files except we need to define the delimiter that will be used
 
     private final CsvHelper<ProductV2> csvHelper = CsvHelper.create(ProductV2.class,";");
-## The ReflectionUtil Class: Dynamic Class Examination
+## Optimization considaration
 
-The ReflectionUtil class serves as the backbone of this Java library, facilitating dynamic class examination and manipulation through the power of Java reflection.
-One noteworthy feature of the ReflectionUtil class is the optimization applied to enhance performance. During initialization, all getters, setters, and fields are eagerly loaded and encapsulated in the SheetField Record. This deliberate action minimizes the need for reflection lookups in subsequent operations and boosts overall efficiency.
+One noteworthy feature of this library is the optimization applied to enhance performance. During initialization, constructor and all getters and setters are initialized only once and used subsequently. This  minimizes the need for reflection lookups in subsequent operations and boosts overall efficiency.
 
-## SheetField Record Overview
-```public record SheetField<T>(String typeName, String title, Function<T,Object> getter, BiConsumer<T,Object> setter, int colIndex)```
-
-The Field record is a fundamental component of the library, designed to encapsulate information about the field of a class.
-
-### Key Methods:
-```public Object getValue(T obj)```: Retrieves the value of the field from an object using its getter method.
-
-```public void setValue(T obj, Object value)```: Sets the value of the field in an object using its setter method.
-
-## Conclusion :
-By leveraging this custom library, developers can significantly simplify the process of converting Excel and CSV files to POJOs in Java. The integration of Java reflection, along with thoughtful design considerations, empowers dynamic mapping, making it a valuable tool for data processing tasks.

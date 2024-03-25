@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.Map;
 
 @Data
 @Builder
@@ -20,12 +19,12 @@ import java.util.Map;
 @NoArgsConstructor
 public class Product {
 
-    @CellDefinition(0)
+    @CellDefinition(value = 0)
     private String name;
 
     @CellDefinition(1)
     private long price;
-    @CellDefinition(value = 2,title = "Promo price")
+    @CellDefinition(value = 2,title = "Promotion price")
     private double promoPrice;
 
     @CellDefinition(5)
@@ -49,19 +48,14 @@ public class Product {
     @CellDefinition(9)
     private ZonedDateTime zonedDateTime;
 
-    @CellEnum(enumsMapperMethod = "categoryMap")
-    @CellDefinition(10)
+    @CellEnum(converter = CategoryConverter.class)
+    @CellDefinition(value = 10)
     private Category category;
 
     @CellDefinition(11)
     private LocalDateTime localDateTime;
 
-    private Map<Category,String> categoryMap(){
-        return Map.of(Category.A,"aa",
-                Category.B,"bb",
-                Category.C,"cc"
-        );
-    }
+    private String otherProp;
 
     public Product(String name, long price, double promoPrice, Double minPrice, boolean active, Boolean expired, Integer unitsInStock, Date createdDate, LocalDate updatedDate, ZonedDateTime zonedDateTime, Category category, LocalDateTime localDateTime) {
         this.name = name;

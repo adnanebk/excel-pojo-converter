@@ -1,9 +1,8 @@
-package com.adnanebk.excelcsvconverter.excelcsv;
+package com.adnanebk.excelcsvconverter.excelcsv.core.heplers;
 
+import com.adnanebk.excelcsvconverter.excelcsv.core.reflection.ReflectionHelper;
+import com.adnanebk.excelcsvconverter.excelcsv.core.rows_handlers.ExcelRowsHandler;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
-import com.adnanebk.excelcsvconverter.excelcsv.utils.DateParserFormatterUtil;
-import com.adnanebk.excelcsvconverter.excelcsv.utils.ExcelRowsHandlerUtil;
-import com.adnanebk.excelcsvconverter.excelcsv.utils.ReflectionUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -13,30 +12,29 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
 public class ExcelHelper<T> {
 
-    private final ExcelRowsHandlerUtil<T> rowsHandlerUtil;
+    private final ExcelRowsHandler<T> rowsHandler;
     private final String[] headers;
 
-    private ExcelHelper(ExcelRowsHandlerUtil<T> rowsHandlerUtil, String[] headers) {
-        this.rowsHandlerUtil = rowsHandlerUtil;
-        this.headers=headers==null? rowsHandlerUtil.getHeaders():headers;
+    private ExcelHelper(ExcelRowsHandler<T> rowsHandler, String[] headers) {
+        this.rowsHandler = rowsHandler;
+        this.headers= headers;
     }
 
     public static <T> ExcelHelper<T> create(Class<T> type) {
         return create(type,null);
     }
     public static <T> ExcelHelper<T> create(Class<T> type,String[] headers) {
-        var reflectionUtil = new ReflectionUtil<T>(type);
-        var dateParserFormatterUtil = reflectionUtil.getSheetInfo()
-                .map(info->new DateParserFormatterUtil(info.datePattern(),info.dateTimePattern()))
-                .orElse(new DateParserFormatterUtil("",""));
-        var rowsHandlerUtil = new ExcelRowsHandlerUtil<>(reflectionUtil,dateParserFormatterUtil);
-        return new ExcelHelper<>(rowsHandlerUtil,headers);
+        var reflectionHelper = new ReflectionHelper<>(type);
+        var rowsHandler = new ExcelRowsHandler<>(reflectionHelper);
+        return new ExcelHelper<>(rowsHandler,Optional.ofNullable(headers)
+                 .orElse(reflectionHelper.getHeaders().toArray(String[]::new)));
     }
 
 
@@ -46,7 +44,7 @@ public class ExcelHelper<T> {
             return StreamSupport.stream(sheet.spliterator(), false)
                     .filter(this::hasAnyCell)
                     .skip(1)
-                    .map(rowsHandlerUtil::createObjectFromRow);
+                    .map(rowsHandler::convertToObject);
         }
     }
 
@@ -56,7 +54,7 @@ public class ExcelHelper<T> {
             Sheet sheet = workbook.createSheet();
             createHeaders(sheet, workbook);
             for (int i = 0; i < list.size(); i++) {
-                this.rowsHandlerUtil.fillRowFromObject(sheet.createRow(i+1), list.get(i));
+                this.rowsHandler.fillRowFromObject(sheet.createRow(i+1), list.get(i));
             }
             autoSizeColumns(sheet);
             workbook.write(out);
