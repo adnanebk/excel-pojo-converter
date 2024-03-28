@@ -99,7 +99,7 @@ class ExcelHelperTest {
         List<Product> productList = getProducts();
 
         // Generate Excel file
-        String destinationPath = "src/test/resources/products.xlsx";
+        String destinationPath = "src/test/resources/products3.xlsx";
         try (ByteArrayInputStream excelBytes = excelHelper.toExcel(productList);
              Workbook workbook = new XSSFWorkbook(excelBytes);
              FileOutputStream outputStream = new FileOutputStream(destinationPath)
@@ -148,7 +148,7 @@ class ExcelHelperTest {
     void toList_withValidExcelFile_shouldReturnCorrectProductList() throws IOException {
 
         // Read the file as an InputStream
-        String destinationPath = "src/test/resources/products.xlsx";
+        String destinationPath = "src/test/resources/products3.xlsx";
         // Read the file as an InputStream
         try (InputStream inputStream = Files.newInputStream(new File(destinationPath).toPath())) {
 
@@ -181,7 +181,7 @@ class ExcelHelperTest {
     void toList_withValidExcelFile_includeAllOption_shouldReturnCorrectProductList() throws IOException {
 
         // Read the file as an InputStream
-        String destinationPath = "src/test/resources/products.xlsx";
+        String destinationPath = "src/test/resources/products2.xlsx";
         // Read the file as an InputStream
         try (InputStream inputStream = Files.newInputStream(new File(destinationPath).toPath())) {
             // Create a MockMultipartFile
@@ -203,7 +203,7 @@ class ExcelHelperTest {
             assertNotNull(result.get(1).getCreatedDate()); // Assuming it's not null in the Excel file
             assertTrue(LocalDate.now().isEqual(result.get(1).getUpdatedDate())); // Assuming it's not null in the Excel file
             assertNotNull(result.get(1).getZonedDateTime()); // Assuming it's not null in the Excel file
-            assertSame(null, result.get(1).getCategory());
+            assertSame(Category.B, result.get(1).getCategory());
         }
     }
 

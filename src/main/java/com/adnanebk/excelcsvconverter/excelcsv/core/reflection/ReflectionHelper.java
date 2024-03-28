@@ -77,8 +77,9 @@ public class ReflectionHelper<T> {
                 String title=index < titles.length ? titles[index]:camelCaseWordsToTitleWords(field.getName());
                 headers.add(title);
                 fields.add(new ReflectedField<>(field,this.createConverter(field, null),index));
+                index++;
             }
-            index++;
+
         }
     }
 
