@@ -45,10 +45,6 @@ public class Product {
     @CellDefinition(11)
     private LocalDateTime localDateTime;
 
-    private Map<Category,String> categoryMap(){
-        return Map.of(Category.A,"Formatted A",
-                      Category.B,"Formatted B");
-    }
 }
 
 public class CategoryConverter implements EnumConverter<Category> {
