@@ -1,7 +1,7 @@
 package com.adnanebk.excelcsvconverter.excelcsv.core.converters;
 
 @FunctionalInterface
-public interface FieldConverter<T> extends Converter<T> {
+public interface FieldConverterI<T> extends Converter<T> {
 
 
     @Override

@@ -87,23 +87,31 @@ public class ReflectionHelper<T> {
     try {
         if(cellDefinition!=null && !cellDefinition.converter().isInterface())
            return cellDefinition.converter().getDeclaredConstructor().newInstance();
-        else if (field.isAnnotationPresent(CellConverter.class))
+        if (field.isAnnotationPresent(CellConverter.class))
            return field.getDeclaredAnnotation(CellConverter.class).converter().getDeclaredConstructor().newInstance();
         if(field.getType().isEnum()) {
-            var enumsAnnotation = field.getDeclaredAnnotation(CellEnum.class);
-            if(enumsAnnotation!=null)
-              return new EnumsConverter<>(field.getType(),enumsAnnotation.converter().getDeclaredConstructor().newInstance().convert());
-            return new EnumsConverter<>(field.getType(),new HashMap<>());
+            return getEnumsConverter(field);
         }
-        else  if(field.getType().equals(Boolean.class) || field.getType().equals(boolean.class)) {
-            return  Optional.ofNullable(field.getDeclaredAnnotation(CellBoolean.class))
-                    .map(cell->new BooleanConverter(cell.trueValue(),cell.falseValue()))
-                    .orElseGet(BooleanConverter::new);
+        if(field.getType().equals(Boolean.class) || field.getType().equals(boolean.class)) {
+            return getBooleanConverter(field);
         }
         return  null;
         } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new ReflectionException(e.getMessage());
         }
+    }
+
+    private BooleanConverter getBooleanConverter(Field field) {
+        return Optional.ofNullable(field.getDeclaredAnnotation(CellBoolean.class))
+                .map(cell -> new BooleanConverter(cell.trueValue(), cell.falseValue()))
+                .orElseGet(BooleanConverter::new);
+    }
+
+    private  EnumsConverter<?> getEnumsConverter(Field field) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        var enumsAnnotation = field.getDeclaredAnnotation(CellEnum.class);
+        if(enumsAnnotation!=null)
+            return new EnumsConverter<>(field.getType(), enumsAnnotation.converter().getDeclaredConstructor().newInstance().convert());
+        return new EnumsConverter<>(field.getType(), new HashMap<>());
     }
 
 

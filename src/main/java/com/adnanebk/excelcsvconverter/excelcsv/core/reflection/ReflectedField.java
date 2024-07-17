@@ -39,8 +39,6 @@ public class ReflectedField<T> {
 
     public void setValue(Object cellValue,Object obj) {
         try{
-        if (cellValue == null)
-           return;
         if(converter!=null)
          setter.invoke(obj,converter.convertToFieldValue(cellValue.toString()));
         else setter.invoke(obj,cellValue);

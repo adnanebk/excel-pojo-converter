@@ -1,6 +1,6 @@
 package com.adnanebk.excelcsvconverter.excelcsv.annotations;
 
-import com.adnanebk.excelcsvconverter.excelcsv.core.converters.CellConverterI;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.FieldConverterI;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface CellConverter {
-    Class<? extends CellConverterI<?>> converter();
+public @interface FieldConverter {
+    Class<? extends FieldConverterI<?>> converter();
 }

@@ -10,7 +10,6 @@ import org.apache.poi.ss.usermodel.Row;
 
 import java.time.*;
 import java.util.Date;
-import java.util.Optional;
 
 public class ExcelRowsHandler<T> {
 
@@ -43,7 +42,7 @@ public class ExcelRowsHandler<T> {
     }
 
     private Object getCellValue(ReflectedField<?> reflectedField, Row row) {
-        return  this.getCurrentCell(reflectedField.getCellIndex(),row).map(cell -> {
+        var cell =  this.getCurrentCell(reflectedField.getCellIndex(),row);
             try {
                 return switch (reflectedField.getTypeName()) {
                     case "string", "enum", "boolean" -> cell.getStringCellValue();
@@ -62,7 +61,6 @@ public class ExcelRowsHandler<T> {
             } catch (DateTimeException e) {
                 throw new ExcelValidationException(String.format("Invalid or unsupported date pattern in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
             }
-        }).orElse(null);
     }
 
     private void setCellValue(String fieldType, Cell cell, Object fieldValue) {
@@ -104,8 +102,8 @@ public class ExcelRowsHandler<T> {
             return dateParserFormatter.parseToZonedDateTime(cell.getStringCellValue());
     }
 
-    private Optional<Cell> getCurrentCell(int colIndex, Row currentRow) {
-        return Optional.ofNullable(currentRow.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
+    private Cell getCurrentCell(int colIndex, Row currentRow) {
+        return currentRow.getCell(colIndex, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
     }
 
 }
