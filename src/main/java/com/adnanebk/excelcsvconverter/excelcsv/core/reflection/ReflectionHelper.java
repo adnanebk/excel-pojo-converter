@@ -88,7 +88,9 @@ public class ReflectionHelper<T> {
         if(cellDefinition!=null && !cellDefinition.converter().isInterface())
            return cellDefinition.converter().getDeclaredConstructor().newInstance();
         if (field.isAnnotationPresent(CellConverter.class))
-           return field.getDeclaredAnnotation(CellConverter.class).converter().getDeclaredConstructor().newInstance();
+           return field.getDeclaredAnnotation(CellConverter.class).value().getDeclaredConstructor().newInstance();
+        if (field.isAnnotationPresent(FieldConverter.class))
+            return field.getDeclaredAnnotation(FieldConverter.class).value().getDeclaredConstructor().newInstance();
         if(field.getType().isEnum()) {
             return getEnumsConverter(field);
         }

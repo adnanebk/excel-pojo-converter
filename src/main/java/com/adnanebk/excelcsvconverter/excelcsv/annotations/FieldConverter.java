@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface FieldConverter {
-    Class<? extends FieldConverterI<?>> converter();
+    Class<? extends FieldConverterI<?>> value();
 }
