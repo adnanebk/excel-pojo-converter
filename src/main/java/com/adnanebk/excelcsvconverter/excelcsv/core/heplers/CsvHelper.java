@@ -8,9 +8,9 @@ import com.opencsv.ICSVWriter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 
@@ -30,13 +30,16 @@ public class CsvHelper<T> {
     }
 
     public static <T> CsvHelper<T> create(Class<T> type,String delimiter) {
-        return create(type,delimiter,null);
-    }
-    public static <T> CsvHelper<T> create(Class<T> type,String delimiter,String[] headers) {
         var reflectionHelper = new ReflectionHelper<>(type);
         var rowsHandler = new CsvRowsHandler<>(reflectionHelper);
-        return new CsvHelper<>(rowsHandler,delimiter,Optional.ofNullable(headers)
-                .orElse(reflectionHelper.getHeaders().toArray(String[]::new)));
+        return new CsvHelper<>(rowsHandler,delimiter,reflectionHelper.getHeaders().toArray(String[]::new));
+    }
+
+        public static <T> CsvHelper<T> create(Class<T> type,String delimiter, ColumnDefinition... columnsDefinitions) {
+        var headers = Arrays.stream(columnsDefinitions).map(ColumnDefinition::getTitle);
+        var reflectionHelper = new ReflectionHelper<>(type, columnsDefinitions);
+        var rowsHandler = new CsvRowsHandler<>(reflectionHelper);
+        return new CsvHelper<>(rowsHandler,delimiter,headers.toArray(String[]::new));
     }
 
     public Stream<T> toStream(InputStream inputStream) {

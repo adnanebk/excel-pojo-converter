@@ -1,6 +1,10 @@
 package com.adnanebk.excelcsvconverter.excelcsv.annotations;
 
 import com.adnanebk.excelcsvconverter.excelcsv.core.converters.Converter;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.EnumConverter;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.ToCellConverter;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.ToFieldConverter;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -14,5 +18,10 @@ public @interface CellDefinition {
     int value();
 
     Class<? extends Converter> converter() default Converter.class;
+    Class<? extends ToFieldConverter> toFieldConverter() default ToFieldConverter.class;
+    Class<? extends ToCellConverter> toCellConverter() default ToCellConverter.class;
+    Class<? extends EnumConverter> enumConverter() default EnumConverter.class;
+
+
 
 }

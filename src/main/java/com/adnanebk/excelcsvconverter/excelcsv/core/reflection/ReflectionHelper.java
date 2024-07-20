@@ -1,10 +1,15 @@
 package com.adnanebk.excelcsvconverter.excelcsv.core.reflection;
 
 
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.*;
-import com.adnanebk.excelcsvconverter.excelcsv.core.converters.BooleanConverter;
-import com.adnanebk.excelcsvconverter.excelcsv.core.converters.Converter;
-import com.adnanebk.excelcsvconverter.excelcsv.core.converters.EnumsConverter;
+import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
+import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.*;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.BooleanConverterAdapter;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.EnumConverterAdapter;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.ToCellConverterAdapter;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.ToFieldConverterAdapter;
+import com.adnanebk.excelcsvconverter.excelcsv.core.heplers.ColumnDefinition;
+import com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
 
 import java.lang.reflect.Constructor;
@@ -23,6 +28,22 @@ public class ReflectionHelper<T> {
         defaultConstructor=getDefaultConstructor();
         this.setFieldsAndTitles();
     }
+
+    public ReflectionHelper(Class<T> type, ColumnDefinition[] columnsDefinitions) {
+        classType = type;
+        defaultConstructor=getDefaultConstructor();
+            Arrays.sort(columnsDefinitions,Comparator.comparing(ColumnDefinition::getColumnIndex));
+            for (ColumnDefinition op : columnsDefinitions) {
+            try {
+             op.setConverterIfNotExist(type.getDeclaredField(op.getFieldName()).getType());
+             fields.add(new ReflectedField<>(type.getDeclaredField(op.getFieldName()),op.getConverter(),op.getColumnIndex()));
+             headers.add(op.getTitle());
+            } catch (NoSuchFieldException e) {
+                throw new ReflectionException("the specified field name {"+op.getFieldName()+"} is not found");
+            }
+        }
+    }
+
     public List<ReflectedField<?>> getFields() {
         return fields;
     }
@@ -38,8 +59,10 @@ public class ReflectionHelper<T> {
         }
     }
 
-    public Optional<SheetDefinition> getSheetInfo() {
-        return Optional.ofNullable(classType.getAnnotation(SheetDefinition.class));
+    public DateParserFormatter getDateParserFormatter() {
+        return Optional.ofNullable(classType.getAnnotation(SheetDefinition.class))
+                .map(info->new DateParserFormatter(info.datePattern(),info.dateTimePattern()))
+                .orElseGet(DateParserFormatter::new);
     }
 
     private Constructor<T> getDefaultConstructor() {
@@ -51,72 +74,40 @@ public class ReflectionHelper<T> {
     }
 
     private void setFieldsAndTitles(){
-        boolean hasIncludeAllFields =  getSheetInfo().filter(SheetDefinition::includeAllFields).isPresent();
-        if(hasIncludeAllFields)
-           this.createAllFieldsAndTitles();
-        else this.createAnnotatedFieldsAndTitles();
-    }
-    private void createAnnotatedFieldsAndTitles() {
-         Arrays.stream(classType.getDeclaredFields())
+        Arrays.stream(classType.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(CellDefinition.class))
                 .sorted(Comparator.comparing(field -> field.getDeclaredAnnotation(CellDefinition.class).value()))
                 .forEach(field->{
                     var cellDefinition = field.getDeclaredAnnotation(CellDefinition.class);
                     var reflectedField = new ReflectedField<>(field,this.createConverter(field,cellDefinition),cellDefinition.value());
                     String title = Optional.of(cellDefinition.title()).filter(s -> !s.isEmpty())
-                                  .orElseGet(() -> camelCaseWordsToTitleWords(field.getName()));
+                            .orElseGet(() -> camelCaseWordsToTitleWords(field.getName()));
                     fields.add(reflectedField);
                     headers.add(title);
                 });
     }
-    private void createAllFieldsAndTitles() {
-        var titles = classType.getAnnotation(SheetDefinition.class).titles();
-        int index=0;
-        for (var field : classType.getDeclaredFields()) {
-            if (!field.isAnnotationPresent(IgnoreCell.class)) {
-                String title=index < titles.length ? titles[index]:camelCaseWordsToTitleWords(field.getName());
-                headers.add(title);
-                fields.add(new ReflectedField<>(field,this.createConverter(field, null),index));
-                index++;
-            }
-
-        }
-    }
 
     private Converter<?> createConverter(Field field, CellDefinition cellDefinition) {
     try {
-        if(cellDefinition!=null && !cellDefinition.converter().isInterface())
+        if(cellDefinition==null)
+            return null;
+        if(!cellDefinition.converter().isInterface())
            return cellDefinition.converter().getDeclaredConstructor().newInstance();
-        if (field.isAnnotationPresent(CellConverter.class))
-           return field.getDeclaredAnnotation(CellConverter.class).value().getDeclaredConstructor().newInstance();
-        if (field.isAnnotationPresent(FieldConverter.class))
-            return field.getDeclaredAnnotation(FieldConverter.class).value().getDeclaredConstructor().newInstance();
-        if(field.getType().isEnum()) {
-            return getEnumsConverter(field);
-        }
+        if(!cellDefinition.toCellConverter().isInterface())
+            return new ToCellConverterAdapter<>(cellDefinition.toCellConverter().getDeclaredConstructor().newInstance());
+        if(!cellDefinition.toFieldConverter().isInterface())
+            return new ToFieldConverterAdapter<>(cellDefinition.toFieldConverter().getDeclaredConstructor().newInstance());
+        if(!cellDefinition.enumConverter().isInterface())
+            return new EnumConverterAdapter<>(field.getType(),
+                    cellDefinition.enumConverter().getDeclaredConstructor().newInstance());
         if(field.getType().equals(Boolean.class) || field.getType().equals(boolean.class)) {
-            return getBooleanConverter(field);
+            return new BooleanConverterAdapter();
         }
         return  null;
         } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new ReflectionException(e.getMessage());
         }
     }
-
-    private BooleanConverter getBooleanConverter(Field field) {
-        return Optional.ofNullable(field.getDeclaredAnnotation(CellBoolean.class))
-                .map(cell -> new BooleanConverter(cell.trueValue(), cell.falseValue()))
-                .orElseGet(BooleanConverter::new);
-    }
-
-    private  EnumsConverter<?> getEnumsConverter(Field field) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        var enumsAnnotation = field.getDeclaredAnnotation(CellEnum.class);
-        if(enumsAnnotation!=null)
-            return new EnumsConverter<>(field.getType(), enumsAnnotation.converter().getDeclaredConstructor().newInstance().convert());
-        return new EnumsConverter<>(field.getType(), new HashMap<>());
-    }
-
-
     private String camelCaseWordsToTitleWords(String word) {
         String firstChar = Character.toUpperCase(word.charAt(0))+"";
         String remaining = word.substring(1);

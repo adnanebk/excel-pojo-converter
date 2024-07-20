@@ -2,7 +2,7 @@ package com.adnanebk.excelcsvconverter.excelcsv.core.heplers;
 
 import com.adnanebk.excelcsvconverter.excelcsv.core.reflection.ReflectionHelper;
 import com.adnanebk.excelcsvconverter.excelcsv.core.rows_handlers.ExcelRowsHandler;
-import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
+import com.adnanebk.excelcsvconverter.excelcsv.exceptions.SheetValidationException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -11,8 +11,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -28,13 +28,15 @@ public class ExcelHelper<T> {
     }
 
     public static <T> ExcelHelper<T> create(Class<T> type) {
-        return create(type,null);
-    }
-    public static <T> ExcelHelper<T> create(Class<T> type,String[] headers) {
         var reflectionHelper = new ReflectionHelper<>(type);
         var rowsHandler = new ExcelRowsHandler<>(reflectionHelper);
-        return new ExcelHelper<>(rowsHandler,Optional.ofNullable(headers)
-                 .orElse(reflectionHelper.getHeaders().toArray(String[]::new)));
+        return new ExcelHelper<>(rowsHandler,reflectionHelper.getHeaders().toArray(String[]::new));
+    }
+    public static <T> ExcelHelper<T> create(Class<T> type, ColumnDefinition... columnsDefinitions){
+        var headers = Arrays.stream(columnsDefinitions).map(ColumnDefinition::getTitle);
+        var reflectionHelper = new ReflectionHelper<>(type, columnsDefinitions);
+        var rowsHandler = new ExcelRowsHandler<>(reflectionHelper);
+        return new ExcelHelper<>(rowsHandler,headers.toArray(String[]::new));
     }
 
 
@@ -60,7 +62,7 @@ public class ExcelHelper<T> {
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
-            throw new ExcelValidationException("fail to import data to Excel file: ");
+            throw new SheetValidationException("fail to import data to Excel file: ");
         }
     }
 

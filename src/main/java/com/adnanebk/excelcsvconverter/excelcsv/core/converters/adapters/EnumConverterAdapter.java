@@ -1,15 +1,17 @@
-package com.adnanebk.excelcsvconverter.excelcsv.core.converters;
+package com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters;
+
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.Converter;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.EnumConverter;
 
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EnumsConverter<T extends Enum<T>> implements Converter<T> {
-
+public class EnumConverterAdapter<T extends Enum<T>> implements Converter<T> {
     private final EnumMap<T,String> enumToCellValue;
     private final  Map<String,T> cellValueToEnum;
 
-    public EnumsConverter(Class<?> type,Map<?,String> map) {
+    public EnumConverterAdapter(Class<?> type, Map<?,String> map) {
         Class<T> enumType = (Class<T>) type;
        enumToCellValue = new EnumMap<>(enumType);
        cellValueToEnum = new HashMap<>();
@@ -21,6 +23,10 @@ public class EnumsConverter<T extends Enum<T>> implements Converter<T> {
             enumToCellValue.putIfAbsent(constant, constant.toString());
             cellValueToEnum.putIfAbsent(constant.toString(), constant);
         }
+    }
+
+    public EnumConverterAdapter(Class<?> type, EnumConverter<?> enumConverter) {
+        this(type,enumConverter.convert());
     }
 
 

@@ -11,9 +11,6 @@ import static com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserForma
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface SheetDefinition {
-    boolean includeAllFields() default false;
-
-    String[] titles() default {};
 
     String datePattern() default DEFAULT_DATE_PATTERN;
 

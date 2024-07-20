@@ -1,8 +1,6 @@
 package com.adnanebk.excelcsvconverter.excelcsv.models;
 
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellBoolean;
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,8 +25,7 @@ public class Product {
     @CellDefinition(value = 2,title = "Promotion price")
     private double promoPrice;
 
-    @CellDefinition(5)
-    @CellBoolean(trueValue = "yes",falseValue = "no")
+    @CellDefinition(value = 5,converter = BooleanConverter.class)
     private Boolean expired;
 
     @CellDefinition(3)
@@ -48,8 +45,7 @@ public class Product {
     @CellDefinition(9)
     private ZonedDateTime zonedDateTime;
 
-    @CellEnum(converter = CategoryConverter.class)
-    @CellDefinition(value = 10)
+    @CellDefinition(value = 10,enumConverter = CategoryConverter.class)
     private Category category;
 
     @CellDefinition(11)

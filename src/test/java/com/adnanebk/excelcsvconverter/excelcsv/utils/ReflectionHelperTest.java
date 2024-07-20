@@ -50,12 +50,11 @@ class ReflectionHelperTest {
         var product = reflectionHelper.createInstance();
         assertNotNull(product);
         assertEquals(0,product.getPrice());
-
     }
 
     @Test
     void getSheetInfo() {
-        var sheetInfo = reflectionHelper.getSheetInfo();
-        assertFalse(sheetInfo.isPresent());
+        var dateParserFormatter = reflectionHelper.getDateParserFormatter();
+        assertNotNull(dateParserFormatter);
     }
 }

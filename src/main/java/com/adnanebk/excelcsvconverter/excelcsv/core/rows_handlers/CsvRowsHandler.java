@@ -2,7 +2,7 @@ package com.adnanebk.excelcsvconverter.excelcsv.core.rows_handlers;
 
 import com.adnanebk.excelcsvconverter.excelcsv.core.reflection.ReflectionHelper;
 import com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter;
-import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
+import com.adnanebk.excelcsvconverter.excelcsv.exceptions.SheetValidationException;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -17,9 +17,7 @@ public class CsvRowsHandler<T> {
 
     public CsvRowsHandler(ReflectionHelper<T> reflectionHelper) {
         this.reflectionHelper = reflectionHelper;
-        this.dateParserFormatter = reflectionHelper.getSheetInfo()
-                .map(info->new DateParserFormatter(info.datePattern(),info.dateTimePattern()))
-                .orElseGet(DateParserFormatter::new);
+        this.dateParserFormatter = reflectionHelper.getDateParserFormatter();
 
     }
 
@@ -65,13 +63,13 @@ public class CsvRowsHandler<T> {
                 case "localdatetime" -> dateParserFormatter.parseToLocalDateTime(cellValue);
                 case "zoneddatetime" -> dateParserFormatter.parseToZonedDateTime(cellValue);
                 case "date" -> convertToDate(cellValue);
-                default -> throw new ExcelValidationException("Unsupported type: " + fieldType);
+                default -> throw new SheetValidationException("Unsupported type: " + fieldType);
             };
         } catch (DateTimeException e) {
-            throw new ExcelValidationException(String.format("Invalid or unsupported date pattern for the value %s", cellValue));
+            throw new SheetValidationException(String.format("Invalid or unsupported date pattern for the value %s", cellValue));
         }
         catch (RuntimeException ex){
-            throw new ExcelValidationException("Unexpected or Invalid cell value {"+cellValue+"}  ");
+            throw new SheetValidationException("Unexpected or Invalid cell value {"+cellValue+"}  ");
         }
     }
 

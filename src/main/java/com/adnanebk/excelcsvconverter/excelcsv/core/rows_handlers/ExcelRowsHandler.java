@@ -3,7 +3,7 @@ package com.adnanebk.excelcsvconverter.excelcsv.core.rows_handlers;
 import com.adnanebk.excelcsvconverter.excelcsv.core.reflection.ReflectedField;
 import com.adnanebk.excelcsvconverter.excelcsv.core.reflection.ReflectionHelper;
 import com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter;
-import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ExcelValidationException;
+import com.adnanebk.excelcsvconverter.excelcsv.exceptions.SheetValidationException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -20,9 +20,7 @@ public class ExcelRowsHandler<T> {
 
     public ExcelRowsHandler(ReflectionHelper<T> reflectionHelper) {
         this.reflectionHelper = reflectionHelper;
-        this.dateParserFormatter = reflectionHelper.getSheetInfo()
-                .map(info->new DateParserFormatter(info.datePattern(),info.dateTimePattern()))
-                .orElseGet(DateParserFormatter::new);
+        this.dateParserFormatter = reflectionHelper.getDateParserFormatter();
     }
 
     public void fillRowFromObject(Row row, T obj) {
@@ -54,12 +52,12 @@ public class ExcelRowsHandler<T> {
                     case "localdatetime" -> getAsLocalDateTime(cell);
                     case "zoneddatetime" -> getAsZonedDateTime(cell);
                     case "date" -> getAsDate(cell);
-                    default -> throw new ExcelValidationException("Unsupported field typeName " + reflectedField.getTypeName());
+                    default -> throw new SheetValidationException("Unsupported field typeName " + reflectedField.getTypeName());
                 };
             } catch (IllegalStateException | NumberFormatException e) {
-                throw new ExcelValidationException(String.format("Unexpected or Invalid cell value in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
+                throw new SheetValidationException(String.format("Unexpected or Invalid cell value in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
             } catch (DateTimeException e) {
-                throw new ExcelValidationException(String.format("Invalid or unsupported date pattern in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
+                throw new SheetValidationException(String.format("Invalid or unsupported date pattern in row %s, column %s", cell.getRowIndex() + 1, ALPHABET.charAt(cell.getColumnIndex())));
             }
     }
 
@@ -73,7 +71,7 @@ public class ExcelRowsHandler<T> {
             case "localdatetime" -> cell.setCellValue(dateParserFormatter.format((LocalDateTime) fieldValue));
             case "zoneddatetime" -> cell.setCellValue(dateParserFormatter.format((ZonedDateTime) fieldValue));
             case "date" -> cell.setCellValue(dateParserFormatter.format((Date) fieldValue));
-            default -> throw new ExcelValidationException("Unsupported field typeName");
+            default -> throw new SheetValidationException("Unsupported field typeName");
         }
     }
 
