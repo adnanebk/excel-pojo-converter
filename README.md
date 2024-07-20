@@ -30,7 +30,6 @@ public class Product {
     private long price;
 
     @CellDefinition(2)
-    @CellBoolean(trueValue = "yes",falseValue = "no")
     private boolean active;
 
     @CellDefinition(value = 3, title = "Promo price")
@@ -38,8 +37,7 @@ public class Product {
 
     // Additional fields...
 
-    @CellEnum(converter = CategoryConverter.class)
-    @CellDefinition(10)
+    @CellDefinition(10,enumConverter =  CategoryConverter.class)
     private Category category;
 
     @CellDefinition(11)
@@ -67,7 +65,7 @@ class NameConverter implements Converter<String> {
 
     @Override
     public String convertToFieldValue(String cellValue) {
-        return cellValue + " added";
+        return cellValue + " modified text";
     }
 }
 ```
@@ -77,12 +75,11 @@ we can also define the title of the cell, by default it will convert the camel c
 
 The @SheetDefinition annotation provides additional information like date formatting patterns that will be used during conversion of date field types.
 
-we make use of the @CellEnum annotation in the enum Category field, and we define a converter class that contains the conversions (by using a map) between the enum constants and the cell values in the excel/csv (by default the enum constants will be used as cell values).
+we make use of the enumConverter attribute that defines a converter class that contains the conversions (by using a map) between the enum constants and the cell values in the excel/csv (by default the enum constants will be used as cell values).
 
-we make use of the @CellBoolean annotation in the boolean active field,it has two arguments witch represents the converted cells values in the excel/csv file .
 
-We can also use a custom converter to convert a field value to its cell value, to do that we define
-the converter argument in the cellDefinition annotation like the example in the name field, or we can use the annotation @CellConverter(converter = MyConverter.class)  
+We can also use a custom converter to convert a field value to its cell value or the reverse, to do that we define
+the converter argument to de both conversions sides or toFieldConverter/toCellConverter to do one way conversion
 
 Now, let’s introduce a second version of our POJO class, ProductV2:
 ```
@@ -132,6 +129,30 @@ public class ExcelFieldsController {
     }
 }
 ```
+
+we have just seen one way to do the convesions by using annotations, we can also the programatic approch to do the same
+
+```
+    private  ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class, createColumnsDefinitions());
+
+    private  ColumnDefinition[] createColumnsDefinitions() {
+       return new ColumnDefinition[]{
+               new ColumnDefinition(0, "name", "Name"),
+               new ColumnDefinition(1, "price", "Price",(String e)->Long.parseLong(e)),
+               new ColumnDefinition(2, "promoPrice", "Promotion price"),
+               new ColumnDefinition(5, "expired", "Expired",new BooleanConverter()),
+               new ColumnDefinition(3, "minPrice", "Min price"),
+               new ColumnDefinition(4, "active", "Active"),
+               new ColumnDefinition(6, "unitsInStock", "Units in stock"),
+               new ColumnDefinition(7, "createdDate", "Created date"),
+               new ColumnDefinition(8, "updatedDate", "Updated date"),
+               new ColumnDefinition(9, "zonedDateTime", "Zoned date time"),
+               new ColumnDefinition(10, "category", "Category", ()->Map.of(Category.A,"aa", Category.B,"bb", Category.C,"cc"),Category.class),
+               new ColumnDefinition(11, "localDateTime", "Local date time")
+       };
+    }
+```
+
 the same applicable for converting csv files except we need to define the delimiter that will be used
 
     private final CsvHelper<ProductV2> csvHelper = CsvHelper.create(ProductV2.class,";");
