@@ -81,30 +81,6 @@ we make use of the enumConverter attribute that defines a converter class that c
 We can also use a custom converter to convert a field value to its cell value or the reverse, to do that we define
 the converter argument to de both conversions sides or toFieldConverter/toCellConverter to do one way conversion
 
-Now, let’s introduce a second version of our POJO class, ProductV2:
-```
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@SheetDefinition(includeAllFields = true,titles={"Name","Category","Date"})
-public class ProductV2 {
-
-    private String name;
-
-    // Additional fields...
-
-    private Category category;
-
-    @IgnoreCell
-    private LocalDateTime localDateTime;
-}
-```
-
-when includeAllFields argument set to true the fields are automatically included and mapped in the cells based on its declared order and ignoring fields that annotated with @IgnoreCell annotation,
-
-we can define the titles in the titles argument with the role that they must be in the same order as the fields.
-
 ## Converting Excel/csv to POJOs and vice versa
 ```
 @RestController
