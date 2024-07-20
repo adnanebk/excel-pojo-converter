@@ -3,6 +3,7 @@ package com.adnanebk.excelcsvconverter.excelcsv.core.heplers;
 
 import com.adnanebk.excelcsvconverter.excelcsv.core.reflection.ReflectionHelper;
 import com.adnanebk.excelcsvconverter.excelcsv.core.rows_handlers.CsvRowsHandler;
+import com.adnanebk.excelcsvconverter.excelcsv.exceptions.SheetValidationException;
 import com.opencsv.CSVWriter;
 import com.opencsv.ICSVWriter;
 
@@ -48,7 +49,7 @@ public class CsvHelper<T> {
                     .map(row -> this.rowsHandler.convertToObject(row,delimiter,QUOTE_CHARACTER));
     }
 
-    public ByteArrayInputStream toCsv(List<T> list) throws IOException {
+    public ByteArrayInputStream toCsv(List<T> list) {
         StringWriter stringWriter=new StringWriter();
         try(CSVWriter csvWriter = new CSVWriter(stringWriter, delimiter.charAt(0), QUOTE_CHARACTER, ESCAPE_CHARACTER, LINE_END)) {
             List<String[]> data = new LinkedList<>();
@@ -58,6 +59,8 @@ public class CsvHelper<T> {
             }
             csvWriter.writeAll(data);
             return new ByteArrayInputStream(stringWriter.toString().getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new SheetValidationException(e.getMessage());
         }
     }
 
