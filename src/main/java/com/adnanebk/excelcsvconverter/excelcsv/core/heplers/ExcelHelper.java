@@ -40,13 +40,15 @@ public class ExcelHelper<T> {
     }
 
 
-    public Stream<T> toStream(InputStream inputStream) throws IOException {
+    public Stream<T> toStream(InputStream inputStream){
         try (Workbook workbook = new XSSFWorkbook(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             return StreamSupport.stream(sheet.spliterator(), false)
                     .filter(this::hasAnyCell)
                     .skip(1)
                     .map(rowsHandler::convertToObject);
+        } catch (Exception ex){
+            throw new SheetValidationException(ex.getMessage());
         }
     }
 
