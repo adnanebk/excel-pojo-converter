@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.adnanebk</groupId>
 	<artifactId>excel-csv-converter</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<name>excel-csv-converter</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
@@ -73,6 +73,11 @@
 			<name>adnanebk</name>
 			<url>https://maven.pkg.github.com/adnanebk/excel-csv-pojo-converter</url>
 		</repository>
+		<snapshotRepository>
+			<id>github</id>
+			<name>adnanebk</name>
+			<url>https://maven.pkg.github.com/adnanebk/excel-csv-pojo-converter</url>
+		</snapshotRepository>
 	</distributionManagement>
 
 	<profiles>
