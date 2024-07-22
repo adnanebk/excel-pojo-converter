@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.adnanebk</groupId>
 	<artifactId>excel-csv-converter</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0-SNAPSHOT</version>
 	<name>excel-csv-converter</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.5</version>
+			<version>5.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.opencsv</groupId>
@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>6.0.6</version>
+			<version>6.0.11</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
