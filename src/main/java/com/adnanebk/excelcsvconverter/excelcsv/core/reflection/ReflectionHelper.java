@@ -8,7 +8,7 @@ import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.BooleanC
 import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.EnumConverterAdapter;
 import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.ToCellConverterAdapter;
 import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.ToFieldConverterAdapter;
-import com.adnanebk.excelcsvconverter.excelcsv.core.heplers.ColumnDefinition;
+import com.adnanebk.excelcsvconverter.excelcsv.core.ColumnDefinition;
 import com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
 

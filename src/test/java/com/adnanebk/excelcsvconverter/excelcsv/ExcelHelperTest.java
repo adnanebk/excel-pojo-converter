@@ -1,8 +1,8 @@
 package com.adnanebk.excelcsvconverter.excelcsv;
 
 import com.adnanebk.excelcsvconverter.excelcsv.core.converters.ToCellConverter;
-import com.adnanebk.excelcsvconverter.excelcsv.core.heplers.ColumnDefinition;
-import com.adnanebk.excelcsvconverter.excelcsv.core.heplers.ExcelHelper;
+import com.adnanebk.excelcsvconverter.excelcsv.core.ColumnDefinition;
+import com.adnanebk.excelcsvconverter.excelcsv.core.excelpojoconverter.ExcelHelper;
 import com.adnanebk.excelcsvconverter.excelcsv.models.BooleanConverter;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Category;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Product;

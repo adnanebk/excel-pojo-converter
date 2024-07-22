@@ -1,6 +1,6 @@
 package com.adnanebk.excelcsvconverter.excelcsv;
 
-import com.adnanebk.excelcsvconverter.excelcsv.core.heplers.CsvHelper;
+import com.adnanebk.excelcsvconverter.excelcsv.core.csvpojoconverter.CsvHelper;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Category;
 import com.adnanebk.excelcsvconverter.excelcsv.models.Product;
 import org.junit.jupiter.api.*;
