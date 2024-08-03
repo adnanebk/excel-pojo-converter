@@ -1,13 +1,13 @@
-package com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters;
+package com.adnanebk.excelcsvconverter.excelcsv.core.converters.implementations;
 
 import com.adnanebk.excelcsvconverter.excelcsv.core.converters.Converter;
 import com.adnanebk.excelcsvconverter.excelcsv.core.converters.ToCellConverter;
 
-public class ToCellConverterAdapter<T>  implements Converter<T> {
+public class ToCellConverterImp<T>  implements Converter<T> {
 
     private final ToCellConverter<T> toCellConverter;
 
-    public ToCellConverterAdapter(ToCellConverter<T> toCellConverter) {
+    public ToCellConverterImp(ToCellConverter<T> toCellConverter) {
         this.toCellConverter = toCellConverter;
     }
 

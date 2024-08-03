@@ -12,8 +12,6 @@ import java.util.List;
 public class DateParserFormatter {
 
 
-    public static  final String DEFAULT_DATE_TIME_PATTERN="dd/MM/yyyy HH:mm";
-    public static  final String DEFAULT_DATE_PATTERN="dd/MM/yyyy";
     private static final List<String> DATE_TIME_PATTERNS = new ArrayList<>();
     private static final List<String> DATE_PATTERNS = new ArrayList<>();
     private final SimpleDateFormat dateFormatter;
@@ -21,12 +19,20 @@ public class DateParserFormatter {
     private DateTimeFormatter localedDateTimeFormatter;
 
     public DateParserFormatter(String datePattern, String dateTimePattern) {
-        this.dateFormatter = new SimpleDateFormat(dateTimePattern);
-        localedDateFormatter = DateTimeFormatter.ofPattern(datePattern);
-        localedDateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern);
+        if(dateTimePattern!=null && !dateTimePattern.isEmpty()){
+            this.dateFormatter = new SimpleDateFormat(dateTimePattern);
+            this.localedDateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern);
+        }
+        else {
+            this.dateFormatter = new SimpleDateFormat();
+            this.localedDateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+        }
+         localedDateFormatter =(datePattern!=null && !datePattern.isEmpty())? DateTimeFormatter.ofPattern(datePattern)
+                               : DateTimeFormatter.ISO_LOCAL_DATE;
     }
-    public DateParserFormatter(){
-        this(DEFAULT_DATE_PATTERN,DEFAULT_DATE_TIME_PATTERN);
+
+    public DateParserFormatter() {
+        this(null,null);
     }
 
     static {

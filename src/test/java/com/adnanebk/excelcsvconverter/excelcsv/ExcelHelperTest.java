@@ -29,8 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter.DEFAULT_DATE_PATTERN;
-import static com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter.DEFAULT_DATE_TIME_PATTERN;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -107,11 +106,11 @@ class ExcelHelperTest {
                 assertEquals("true", row.getCell(4).getStringCellValue());
                 assertEquals("Yes", row.getCell(5).getStringCellValue());
                 assertEquals((double) product.getUnitsInStock(), row.getCell(6).getNumericCellValue());
-                assertEquals(new SimpleDateFormat(DEFAULT_DATE_TIME_PATTERN).format(product.getCreatedDate()), row.getCell(7).getStringCellValue());
-                assertEquals(DateTimeFormatter.ofPattern(DEFAULT_DATE_PATTERN).format(product.getUpdatedDate()), row.getCell(8).getStringCellValue());
-                assertEquals(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_PATTERN).format(product.getZonedDateTime()), row.getCell(9).getStringCellValue());
+                assertEquals(new SimpleDateFormat().format(product.getCreatedDate()), row.getCell(7).getStringCellValue());
+                assertEquals(DateTimeFormatter.ISO_LOCAL_DATE.format(product.getUpdatedDate()), row.getCell(8).getStringCellValue());
+                assertEquals(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(product.getZonedDateTime()), row.getCell(9).getStringCellValue());
                 assertEquals("bb", row.getCell(10).getStringCellValue());
-                assertEquals(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_PATTERN).format(product.getLocalDateTime()), row.getCell(11).getStringCellValue());
+                assertEquals(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(product.getLocalDateTime()), row.getCell(11).getStringCellValue());
         } catch (IOException e) {
             fail("Error reading Excel file: " + e.getMessage());
         }
@@ -146,7 +145,7 @@ class ExcelHelperTest {
             assertFalse(result.get(1).getExpired());
             assertEquals(30, result.get(1).getUnitsInStock());
             assertNotNull(result.get(1).getCreatedDate()); // Assuming it's not null in the Excel file
-            assertTrue(LocalDate.now().isEqual(result.get(1).getUpdatedDate())); // Assuming it's not null in the Excel file
+            assertEquals(LocalDate.now(),result.get(1).getUpdatedDate()); // Assuming it's not null in the Excel file
             assertNotNull(result.get(1).getZonedDateTime()); // Assuming it's not null in the Excel file
             assertSame(Category.B, result.get(1).getCategory()); // Assuming it's not null in the Excel file
         }

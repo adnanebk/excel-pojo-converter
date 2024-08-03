@@ -1,12 +1,10 @@
 package com.adnanebk.excelcsvconverter.excelcsv.core;
 
 import com.adnanebk.excelcsvconverter.excelcsv.core.converters.*;
-import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.BooleanConverterAdapter;
-import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.EnumConverterAdapter;
-import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.ToCellConverterAdapter;
-import com.adnanebk.excelcsvconverter.excelcsv.core.converters.adapters.ToFieldConverterAdapter;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.implementations.EnumConverterImp;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.implementations.ToCellConverterImp;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.implementations.ToFieldConverterImp;
 
-import java.util.HashMap;
 
 public class ColumnDefinition {
 
@@ -31,21 +29,21 @@ public class ColumnDefinition {
         this.columnIndex = columnIndex;
         this.fieldName = fieldName;
         this.title = title;
-        this.converter = new ToFieldConverterAdapter<>(converter);
+        this.converter = new ToFieldConverterImp<>(converter);
     }
 
     public ColumnDefinition(int columnIndex, String fieldName, String title, ToCellConverter<?> converter) {
         this.columnIndex = columnIndex;
         this.fieldName = fieldName;
         this.title = title;
-        this.converter = new ToCellConverterAdapter<>(converter);
+        this.converter = new ToCellConverterImp<>(converter);
     }
 
     public ColumnDefinition(int columnIndex, String fieldName, String title, EnumConverter<? extends Enum<?>> converter, Class<? extends Enum<?>> classType) {
         this.columnIndex = columnIndex;
         this.fieldName = fieldName;
         this.title = title;
-        this.converter = new EnumConverterAdapter<>(classType,converter);
+        this.converter = new EnumConverterImp<>(classType,converter);
     }
 
 
@@ -81,11 +79,5 @@ public class ColumnDefinition {
         this.converter = converter;
     }
 
-    public void setConverterIfNotExist(Class<?> classType) {
-        if(converter==null && classType.isEnum())
-            this.converter = new EnumConverterAdapter<>(classType,new HashMap<>());
-        else if(converter==null && classType.equals(Boolean.class) || classType.equals(boolean.class))
-            this.converter = new BooleanConverterAdapter();
 
-    }
 }

@@ -2,6 +2,23 @@
 
 Converting Excel or CSV files into Java objects (POJOs) and vice versa can be a complex process, this is why i have created a java library that handles both excel and csv conversions to pojo objects in both directions (read and wrire ) by leveraguling Java reflection.
 
+## Required dependencies
+to use this library you have to add these dependencies, or only one of them and remove the folder that is responsible for other conversion type (csvpojoconverter or excelpojoconverter)
+
+```
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.3.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.9</version>
+		</dependency>
+```
+
 ## Understanding the POJO Class
 
 Before we dive into the library, let’s take a close look at a sample Java class that serves as our data model:

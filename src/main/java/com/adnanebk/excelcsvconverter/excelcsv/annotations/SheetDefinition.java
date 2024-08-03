@@ -5,16 +5,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter.DEFAULT_DATE_PATTERN;
-import static com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter.DEFAULT_DATE_TIME_PATTERN;
-
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface SheetDefinition {
 
-    String datePattern() default DEFAULT_DATE_PATTERN;
+    String datePattern() default "";
 
-    String dateTimePattern() default DEFAULT_DATE_TIME_PATTERN;
+    String dateTimePattern() default "";
 
 
 

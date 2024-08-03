@@ -24,30 +24,31 @@ public class ExcelHelper<T> {
 
     private ExcelHelper(ExcelRowsHandler<T> rowsHandler, String[] headers) {
         this.rowsHandler = rowsHandler;
-        this.headers= headers;
+        this.headers = headers;
     }
 
     public static <T> ExcelHelper<T> create(Class<T> type) {
         var reflectionHelper = new ReflectionHelper<>(type);
         var rowsHandler = new ExcelRowsHandler<>(reflectionHelper);
-        return new ExcelHelper<>(rowsHandler,reflectionHelper.getHeaders().toArray(String[]::new));
+        return new ExcelHelper<>(rowsHandler, reflectionHelper.getHeaders().toArray(String[]::new));
     }
-    public static <T> ExcelHelper<T> create(Class<T> type, ColumnDefinition... columnsDefinitions){
+
+    public static <T> ExcelHelper<T> create(Class<T> type, ColumnDefinition... columnsDefinitions) {
         var headers = Arrays.stream(columnsDefinitions).map(ColumnDefinition::getTitle);
         var reflectionHelper = new ReflectionHelper<>(type, columnsDefinitions);
         var rowsHandler = new ExcelRowsHandler<>(reflectionHelper);
-        return new ExcelHelper<>(rowsHandler,headers.toArray(String[]::new));
+        return new ExcelHelper<>(rowsHandler, headers.toArray(String[]::new));
     }
 
 
-    public Stream<T> toStream(InputStream inputStream){
+    public Stream<T> toStream(InputStream inputStream) {
         try (Workbook workbook = new XSSFWorkbook(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             return StreamSupport.stream(sheet.spliterator(), false)
                     .filter(this::hasAnyCell)
                     .skip(1)
                     .map(rowsHandler::convertToObject);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             throw new SheetValidationException(ex.getMessage());
         }
     }
@@ -58,7 +59,7 @@ public class ExcelHelper<T> {
             Sheet sheet = workbook.createSheet();
             createHeaders(sheet, workbook);
             for (int i = 0; i < list.size(); i++) {
-                this.rowsHandler.fillRowFromObject(sheet.createRow(i+1), list.get(i));
+                this.rowsHandler.fillRowFromObject(sheet.createRow(i + 1), list.get(i));
             }
             autoSizeColumns(sheet);
             workbook.write(out);
@@ -84,9 +85,11 @@ public class ExcelHelper<T> {
             cell.setCellStyle(headerStyle);
         }
     }
+
     private boolean hasAnyCell(Row currentRow) {
         return currentRow.getPhysicalNumberOfCells() > 0;
     }
+
     private void autoSizeColumns(Sheet sheet) {
         for (int i = 0; i < sheet.getLastRowNum(); i++)
             sheet.autoSizeColumn(i);

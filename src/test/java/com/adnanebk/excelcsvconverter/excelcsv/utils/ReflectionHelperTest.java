@@ -21,12 +21,12 @@ class ReflectionHelperTest {
         Assertions.assertEquals("string",fields.get(0).getTypeName());
 
         Assertions.assertEquals(1,fields.get(1).getCellIndex());
-        Assertions.assertEquals("long",fields.get(1).getTypeName());
+        Assertions.assertEquals("number",fields.get(1).getTypeName());
 
         Assertions.assertEquals(2,fields.get(2).getCellIndex());
-        Assertions.assertEquals("double",fields.get(2).getTypeName());
+        Assertions.assertEquals("number",fields.get(2).getTypeName());
 
-        Assertions.assertEquals("double",fields.get(3).getTypeName());
+        Assertions.assertEquals("number",fields.get(3).getTypeName());
 
         Assertions.assertEquals("boolean",fields.get(4).getTypeName());
 
