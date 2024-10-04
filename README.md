@@ -54,14 +54,11 @@ public class Product {
 }
 
 public class CategoryConverter implements EnumConverter<Category> {
-    Map<Category,String> map =  Map.of(Category.A,"aa",
-            Category.B,"bb",
-            Category.C,"cc"
-    );
+
     
     @Override
     public Map<Category, String> convert() {
-        return map;
+        return Map.of(Category.A,"aa", Category.B,"bb",Category.C,"cc");
     }
 }
 class NameConverter implements Converter<String> {
@@ -77,17 +74,17 @@ class NameConverter implements Converter<String> {
     }
 }
 ```
-This Product class is annotated with various annotations that play a crucial role in the conversion process. Each field is annotated with @CellDefinition, indicating its position in the Excel or CSV file.
+This Product class is annotated with various annotations that play a crucial role in the conversion process. Each field is annotated with @CellDefinition, indicating its cell position in the Excel or CSV file.
 
 we can also define the title of the cell, by default it will convert the camel case name of the field to a name with spaces (ex: firstName=>First name)
 
 The @SheetDefinition annotation provides additional information like date formatting patterns that will be used during conversion of date field types.
 
-we make use of the enumConverter attribute that defines a converter class that contains the conversions (by using a map) between the enum constants and the cell values in the excel/csv (by default the enum constants will be used as cell values).
+we used the enumConverter attribute to define a converter class that contains the conversions (by using a map) between the enum constants and the cell values in the excel/csv (by default the enum constants will be used as cell values).
 
 
-We can also use a custom converter to convert a field value to its cell value or the reverse, to do that we define
-the converter argument to de both conversions sides or toFieldConverter/toCellConverter to do one way conversion
+We can also use a custom converter to convert a field value to its cell value or the reverse, to do that we can define
+argument 'converter' to de both conversion sides or the arguments 'toFieldConverter', 'toCellConverter' to do one way of the conversion
 
 ## Converting Excel/csv to POJOs and vice versa
 ```
@@ -114,7 +111,7 @@ public class ExcelFieldsController {
 }
 ```
 
-we have just seen one way to do the convesions by using annotations, we can also the programatic approch to do the same
+we have just seen one way to do the convesions by using annotations, we can also use the programatic approch to do the same
 
 ```
     private  ExcelHelper<Product> excelHelper = ExcelHelper.create(Product.class, createColumnsDefinitions());
