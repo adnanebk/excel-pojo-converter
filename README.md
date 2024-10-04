@@ -83,8 +83,8 @@ The @SheetDefinition annotation provides additional information like date format
 we used the enumConverter attribute to define a converter class that contains the conversions (by using a map) between the enum constants and the cell values in the excel/csv (by default the enum constants will be used as cell values).
 
 
-We can also use a custom converter to convert a field value to its cell value or the reverse, to do that we can define
-argument 'converter' to de both conversion sides or the arguments 'toFieldConverter', 'toCellConverter' to do one way of the conversion
+We can also use a custom converter to convert a field value to its cell value or the reverse, to do that we can define the
+argument 'converter' to do both conversion sides or the arguments 'toFieldConverter', 'toCellConverter' to do one way of the conversion
 
 ## Converting Excel/csv to POJOs and vice versa
 ```
