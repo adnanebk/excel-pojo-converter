@@ -16,7 +16,7 @@ public class EnumConverterImp<T extends Enum<T>> implements Converter<T> {
         if(!type.isEnum())
             throw new ConverterException("Can't convert " + type + " to Enum");
         Class<T> enumType = (Class<T>) type;
-        enumToCellValue = new EnumMap<>(enumType);
+       enumToCellValue = new EnumMap<>(enumType);
        cellValueToEnum = new HashMap<>();
         for(var entry : map.entrySet()){
             enumToCellValue.put(enumType.cast(entry.getKey()),entry.getValue());

@@ -2,11 +2,9 @@ package com.adnanebk.excelcsvconverter.excelcsv.core.reflection;
 
 
 import com.adnanebk.excelcsvconverter.excelcsv.annotations.CellDefinition;
-import com.adnanebk.excelcsvconverter.excelcsv.annotations.SheetDefinition;
-import com.adnanebk.excelcsvconverter.excelcsv.core.converters.*;
-import com.adnanebk.excelcsvconverter.excelcsv.core.converters.implementations.*;
 import com.adnanebk.excelcsvconverter.excelcsv.core.ColumnDefinition;
-import com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.Converter;
+import com.adnanebk.excelcsvconverter.excelcsv.core.converters.implementations.*;
 import com.adnanebk.excelcsvconverter.excelcsv.exceptions.ReflectionException;
 
 import java.lang.reflect.Constructor;
@@ -22,20 +20,17 @@ public class ReflectionHelper<T> {
     private final List<String> headers = new ArrayList<>();
     private final Class<T> classType;
     private final Constructor<T> defaultConstructor;
-    private final DateParserFormatter dateParserFormatter;
 
     public ReflectionHelper(Class<T> type) {
         classType = type;
         defaultConstructor = getDefaultConstructor();
-        this.dateParserFormatter = this.getDateParserFormatter();
         this.setFieldsAndTitles();
     }
 
     public ReflectionHelper(Class<T> type, ColumnDefinition[] columnsDefinitions) {
         classType = type;
         defaultConstructor = getDefaultConstructor();
-        this.dateParserFormatter = this.getDateParserFormatter();
-        Arrays.sort(columnsDefinitions, Comparator.comparing(ColumnDefinition::getColumnIndex));
+        Arrays.sort(columnsDefinitions,Comparator.comparing(ColumnDefinition::getColumnIndex));
         for (ColumnDefinition op : columnsDefinitions) {
             try {
                 Field field = type.getDeclaredField(op.getFieldName());
@@ -44,7 +39,7 @@ public class ReflectionHelper<T> {
                 fields.add(new ReflectedField<>(field, op.getConverter(), op.getColumnIndex()));
                 headers.add(op.getTitle());
             } catch (NoSuchFieldException e) {
-                throw new ReflectionException("the specified field name {" + op.getFieldName() + "} is not found");
+                throw new ReflectionException("the specified field name '" + op.getFieldName() + "' is not found in the class '"+classType.getSimpleName()+"'");
             }
         }
     }
@@ -63,12 +58,6 @@ public class ReflectionHelper<T> {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new ReflectionException(e.getMessage());
         }
-    }
-
-    public DateParserFormatter getDateParserFormatter() {
-        return Optional.ofNullable(classType.getAnnotation(SheetDefinition.class))
-                .map(info -> new DateParserFormatter(info.datePattern(), info.dateTimePattern()))
-                .orElseGet(DateParserFormatter::new);
     }
 
     private Constructor<T> getDefaultConstructor() {
@@ -99,10 +88,10 @@ public class ReflectionHelper<T> {
                 return null;
             if (!cellDefinition.converter().isInterface())
                 return cellDefinition.converter().getDeclaredConstructor().newInstance();
-            if (!cellDefinition.toCellConverter().isInterface())
-                return new ToCellConverterImp<>(cellDefinition.toCellConverter().getDeclaredConstructor().newInstance());
-            if (!cellDefinition.toFieldConverter().isInterface())
-                return new ToFieldConverterImp<>(cellDefinition.toFieldConverter().getDeclaredConstructor().newInstance());
+            if (!cellDefinition.fieldConverter().isInterface())
+                return new FieldConverterImp<>(cellDefinition.fieldConverter().getDeclaredConstructor().newInstance());
+            if (!cellDefinition.cellConverter().isInterface())
+                return new CellConverterImp<>(cellDefinition.cellConverter().getDeclaredConstructor().newInstance());
             if (!cellDefinition.enumConverter().isInterface())
                 return new EnumConverterImp<>(field.getType(),
                         cellDefinition.enumConverter().getDeclaredConstructor().newInstance());
@@ -120,16 +109,16 @@ public class ReflectionHelper<T> {
             return new EnumConverterImp<>(field.getType(), new HashMap<>());
 
         if (field.getType().equals(Date.class)) {
-            return new DateConverter(dateParserFormatter);
+            return new DateConverter();
         }
         if (field.getType().equals(LocalDate.class)) {
-            return new LocalDateConverter(dateParserFormatter);
+            return new LocalDateConverter();
         }
         if (field.getType().equals(LocalDateTime.class)) {
-            return new LocalDateTimeConverter(dateParserFormatter);
+            return new LocalDateTimeConverter();
         }
         if (field.getType().equals(ZonedDateTime.class)) {
-            return new ZonedDateConverter(dateParserFormatter);
+            return new ZonedDateConverter();
         }
         if (field.getType().equals(Integer.class) || field.getType().equals(int.class)) {
             return new IntegerConverter();

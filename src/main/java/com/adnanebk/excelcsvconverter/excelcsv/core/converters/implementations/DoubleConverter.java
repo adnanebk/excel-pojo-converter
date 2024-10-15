@@ -7,7 +7,7 @@ public class DoubleConverter implements Converter<Double> {
 
     @Override
     public Double convertToFieldValue(String cellValue) {
-        return Double.parseDouble(cellValue);
+        return Double.parseDouble(cellValue.replace(",","."));
     }
 
     @Override

@@ -1,25 +1,23 @@
 package com.adnanebk.excelcsvconverter.excelcsv.core.converters.implementations;
 
 import com.adnanebk.excelcsvconverter.excelcsv.core.converters.Converter;
-import com.adnanebk.excelcsvconverter.excelcsv.core.utils.DateParserFormatter;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 public class LocalDateTimeConverter implements Converter<LocalDateTime> {
 
-    private final DateParserFormatter dateParserFormatter;
+    private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    public LocalDateTimeConverter(DateParserFormatter dateParserFormatter) {
-        this.dateParserFormatter = dateParserFormatter;
-    }
 
     @Override
     public LocalDateTime convertToFieldValue(String cellValue) {
-        return dateParserFormatter.parseToLocalDateTime(cellValue);
+        return LocalDateTime.parse(cellValue,FORMATTER);
     }
 
     @Override
     public String convertToCellValue(LocalDateTime fieldValue) {
-        return dateParserFormatter.format(fieldValue);
+        return FORMATTER.format(fieldValue);
     }
 }
