@@ -35,18 +35,18 @@ class CsvHelperTest {
      static void setUp() {
         csvHelper = CsvHelper.create(Product.class, ";");
         csvHelper2 = CsvHelper.create(Product.class, ";",
-                ColumnDefinition.create(0, "name", "Name"),
-                ColumnDefinition.createWithCellConverter(1, "price", "Price", Long::parseLong),
-                ColumnDefinition.create(2, "promoPrice", "Promotion price"),
-                ColumnDefinition.create(5, "expired", "Expired",new BooleanConverter()),
-                ColumnDefinition.create(3, "minPrice", "Min price"),
-                ColumnDefinition.create(4, "active", "Active"),
-                ColumnDefinition.create(6, "unitsInStock", "Units in stock"),
-                ColumnDefinition.create(7, "createdDate", "Created date"),
-                ColumnDefinition.create(8, "updatedDate", "Updated date"),
-                ColumnDefinition.create(9, "zonedDateTime", "Zoned date time"),
-                ColumnDefinition.create(10, "category", "Category", ()->Map.of(Category.A,"aa", Category.B,"bb", Category.C,"cc"),Category.class),
-                ColumnDefinition.create(11, "localDateTime", "Local date time")
+                ColumnDefinition.with(0, "name", "Name"),
+                ColumnDefinition.withCellConverter(1, "price", "Price",  long.class, Long::parseLong),
+                ColumnDefinition.with(2, "promoPrice", "Promotion price"),
+                ColumnDefinition.withConverter(5, "expired", "Expired",Boolean.class,new BooleanConverter()),
+                ColumnDefinition.with(3, "minPrice", "Min price"),
+                ColumnDefinition.with(4, "active", "Active"),
+                ColumnDefinition.with(6, "unitsInStock", "Units in stock"),
+                ColumnDefinition.with(7, "createdDate", "Created date"),
+                ColumnDefinition.with(8, "updatedDate", "Updated date"),
+                ColumnDefinition.with(9, "zonedDateTime", "Zoned date time"),
+                ColumnDefinition.withEnumConverter(10, "category", "Category",Category.class,()->Map.of(Category.A,"aa", Category.B,"bb", Category.C,"cc")),
+                ColumnDefinition.with(11, "localDateTime", "Local date time")
         );
     }
 

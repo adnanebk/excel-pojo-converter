@@ -36,7 +36,7 @@ public class CsvHelper<T> {
         return new CsvHelper<>(reflectionHelper,delimiter, reflectionHelper.getHeaders().toArray(String[]::new));
     }
 
-    public static <T> CsvHelper<T> create(Class<T> type, String delimiter, ColumnDefinition... columnsDefinitions) {
+    public static <T> CsvHelper<T> create(Class<T> type, String delimiter, ColumnDefinition<?>... columnsDefinitions) {
         var headers = Arrays.stream(columnsDefinitions).map(ColumnDefinition::getTitle);
         var reflectionHelper = new ReflectionHelper<>(type, columnsDefinitions);
         return new CsvHelper<>(reflectionHelper, delimiter, headers.toArray(String[]::new));
@@ -71,9 +71,9 @@ public class CsvHelper<T> {
                 if(!cellValue.isEmpty())
                     field.setValue(cellValue, obj);
             } catch (IllegalArgumentException e) {
-                throw new SheetValidationException(String.format("Cannot convert the cell value %s to number", cellValue));
+                throw new SheetValidationException(String.format("Cannot convert the cell value %s to the field %s", cellValue,field.getName()));
             } catch (DateTimeException e) {
-                throw new SheetValidationException(String.format("Invalid or unsupported date pattern for cell value : %s ,you should create a converter", cellValue));
+                throw new SheetValidationException(String.format("Invalid or unsupported date pattern for cell value : %s ,you should create a converter for the field %s", cellValue,field.getName()));
             }
         }
         return obj;

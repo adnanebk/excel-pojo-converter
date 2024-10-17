@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 public class ZonedDateConverter implements Converter<ZonedDateTime> {
 
-    private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_ZONED_DATE_TIME;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
 
     @Override

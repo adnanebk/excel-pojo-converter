@@ -39,18 +39,18 @@ class ExcelHelperTest {
     static void setUp() {
         excelHelper2 = ExcelHelper.create(Product.class);
         excelHelper = ExcelHelper.create(Product.class,
-                ColumnDefinition.create(0, "name", "Name"),
-                ColumnDefinition.createWithCellConverter(1, "price", "Price", Long::parseLong),
-                ColumnDefinition.create(2, "promoPrice", "Promotion price"),
-                ColumnDefinition.create(5, "expired", "Expired",new BooleanConverter()),
-                ColumnDefinition.create(3, "minPrice", "Min price"),
-                ColumnDefinition.create(4, "active", "Active"),
-                ColumnDefinition.create(6, "unitsInStock", "Units in stock"),
-                ColumnDefinition.create(7, "createdDate", "Created date"),
-                ColumnDefinition.create(8, "updatedDate", "Updated date"),
-                ColumnDefinition.create(9, "zonedDateTime", "Zoned date time"),
-                ColumnDefinition.create(10, "category", "Category", ()->Map.of(Category.A,"aa", Category.B,"bb", Category.C,"cc"),Category.class),
-                ColumnDefinition.create(11, "localDateTime", "Local date time")
+                ColumnDefinition.with(0, "name", "Name"),
+                ColumnDefinition.withCellConverter(1, "price", "Price", long.class, Long::parseLong),
+                ColumnDefinition.with(2, "promoPrice", "Promotion price"),
+                ColumnDefinition.withConverter(5, "expired", "Expired",Boolean.class,new BooleanConverter()),
+                ColumnDefinition.with(3, "minPrice", "Min price"),
+                ColumnDefinition.with(4, "active", "Active"),
+                ColumnDefinition.with(6, "unitsInStock", "Units in stock"),
+                ColumnDefinition.with(7, "createdDate", "Created date"),
+                ColumnDefinition.with(8, "updatedDate", "Updated date"),
+                ColumnDefinition.with(9, "zonedDateTime", "Zoned date time"),
+                ColumnDefinition.withEnumConverter(10, "category", "Category",Category.class,()->Map.of(Category.A,"aa", Category.B,"bb", Category.C,"cc")),
+                ColumnDefinition.with(11, "localDateTime", "Local date time")
         );
     }
 
@@ -145,19 +145,38 @@ class ExcelHelperTest {
             assertSame(Category.B, result.get(1).getCategory()); // Assuming it's not null in the Excel file
         }
     }
+
+    @Test
+    void test_field_converter() throws IOException {
+        String destinationPath = "src/test/resources/products3.xlsx";
+        var helper = ExcelHelper.create(Product.class , ColumnDefinition.withFieldConverter(1,"name","Name",String.class,name->name+"..."));
+
+        try (ByteArrayInputStream excelBytes = helper.toExcel(getProducts());
+             Workbook workbook = new XSSFWorkbook(excelBytes);
+             FileOutputStream outputStream = new FileOutputStream(destinationPath)
+        ) {
+            workbook.write(outputStream);
+            Sheet sheet = workbook.getSheetAt(0);
+            assertEquals("Product A...", sheet.getRow(1).getCell(0).getStringCellValue());
+        }
+
+    }
     @Test
     void throw_field_not_found_exception(){
-       Assertions.assertThrows(ReflectionException.class,()->ExcelHelper.create(Product.class, ColumnDefinition.create(0,"namee","Name"))
-       );
+       Assertions.assertThrows(ReflectionException.class,()->ExcelHelper.create(Product.class, ColumnDefinition.with(0,"namee","Name")));
     }
     @Test
     void throw_invalid_value_exception() throws IOException {
         String destinationPath = "src/test/resources/products3.xlsx";
-        var helper = ExcelHelper.create(Product.class , ColumnDefinition.create(1,"name","Name"));
+        var helper = ExcelHelper.create(Product.class , ColumnDefinition.with(1,"name","Name"));
         try (InputStream inputStream = Files.newInputStream(new File(destinationPath).toPath())) {
             Assertions.assertThrows(SheetValidationException.class,()-> helper.toStream(inputStream).toList());
         }
 
+    }
+    @Test
+    void throw_invalid_type_exception() {
+        Assertions.assertThrows(ReflectionException.class,()->ExcelHelper.create(Product.class, ColumnDefinition.withCellConverter(1, "price", "Price", int.class, Integer::parseInt)));
     }
 public static Stream<ExcelHelper<Product>> getAllHelpers(){
         return Stream.of(excelHelper,excelHelper2);

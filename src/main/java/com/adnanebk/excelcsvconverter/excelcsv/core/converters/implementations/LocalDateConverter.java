@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 public class LocalDateConverter implements Converter<LocalDate> {
 
-    private final static DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
 
     @Override

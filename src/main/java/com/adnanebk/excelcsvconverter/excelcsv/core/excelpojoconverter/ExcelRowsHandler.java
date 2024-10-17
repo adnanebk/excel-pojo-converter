@@ -45,9 +45,9 @@ public class ExcelRowsHandler<T> {
                 if(!cell.getCellType().equals(CellType.BLANK))
                   field.setValue(getCellValue(field, cell), obj);
             } catch (IllegalStateException | NumberFormatException e) {
-                throw new SheetValidationException(String.format("Unexpected or Invalid cell value in row %s, column %s", row.getRowNum() + 1, ALPHABET.charAt(field.getCellIndex())));
+                throw new SheetValidationException(String.format("Cannot convert the cell value in row %s, column %s to the field %s", row.getRowNum() + 1, ALPHABET.charAt(field.getCellIndex()),field.getName()));
             } catch (DateTimeException e) {
-                throw new SheetValidationException(String.format("Invalid or unsupported date pattern in row %s, column %s", row.getRowNum() + 1, ALPHABET.charAt(field.getCellIndex())));
+                throw new SheetValidationException(String.format("Invalid or unsupported date pattern in row %s, column %s for the field %s", row.getRowNum() + 1, ALPHABET.charAt(field.getCellIndex()),field.getName()));
             }
         }
         return obj;

@@ -13,7 +13,7 @@ public class FieldConverterImp<T>  implements Converter<T> {
 
     @Override
     public T convertToFieldValue(String cellValue) {
-        throw new UnsupportedOperationException("Not supported operation. cannot convert to field value, use Converter interface to support both conversions");
+        throw new UnsupportedOperationException("Unsupported operation. cannot convert to field value, use cellConverter instead or Converter to support both conversions");
     }
 
     @Override

@@ -27,19 +27,21 @@ public class ReflectionHelper<T> {
         this.setFieldsAndTitles();
     }
 
-    public ReflectionHelper(Class<T> type, ColumnDefinition[] columnsDefinitions) {
+    public ReflectionHelper(Class<T> type, ColumnDefinition<?>[] columnsDefinitions) {
         classType = type;
         defaultConstructor = getDefaultConstructor();
         Arrays.sort(columnsDefinitions,Comparator.comparing(ColumnDefinition::getColumnIndex));
-        for (ColumnDefinition op : columnsDefinitions) {
+        for (var cd : columnsDefinitions) {
             try {
-                Field field = type.getDeclaredField(op.getFieldName());
-                if (op.getConverter() == null)
-                    op.setConverter(this.getDefaultConverter(field));
-                fields.add(new ReflectedField<>(field, op.getConverter(), op.getColumnIndex()));
-                headers.add(op.getTitle());
+                Field field = type.getDeclaredField(cd.getFieldName());
+                if (cd.getConverter() == null)
+                    cd.setConverter(this.getDefaultConverter(field),field.getType());
+                if(!cd.getClassType().equals(field.getType()))
+                    throw new ReflectionException(String.format("The converter of the field %s is not compatible with its type %s",cd.getFieldName(),field.getType().getSimpleName()));
+                fields.add(new ReflectedField<>(field, cd.getConverter(), cd.getColumnIndex()));
+                headers.add(cd.getTitle());
             } catch (NoSuchFieldException e) {
-                throw new ReflectionException("the specified field name '" + op.getFieldName() + "' is not found in the class '"+classType.getSimpleName()+"'");
+                throw new ReflectionException("the specified field name '" + cd.getFieldName() + "' is not found in the class '"+classType.getSimpleName()+"'");
             }
         }
     }
@@ -128,9 +130,6 @@ public class ReflectionHelper<T> {
         }
         if (field.getType().equals(Double.class) || field.getType().equals(double.class)) {
             return new DoubleConverter();
-        }
-        if (field.getType().equals(Short.class) || field.getType().equals(short.class)) {
-            return new ShortConverter();
         }
         return null;
     }
